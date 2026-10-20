@@ -1,6 +1,6 @@
 {
-  "versionCode": 9,
-  "versionName": "1.8",
+  "versionCode": 10,
+  "versionName": "1.9",
   "apk": "MisPagos.apk",
-  "notas": "Las píldoras automáticas se ordenan por su lugar en la pantalla (arriba-izquierda = pago más próximo)"
+  "notas": "Los pagos pagados conservan su lugar por fecha (ya no se van al final)"
 }
