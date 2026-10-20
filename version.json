@@ -1,6 +1,6 @@
 {
-  "versionCode": 6,
-  "versionName": "1.5",
+  "versionCode": 7,
+  "versionName": "1.6",
   "apk": "MisPagos.apk",
-  "notas": "Repositorio ya configurado y sección de actualizaciones al inicio de Ajustes"
+  "notas": "Botón en Ajustes para acomodar todas las píldoras por fecha"
 }
