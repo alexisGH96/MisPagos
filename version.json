@@ -1,6 +1,6 @@
 {
-  "versionCode": 11,
-  "versionName": "2.0",
+  "versionCode": 12,
+  "versionName": "2.1",
   "apk": "MisPagos.apk",
-  "notas": "Las píldoras nuevas piden un toque para ajustar vidrio y lugar"
+  "notas": "Detecta cuando mueves una píldora y la reajusta con el primer toque; botón para reajustar todas"
 }
