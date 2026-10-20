@@ -1,6 +1,6 @@
 {
-  "versionCode": 8,
-  "versionName": "1.7",
+  "versionCode": 9,
+  "versionName": "1.8",
   "apk": "MisPagos.apk",
-  "notas": "Agregar widgets a la pantalla de inicio desde la app (menú ⋮, Ajustes o manteniendo presionado un pago)"
+  "notas": "Las píldoras automáticas se ordenan por su lugar en la pantalla (arriba-izquierda = pago más próximo)"
 }
