@@ -1,6 +1,6 @@
 {
-  "versionCode": 14,
-  "versionName": "2.3",
+  "versionCode": 15,
+  "versionName": "2.4",
   "apk": "MisPagos.apk",
-  "notas": "Nuevo diseño de píldora: anillo de progreso con los días y fecha de vencimiento en color"
+  "notas": "Nuevo diseño de la app: fondo de pantalla desenfocado, pagos en píldoras de vidrio con anillo (tócalo para marcar pagado)"
 }
