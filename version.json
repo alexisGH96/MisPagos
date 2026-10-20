@@ -1,6 +1,6 @@
 {
-  "versionCode": 13,
-  "versionName": "2.2",
+  "versionCode": 14,
+  "versionName": "2.3",
   "apk": "MisPagos.apk",
-  "notas": "Píldoras de vidrio con una bolita de color abajo a la derecha para el estado"
+  "notas": "Nuevo diseño de píldora: anillo de progreso con los días y fecha de vencimiento en color"
 }
