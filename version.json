@@ -1,6 +1,6 @@
 {
-  "versionCode": 7,
-  "versionName": "1.6",
+  "versionCode": 8,
+  "versionName": "1.7",
   "apk": "MisPagos.apk",
-  "notas": "Botón en Ajustes para acomodar todas las píldoras por fecha"
+  "notas": "Agregar widgets a la pantalla de inicio desde la app (menú ⋮, Ajustes o manteniendo presionado un pago)"
 }
