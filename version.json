@@ -1,6 +1,6 @@
 {
-  "versionCode": 12,
-  "versionName": "2.1",
+  "versionCode": 13,
+  "versionName": "2.2",
   "apk": "MisPagos.apk",
-  "notas": "Detecta cuando mueves una píldora y la reajusta con el primer toque; botón para reajustar todas"
+  "notas": "Píldoras de vidrio con una bolita de color abajo a la derecha para el estado"
 }
