@@ -1,6 +1,6 @@
 {
-  "versionCode": 5,
-  "versionName": "1.4",
+  "versionCode": 6,
+  "versionName": "1.5",
   "apk": "MisPagos.apk",
-  "notas": "Buscar actualización desde Ajustes"
+  "notas": "Repositorio ya configurado y sección de actualizaciones al inicio de Ajustes"
 }
