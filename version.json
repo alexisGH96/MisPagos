@@ -1,6 +1,6 @@
 {
-  "versionCode": 10,
-  "versionName": "1.9",
+  "versionCode": 11,
+  "versionName": "2.0",
   "apk": "MisPagos.apk",
-  "notas": "Los pagos pagados conservan su lugar por fecha (ya no se van al final)"
+  "notas": "Las píldoras nuevas piden un toque para ajustar vidrio y lugar"
 }
