@@ -1,6 +1,6 @@
 {
-  "versionCode": 15,
-  "versionName": "2.4",
+  "versionCode": 16,
+  "versionName": "3.0",
   "apk": "MisPagos.apk",
-  "notas": "Nuevo diseño de la app: fondo de pantalla desenfocado, pagos en píldoras de vidrio con anillo (tócalo para marcar pagado)"
+  "notas": "Diseño nuevo: pestañas Inicio, Calendario, Quincenas/Tarjetas, Estadísticas y Ajustes. Modos claro, oscuro y glass. Detalle con abrir app, datos para copiar, recibo variable, pago compartido, comprobantes e historial."
 }
