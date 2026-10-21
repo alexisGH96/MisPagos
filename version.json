@@ -1,6 +1,6 @@
 {
-  "versionCode": 21,
-  "versionName": "3.5",
+  "versionCode": 22,
+  "versionName": "3.6",
   "apk": "MisPagos.apk",
-  "notas": "Glass de día y de noche (sigue a tu celular) con tarjetas de cristal. Barra de vidrio más transparente. Nuevo ícono de perfil. Barra de Claro 2 igual a las demás."
+  "notas": "Animaciones suaves: la pastilla de la barra se desliza como vidrio líquido y las pestañas cambian con transición."
 }
