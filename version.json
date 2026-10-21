@@ -1,6 +1,6 @@
 {
-  "versionCode": 16,
-  "versionName": "3.0",
+  "versionCode": 17,
+  "versionName": "3.1",
   "apk": "MisPagos.apk",
-  "notas": "Diseño nuevo: pestañas Inicio, Calendario, Quincenas/Tarjetas, Estadísticas y Ajustes. Modos claro, oscuro y glass. Detalle con abrir app, datos para copiar, recibo variable, pago compartido, comprobantes e historial."
+  "notas": "Nuevo modo Claro 2 (azul marino con barra con nombres). Anillo de estado en las tarjetas. Colores más suaves en todos los modos."
 }
