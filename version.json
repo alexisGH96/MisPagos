@@ -1,6 +1,6 @@
 {
-  "versionCode": 25,
-  "versionName": "3.9",
+  "versionCode": 26,
+  "versionName": "4.0",
   "apk": "MisPagos.apk",
-  "notas": "Vibración más fuerte en la barra de navegación y en la ruleta de Próximos."
+  "notas": "Vibración un poco más suave. El diseño azul marino ahora es Claro 1 y es el que usa Auto de día."
 }
