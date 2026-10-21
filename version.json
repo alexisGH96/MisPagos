@@ -1,6 +1,6 @@
 {
-  "versionCode": 19,
-  "versionName": "3.3",
+  "versionCode": 20,
+  "versionName": "3.4",
   "apk": "MisPagos.apk",
-  "notas": "La alarma suena con la pantalla apagada y enciende la pantalla. Pantalla de alarma con el diseño elegido. Glass: fondo como antes y barra de vidrio líquido con desenfoque real."
+  "notas": "Canal de actualizaciones fijo. Las instalaciones nuevas empiezan vacías y piden el nombre."
 }
