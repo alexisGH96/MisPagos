@@ -1,6 +1,6 @@
 {
-  "versionCode": 32,
-  "versionName": "4.6",
+  "versionCode": 33,
+  "versionName": "4.7",
   "apk": "MisPagos.apk",
-  "notas": "La píldora del aviso en vivo vuelve a tener el color del estado y muestra los días y el monto (ej. 1 día · $549)."
+  "notas": "Aviso el día de corte para actualizar el monto a pagar. Ahora puedes elegir si es tarjeta de crédito o crédito departamental."
 }
