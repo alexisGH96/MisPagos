@@ -1,6 +1,6 @@
 {
-  "versionCode": 29,
-  "versionName": "4.3",
+  "versionCode": 30,
+  "versionName": "4.4",
   "apk": "MisPagos.apk",
-  "notas": "Aviso en vivo con ícono de la app de pago, anillo de días o ícono de Mis Pagos (eliges en Ajustes) y color según qué tan cerca vence."
+  "notas": "Prueba: píldora del aviso en vivo sin color, con el ícono de la app de pago dentro del anillo del color del estado."
 }
