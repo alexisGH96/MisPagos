@@ -1,6 +1,6 @@
 {
-  "versionCode": 22,
-  "versionName": "3.6",
+  "versionCode": 23,
+  "versionName": "3.7",
   "apk": "MisPagos.apk",
-  "notas": "Animaciones suaves: la pastilla de la barra se desliza como vidrio líquido y las pestañas cambian con transición."
+  "notas": "Corrige la alarma con la pantalla apagada: el celular se mantiene despierto hasta que empieza a sonar."
 }
