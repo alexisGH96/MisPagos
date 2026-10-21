@@ -1,6 +1,6 @@
 {
-  "versionCode": 34,
-  "versionName": "4.8",
+  "versionCode": 35,
+  "versionName": "4.9",
   "apk": "MisPagos.apk",
-  "notas": "Detalle con barra flotante (Atrás/Editar) y regreso animado a tu tarjeta. Imagen de tus tarjetas. Gráfica de pastel. Nueva sección Ahorros en Estadísticas."
+  "notas": "Barra del detalle más compacta (solo íconos). La imagen de la tarjeta ahora va pequeña dentro de la tarjeta del pago."
 }
