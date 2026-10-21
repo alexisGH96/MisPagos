@@ -1,6 +1,6 @@
 {
-  "versionCode": 33,
-  "versionName": "4.7",
+  "versionCode": 34,
+  "versionName": "4.8",
   "apk": "MisPagos.apk",
-  "notas": "Aviso el día de corte para actualizar el monto a pagar. Ahora puedes elegir si es tarjeta de crédito o crédito departamental."
+  "notas": "Detalle con barra flotante (Atrás/Editar) y regreso animado a tu tarjeta. Imagen de tus tarjetas. Gráfica de pastel. Nueva sección Ahorros en Estadísticas."
 }
