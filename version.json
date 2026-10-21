@@ -1,6 +1,6 @@
 {
-  "versionCode": 27,
-  "versionName": "4.1",
+  "versionCode": 28,
+  "versionName": "4.2",
   "apk": "MisPagos.apk",
-  "notas": "Nuevo ícono: anillo de progreso con calendario."
+  "notas": "Prueba: aviso en vivo en el Now Bar de la pantalla de bloqueo para pagos que vencen hoy o mañana (Android 16+)."
 }
