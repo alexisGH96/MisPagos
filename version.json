@@ -1,6 +1,6 @@
 {
-  "versionCode": 36,
-  "versionName": "5.0",
+  "versionCode": 37,
+  "versionName": "5.1",
   "apk": "MisPagos.apk",
-  "notas": "Íconos de las apps sin recuadro blanco y con sombra. Barra del detalle a la derecha. Avisos con el ícono de la app a pagar."
+  "notas": "Nueva gráfica de pastel con sectores separados y porcentajes. Ahora te avisamos con una notificación cuando hay una versión nueva."
 }
