@@ -1,6 +1,6 @@
 {
-  "versionCode": 28,
-  "versionName": "4.2",
+  "versionCode": 29,
+  "versionName": "4.3",
   "apk": "MisPagos.apk",
-  "notas": "Prueba: aviso en vivo en el Now Bar de la pantalla de bloqueo para pagos que vencen hoy o mañana (Android 16+)."
+  "notas": "Aviso en vivo con ícono de la app de pago, anillo de días o ícono de Mis Pagos (eliges en Ajustes) y color según qué tan cerca vence."
 }
