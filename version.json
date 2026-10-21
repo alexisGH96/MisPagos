@@ -1,6 +1,6 @@
 {
-  "versionCode": 24,
-  "versionName": "3.8",
+  "versionCode": 25,
+  "versionName": "3.9",
   "apk": "MisPagos.apk",
-  "notas": "Tarjetas de cristal con el mismo bisel que la barra. Vibración al tocar la barra y vibración de ruleta al deslizar Próximos."
+  "notas": "Vibración más fuerte en la barra de navegación y en la ruleta de Próximos."
 }
