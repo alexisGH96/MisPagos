@@ -1,6 +1,6 @@
 {
-  "versionCode": 37,
-  "versionName": "5.1",
+  "versionCode": 38,
+  "versionName": "5.2",
   "apk": "MisPagos.apk",
-  "notas": "Nueva gráfica de pastel con sectores separados y porcentajes. Ahora te avisamos con una notificación cuando hay una versión nueva."
+  "notas": "Gráfica de pastel rediseñada: más compacta y con todos los porcentajes visibles."
 }
