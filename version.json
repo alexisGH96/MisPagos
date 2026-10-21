@@ -1,6 +1,6 @@
 {
-  "versionCode": 23,
-  "versionName": "3.7",
+  "versionCode": 24,
+  "versionName": "3.8",
   "apk": "MisPagos.apk",
-  "notas": "Corrige la alarma con la pantalla apagada: el celular se mantiene despierto hasta que empieza a sonar."
+  "notas": "Tarjetas de cristal con el mismo bisel que la barra. Vibración al tocar la barra y vibración de ruleta al deslizar Próximos."
 }
