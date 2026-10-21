@@ -1,6 +1,6 @@
 {
-  "versionCode": 31,
-  "versionName": "4.5",
+  "versionCode": 32,
+  "versionName": "4.6",
   "apk": "MisPagos.apk",
-  "notas": "Nuevas categorías: Renta / vivienda y Streaming, con su ícono y en Estadísticas."
+  "notas": "La píldora del aviso en vivo vuelve a tener el color del estado y muestra los días y el monto (ej. 1 día · $549)."
 }
