@@ -1,6 +1,6 @@
 {
-  "versionCode": 18,
-  "versionName": "3.2",
+  "versionCode": 19,
+  "versionName": "3.3",
   "apk": "MisPagos.apk",
-  "notas": "Vincula solo la app de cada pago por su nombre. Buscador con lupa y app sugerida al elegir la app."
+  "notas": "La alarma suena con la pantalla apagada y enciende la pantalla. Pantalla de alarma con el diseño elegido. Glass: fondo como antes y barra de vidrio líquido con desenfoque real."
 }
