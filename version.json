@@ -1,6 +1,6 @@
 {
-  "versionCode": 17,
-  "versionName": "3.1",
+  "versionCode": 18,
+  "versionName": "3.2",
   "apk": "MisPagos.apk",
-  "notas": "Nuevo modo Claro 2 (azul marino con barra con nombres). Anillo de estado en las tarjetas. Colores más suaves en todos los modos."
+  "notas": "Vincula solo la app de cada pago por su nombre. Buscador con lupa y app sugerida al elegir la app."
 }
