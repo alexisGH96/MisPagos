@@ -1,6 +1,6 @@
 {
-  "versionCode": 35,
-  "versionName": "4.9",
+  "versionCode": 36,
+  "versionName": "5.0",
   "apk": "MisPagos.apk",
-  "notas": "Barra del detalle más compacta (solo íconos). La imagen de la tarjeta ahora va pequeña dentro de la tarjeta del pago."
+  "notas": "Íconos de las apps sin recuadro blanco y con sombra. Barra del detalle a la derecha. Avisos con el ícono de la app a pagar."
 }
