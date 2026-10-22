@@ -119,8 +119,13 @@ input,select{width:100%;font:inherit;color:var(--fg);background:var(--surf);bord
 .regla i{position:absolute;inset:0 auto 0 0;border-radius:10px}
 .regla s{position:absolute;top:0;bottom:0;width:2px;background:var(--fg)}
 /* la dona aparece girando y creciendo, y luego los porcentajes */
-.pastel path[fill]:not([fill=none]){transform-box:view-box;transform-origin:50% 50%;animation:pastelEntra .8s cubic-bezier(.2,.8,.2,1) both}
-.pastel path[fill=none],.pastel circle,.pastel text{animation:pastelTexto .4s .7s both}
+.pastel path[fill]:not([fill=none]){transform-box:view-box;transform-origin:50% 50%;opacity:0}
+.pastel path[fill=none],.pastel circle,.pastel text{opacity:0}
+.pastel.ver path[fill]:not([fill=none]){animation:pastelEntra .8s cubic-bezier(.2,.8,.2,1) both}
+.pastel.ver path[fill=none],.pastel.ver circle,.pastel.ver text{animation:pastelTexto .4s .7s both}
+.barras .b{transform:scaleY(0);transform-origin:bottom}
+.barras.ver .b{animation:crece .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes crece{to{transform:none}}
 @keyframes pastelEntra{from{transform:rotate(-70deg) scale(.6);opacity:0}to{transform:none;opacity:1}}
 @keyframes pastelTexto{from{opacity:0}to{opacity:1}}
 /* ---- Glass: cristal sobre manchas de color, de día claro y de noche oscuro ---- */
@@ -131,7 +136,8 @@ input,select{width:100%;font:inherit;color:var(--fg);background:var(--surf);bord
   --t-nar:rgba(255,255,255,.13); --t-ama:rgba(255,255,255,.13); --t-ver:rgba(255,255,255,.13); --t-azu:rgba(255,255,255,.13); --t-roj:rgba(255,255,255,.13); --tile:rgba(255,255,255,.14); color-scheme:dark}
 :root[data-tema="glassn"] body{background:radial-gradient(40% 35% at 18% 15%, #9646E6 0, transparent 70%), radial-gradient(40% 35% at 85% 30%, #F05A96 0, transparent 70%), radial-gradient(45% 40% at 25% 75%, #3278FA 0, transparent 70%), radial-gradient(40% 35% at 85% 85%, #FF963C 0, transparent 70%), var(--bg);background-attachment:fixed}
 /* Glass (opción A): fondo nítido y cada tarjeta lo desenfoca poco, como la barra */
-:root[data-tema="glass"] body{background:#C9D2F5 var(--fondoGlass, url(fondo-glass-2.jpg)) center/cover fixed}
+:root[data-tema="glass"] body{background:transparent} :root[data-tema="glass"]{background:#C9D2F5}
+#fondoGlass{display:none} :root[data-tema="glass"] #fondoGlass{display:block;position:fixed;inset:-40px;z-index:-1;background:var(--fondoGlass, url(fondo-glass-2.jpg)) center/cover;filter:blur(26px) saturate(1.2)}
 /* Glass blanco: blanco con toques de color */
 :root[data-tema="glassb"]{--bg:#FFFFFF; --fg:#12121C; --gr:#5A5A6E; --surf:rgba(255,255,255,.16); --line:rgba(0,0,0,.08); --acc:#12121C; --accTxt:#fff; --nav:rgba(255,255,255,.3); --pill:#F9DED4; --icoSel:#963C1E; --ico:#28283A;
   --t-nar:rgba(255,255,255,.16); --t-ama:rgba(255,255,255,.16); --t-ver:rgba(255,255,255,.16); --t-azu:rgba(255,255,255,.16); --t-roj:rgba(255,255,255,.16); --tile:rgba(255,255,255,.8); --hero1:rgba(255,255,255,.16); --hero2:rgba(255,255,255,.16); --heroTxt:#12121C}
@@ -156,6 +162,7 @@ html,body{overscroll-behavior-y:contain}
 </style>
 </head>
 <body>
+<div id="fondoGlass"></div>
 <main id="app"></main>
 <nav id="nav" aria-label="Secciones"></nav>
 <div id="capa"></div>
@@ -387,8 +394,8 @@ function estadisticas(){
   for(let k = 5; k >= 0; k--){ const d = new Date(h0.getFullYear(), h0.getMonth()-k, 1); meses.push({y:d.getFullYear(), m:d.getMonth(), v:0}); }
   D.pagos.forEach(p => (p.hist||[]).forEach(r => { const f = fecha(r.f); const x = meses.find(z => z.y === f.getFullYear() && z.m === f.getMonth()); if(x) x.v += num(r.m); }));
   const mx = Math.max(1, ...meses.map(z => z.v));
-  h += `<div class="caja"><div class="fila"><span class="b peso">Pagado por mes</span><span class="gris chico">${h0.getFullYear()}</span></div><div style="display:flex;align-items:flex-end;gap:10px;height:150px;margin-top:14px">`;
-  meses.forEach((z,i) => { const act = i === 5; h += `<div style="flex:1;text-align:center"><div class="gris" style="font-size:10px;height:14px">${z.v ? '$' + (z.v >= 1000 ? (z.v/1000).toFixed(1) + 'k' : Math.round(z.v)) : ''}</div><div style="height:${Math.max(4, z.v/mx*110)}px;border-radius:10px;background:${act ? 'var(--r-nar)' : 'var(--fg)'};opacity:${z.v ? 1 : .15};margin:0 auto;width:60%"></div><div class="${act ? 'b' : 'gris'} chico" style="margin-top:6px">${MESES[z.m]}</div></div>`; });
+  h += `<div class="caja"><div class="fila"><span class="b peso">Pagado por mes</span><span class="gris chico">${h0.getFullYear()}</span></div><div class="barras" style="display:flex;align-items:flex-end;gap:10px;height:150px;margin-top:14px">`;
+  meses.forEach((z,i) => { const act = i === 5; h += `<div style="flex:1;text-align:center"><div class="gris" style="font-size:10px;height:14px">${z.v ? '$' + (z.v >= 1000 ? (z.v/1000).toFixed(1) + 'k' : Math.round(z.v)) : ''}</div><div class="b" style="animation-delay:${i*60}ms;height:${Math.max(4, z.v/mx*110)}px;border-radius:10px;background:${act ? 'var(--r-nar)' : 'var(--fg)'};opacity:${z.v ? 1 : .15};margin:0 auto;width:60%"></div><div class="${act ? 'b' : 'gris'} chico" style="margin-top:6px">${MESES[z.m]}</div></div>`; });
   h += `</div></div>`;
   const tipos = ['Tarjetas','Vivienda','Servicios','Streaming','Tiendas','Otros'];
   const cols = ['var(--r-nar)','var(--r-roj)','var(--r-ama)','#8B6CE0','var(--r-azu)','var(--r-ver)'];
@@ -776,6 +783,9 @@ function pintar(anim){
   const app = document.getElementById('app');
   app.innerHTML = [inicio, calendario, carteraV, estadisticas, ajustes][tab]();
   if(anim && !matchMedia('(prefers-reduced-motion: reduce)').matches) app.animate([{opacity:0, transform:'translateY(8px)'}, {opacity:1, transform:'none'}], {duration:260, easing:'cubic-bezier(.2,.8,.2,1)'});
+  // las gráficas se animan cuando aparecen en pantalla
+  const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ e.target.classList.add('ver'); obs.unobserve(e.target); } }), {threshold:.35});
+  app.querySelectorAll('.pastel, .barras').forEach(g => obs.observe(g));
   const n = [['inicio','Inicio'],['cal','Calendario'],['cartera','Quincenas y tarjetas'],['stats','Estadísticas'],['perfil','Ajustes']];
   document.getElementById('nav').innerHTML = n.map(([k,t],i) => `<button class="${i===tab?'sel':''}" data-act="tab" data-n="${i}" aria-label="${t}" ${i===tab?'aria-current="page"':''}>${IC[k]}</button>`).join('');
 }
