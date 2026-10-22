@@ -131,8 +131,11 @@ input,select{width:100%;font:inherit;color:var(--fg);background:var(--surf);bord
   --t-nar:rgba(255,255,255,.13); --t-ama:rgba(255,255,255,.13); --t-ver:rgba(255,255,255,.13); --t-azu:rgba(255,255,255,.13); --t-roj:rgba(255,255,255,.13); --tile:rgba(255,255,255,.14); color-scheme:dark}
 :root[data-tema^="glass"] body{background:radial-gradient(40% 35% at 18% 15%, #9646E6 0, transparent 70%), radial-gradient(40% 35% at 85% 30%, #F05A96 0, transparent 70%), radial-gradient(45% 40% at 25% 75%, #3278FA 0, transparent 70%), radial-gradient(40% 35% at 85% 85%, #FF963C 0, transparent 70%), var(--bg);background-attachment:fixed}
 :root[data-tema="glass"] body{background-color:#C9D2F5}
-:root[data-tema^="glass"] .caja,:root[data-tema^="glass"] .pago,:root[data-tema^="glass"] .pc,:root[data-tema^="glass"] nav,:root[data-tema^="glass"] .seg,:root[data-tema^="glass"] .hero,:root[data-tema^="glass"] .hoja,:root[data-tema^="glass"] input,:root[data-tema^="glass"] select{
-  -webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 10px 30px rgba(0,0,0,.12)}
+:root[data-tema^="glass"] .caja,:root[data-tema^="glass"] .pago,:root[data-tema^="glass"] .pc,:root[data-tema^="glass"] .seg,:root[data-tema^="glass"] .hero,:root[data-tema^="glass"] .hoja,:root[data-tema^="glass"] input,:root[data-tema^="glass"] select{
+  -webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);border:.5px solid rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+:root[data-tema="glassn"] .caja,:root[data-tema="glassn"] .pago,:root[data-tema="glassn"] .pc,:root[data-tema="glassn"] .seg,:root[data-tema="glassn"] .hero{border-color:rgba(255,255,255,.1)}
+:root[data-tema^="glass"] nav{-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 10px 30px rgba(0,0,0,.12)}
+:root[data-tema^="glass"] .dato{border-bottom-color:rgba(255,255,255,.18)}
 :root[data-tema^="glass"] .hoja{background:color-mix(in srgb, var(--bg) 70%, transparent)}
 :root[data-tema^="glass"] .barra{background:rgba(255,255,255,.35)} :root[data-tema^="glass"] .barra i{background:var(--fg)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
