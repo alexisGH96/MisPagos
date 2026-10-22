@@ -1,6 +1,6 @@
 {
-  "versionCode": 43,
-  "versionName": "5.7",
+  "versionCode": 44,
+  "versionName": "5.8",
   "apk": "MisPagos.apk",
-  "notas": "Jala hacia abajo en cualquier pantalla para sincronizar. Sincronizar ahora siempre visible en Cuenta."
+  "notas": "Nueva pestaña Mi perfil con portada y foto, datos personales y ajustes agrupados. Ahorros ahora con gráficas de pastel."
 }
