@@ -451,7 +451,7 @@ function ajustes(){
     <div class="gris chico b" style="margin:22px 8px 8px">Apariencia</div><div class="caja">${[temas.slice(0,3), temas.slice(3)].map((fila,f) => `<div class="seg" style="margin:${f ? '8px' : '0'} 0 0">${fila.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div>`).join('')}<p class="gris chico" style="margin-bottom:0">Glass sigue al sistema (de noche es oscuro). Glass blanco es blanco con toques de color.</p></div>
     ${grupo('Fondo del modo Glass', [['Tu imagen de fondo', D.fondoGlass ? 'Tu foto' : 'Predeterminado', 'fondoGlass']])}
     ${grupo('Perfil', [['Fondo del perfil', D.perfilFondo === -1 ? 'Foto' : FONDOS[D.perfilFondo == null ? 1 : D.perfilFondo][0], 'fondo']])}
-    ${grupo('Tus datos', [['Guardar respaldo', 'archivo', 'exportar'], ['Cargar respaldo', 'archivo', 'importar']])}
+    ${grupo('Tus datos', [['Respaldo en la nube', D.respaldoNube ? 'Guardado' : 'Guardar', 'respNube'], ['Guardar respaldo en archivo', 'archivo', 'exportar'], ['Cargar respaldo de archivo', 'archivo', 'importar']])}
     <input type="file" id="imp" accept="application/json" data-act="importar" hidden>
     <div class="gris chico b" style="margin:22px 8px 8px">Acerca de</div><div class="caja"><p class="chico" style="margin-top:0"><b>Ponla en tu iPhone como app:</b> en Safari toca Compartir y luego "Agregar a pantalla de inicio".</p><p class="gris chico" style="margin-bottom:0">Los avisos llegan cada mañana a las 9:00 (necesitas cuenta y activarlos en "Avisos"). El iPhone no permite que una web vibre por su cuenta. Tus pagos se guardan en este navegador; usa "Guardar respaldo" de vez en cuando.</p></div>`;
 }
@@ -714,6 +714,19 @@ document.addEventListener('click', (ev) => {
     case 'nombre': { const v = prompt('¿Cómo te llamas?', D.nombre); if(v !== null){ D.nombre = v.trim(); guardar(); pintar(); } break; }
     case 'quincena': { const v = prompt('¿Qué día es tu primera quincena?', D.quincena||15); if(v){ D.quincena = Math.max(1, Math.min(28, parseInt(v)||15)); guardar(); pintar(); } break; }
     case 'personas': hojaPersonas(); break;
+    case 'respNube':
+      if(!D.nube || !D.nube.refresh){ alert('Inicia sesión en Mi perfil → Cuenta y pagos compartidos para guardar tu respaldo en la nube.'); break; }
+      abrirHoja(`<h1>Respaldo en la nube</h1><p class="gris">Se guarda en tu cuenta (${esc(D.nube.correo)}); solo tú puedes verlo.${D.respaldoNube ? '<br>Último respaldo: ' + new Date(D.respaldoNube).toLocaleString('es-MX') : ''}</p>
+        <button class="btn lleno" data-act="respGuardar">Guardar ahora</button><button class="btn borde" style="margin-top:10px" data-act="respRecuperar">Recuperar mi respaldo</button><button class="btn borde" style="margin-top:10px" data-act="cerrar">Cerrar</button>`); break;
+    case 'respGuardar': cerrarHoja(); tarea(async () => {
+      const copia = Object.assign({}, D); delete copia.nube; const ahora = Date.now();
+      await pedir('PATCH', DOCS + '/avisos/' + D.nube.uid + '?updateMask.fieldPaths=respaldoWeb&updateMask.fieldPaths=respaldoWebFecha', {fields:{respaldoWeb:sv(JSON.stringify(copia)), respaldoWebFecha:iv(ahora)}}, await token());
+      D.respaldoNube = ahora; guardar(); return 'Respaldo guardado en tu cuenta.'; }); break;
+    case 'respRecuperar': cerrarHoja(); tarea(async () => {
+      let r; try{ r = await pedir('GET', DOCS + '/avisos/' + D.nube.uid, null, await token()); }catch(e){ if(/not found/i.test(e.message)) return 'Todavía no tienes un respaldo en la nube.'; throw e; }
+      const t = r.fields && r.fields.respaldoWeb && r.fields.respaldoWeb.stringValue; if(!t) return 'Todavía no tienes un respaldo en la nube.';
+      if(!confirm('Se reemplazan tus pagos y ajustes actuales por los del respaldo. ¿Continuar?')) return '';
+      const nube = D.nube; D = JSON.parse(t); D.nube = nube; guardar(); aplicarTema(); return 'Respaldo recuperado.'; }); break;
     case 'fondo': hojaFondo(); break;
     case 'fondoGlass':
       if(D.fondoGlass && confirm('¿Volver al fondo predeterminado de Glass? (Cancelar para elegir otra imagen)')){ delete D.fondoGlass; guardar(); aplicarTema(); pintar(); break; }
