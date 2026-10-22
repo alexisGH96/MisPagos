@@ -1,6 +1,6 @@
 {
-  "versionCode": 45,
-  "versionName": "5.9",
+  "versionCode": 46,
+  "versionName": "6.0",
   "apk": "MisPagos.apk",
-  "notas": "Fondos de perfil nuevos (Atardecer, Noche, Aurora, Bokeh, Geométrico, Cristal). Gráficas con líneas rectas y flecha al porcentaje."
+  "notas": "Modo Glass: tarjetas de cristal sin contorno blanco, como el panel de Samsung."
 }
