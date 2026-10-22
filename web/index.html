@@ -131,7 +131,7 @@ input,select{width:100%;font:inherit;color:var(--fg);background:var(--surf);bord
   --t-nar:rgba(255,255,255,.13); --t-ama:rgba(255,255,255,.13); --t-ver:rgba(255,255,255,.13); --t-azu:rgba(255,255,255,.13); --t-roj:rgba(255,255,255,.13); --tile:rgba(255,255,255,.14); color-scheme:dark}
 :root[data-tema="glassn"] body{background:radial-gradient(40% 35% at 18% 15%, #9646E6 0, transparent 70%), radial-gradient(40% 35% at 85% 30%, #F05A96 0, transparent 70%), radial-gradient(45% 40% at 25% 75%, #3278FA 0, transparent 70%), radial-gradient(40% 35% at 85% 85%, #FF963C 0, transparent 70%), var(--bg);background-attachment:fixed}
 /* Glass (opción A): fondo nítido y cada tarjeta lo desenfoca poco, como la barra */
-:root[data-tema="glass"] body{background:#C9D2F5 url(fondo-glass.jpg) center/cover fixed}
+:root[data-tema="glass"] body{background:#C9D2F5 var(--fondoGlass, url(fondo-glass.jpg)) center/cover fixed}
 /* Glass blanco: blanco con toques de color */
 :root[data-tema="glassb"]{--bg:#FFFFFF; --fg:#12121C; --gr:#5A5A6E; --surf:rgba(255,255,255,.16); --line:rgba(0,0,0,.08); --acc:#12121C; --accTxt:#fff; --nav:rgba(255,255,255,.3); --pill:#F9DED4; --icoSel:#963C1E; --ico:#28283A;
   --t-nar:rgba(255,255,255,.16); --t-ama:rgba(255,255,255,.16); --t-ver:rgba(255,255,255,.16); --t-azu:rgba(255,255,255,.16); --t-roj:rgba(255,255,255,.16); --tile:rgba(255,255,255,.8); --hero1:rgba(255,255,255,.16); --hero2:rgba(255,255,255,.16); --heroTxt:#12121C}
@@ -146,6 +146,12 @@ input,select{width:100%;font:inherit;color:var(--fg);background:var(--surf);bord
 :root[data-tema^="glass"] .dato{border-bottom-color:rgba(255,255,255,.18)}
 :root[data-tema^="glass"] .hoja{background:color-mix(in srgb, var(--bg) 70%, transparent)}
 :root[data-tema^="glass"] .barra{background:rgba(255,255,255,.35)} :root[data-tema^="glass"] .barra i{background:var(--fg)}
+#jalar{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 8px);width:42px;height:42px;margin-left:-21px;border-radius:50%;background:var(--surf);color:var(--r-nar);box-shadow:var(--sombra);display:grid;place-items:center;opacity:0;transform:translateY(-60px);z-index:30;pointer-events:none;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+:root[data-tema="claro1"] #jalar{color:var(--acc)} #jalar svg{width:24px;height:24px} #jalar .ok{display:none}
+#jalar.girando svg{animation:girar .8s linear infinite} #jalar.hecho .fl{display:none} #jalar.hecho .ok{display:block} #jalar.hecho svg{animation:none}
+#jalar.vuelve{transition:transform .26s cubic-bezier(.2,.8,.2,1),opacity .26s}
+@keyframes girar{to{transform:rotate(360deg)}}
+html,body{overscroll-behavior-y:contain}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -154,6 +160,7 @@ input,select{width:100%;font:inherit;color:var(--fg);background:var(--surf);bord
 <nav id="nav" aria-label="Secciones"></nav>
 <div id="capa"></div>
 <div class="toast" id="toast" role="status"></div>
+<div id="jalar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path class="fl" d="M20 12a8 8 0 0 1-13.7 5.6M4 12a8 8 0 0 1 13.7-5.6"/><path class="fl" d="M17.7 2.8v3.8h-3.8M6.3 21.2v-3.8h3.8"/><path class="ok" d="M6 12.5l4 4 8-8"/></svg></div>
 <script>
 /* ===================== datos ===================== */
 const LS = 'mispagos.v1';
@@ -442,6 +449,7 @@ function ajustes(){
     ${grupo('Avisos', [['Avisos de pagos en este celular', D.avisos ? 'Activados' : 'Activar', 'avisos']])}
     ${grupo('Cuenta y personas', [['Cuenta y pagos compartidos', correo ? (D.nube.verif ? 'Conectada' : 'Sin verificar') : 'Sin cuenta', 'cuenta'], ['Personas con las que pagas', personas().length + ' personas', 'personas']])}
     <div class="gris chico b" style="margin:22px 8px 8px">Apariencia</div><div class="caja">${[temas.slice(0,3), temas.slice(3)].map((fila,f) => `<div class="seg" style="margin:${f ? '8px' : '0'} 0 0">${fila.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div>`).join('')}<p class="gris chico" style="margin-bottom:0">Glass sigue al sistema (de noche es oscuro). Glass blanco es blanco con toques de color.</p></div>
+    ${grupo('Fondo del modo Glass', [['Tu imagen de fondo', D.fondoGlass ? 'Tu foto' : 'Predeterminado', 'fondoGlass']])}
     ${grupo('Perfil', [['Fondo del perfil', D.perfilFondo === -1 ? 'Foto' : FONDOS[D.perfilFondo == null ? 1 : D.perfilFondo][0], 'fondo']])}
     ${grupo('Tus datos', [['Guardar respaldo', 'archivo', 'exportar'], ['Cargar respaldo', 'archivo', 'importar']])}
     <input type="file" id="imp" accept="application/json" data-act="importar" hidden>
@@ -707,6 +715,9 @@ document.addEventListener('click', (ev) => {
     case 'quincena': { const v = prompt('¿Qué día es tu primera quincena?', D.quincena||15); if(v){ D.quincena = Math.max(1, Math.min(28, parseInt(v)||15)); guardar(); pintar(); } break; }
     case 'personas': hojaPersonas(); break;
     case 'fondo': hojaFondo(); break;
+    case 'fondoGlass':
+      if(D.fondoGlass && confirm('¿Volver al fondo predeterminado de Glass? (Cancelar para elegir otra imagen)')){ delete D.fondoGlass; guardar(); aplicarTema(); pintar(); break; }
+      elegirImagen(f => reducir(f, 1400).then(u => { D.fondoGlass = u; if(!String(D.tema).startsWith('glass')) D.tema = 'glass'; guardar(); aplicarTema(); pintar(); aviso('✓ Tip: elige la misma imagen de tu fondo de pantalla'); }).catch(() => aviso('No pude usar esa imagen'))); break;
     case 'fondoSel': D.perfilFondo = +n; guardar(); cerrarHoja(); pintar(); break;
     case 'fondoFoto': cerrarHoja(); elegirImagen(f => reducir(f, 1200, 'portada').then(u => { D.fondoFoto = u; D.perfilFondo = -1; guardar(); pintar(); }).catch(() => aviso('No pude usar esa imagen'))); break;
     case 'foto':
@@ -743,6 +754,7 @@ function aplicarTema(){
   if(t === 'glass') t = noche ? 'glassn' : 'glass';
   if(t === 'glassb') t = 'glassb';
   document.documentElement.dataset.tema = t;
+  if(D.fondoGlass) document.documentElement.style.setProperty('--fondoGlass', `url(${D.fondoGlass})`); else document.documentElement.style.removeProperty('--fondoGlass');
   document.querySelector('meta[name=theme-color]').content = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
 }
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { aplicarTema(); pintar(); });
@@ -758,6 +770,32 @@ aplicarTema();
 if(!D.nombre && !D.pagos.length){ setTimeout(() => { const v = prompt('¡Bienvenido a Mis Pagos! ¿Cómo te llamas?'); if(v){ D.nombre = v.trim(); guardar(); pintar(); } }, 400); }
 pintar();
 if(D.nube && D.nube.refresh && D.nube.verif) sincronizar().then(pintar).catch(() => {});
+/* ---- jalar hacia abajo para sincronizar ---- */
+(() => {
+  const bola = document.getElementById('jalar'), app = document.getElementById('app'), UMBRAL = 80, MAX = 120;
+  let y0 = null, d = 0, ocupado = false;
+  const mover = (v, anim) => {
+    bola.classList.toggle('vuelve', !!anim); app.style.transition = anim ? 'transform .26s cubic-bezier(.2,.8,.2,1)' : 'none';
+    bola.style.transform = `translateY(${Math.min(v, MAX) - 60}px) rotate(${v * 2.2}deg)`; bola.style.opacity = Math.min(1, v / (UMBRAL * .6));
+    app.style.transform = v ? `translateY(${Math.min(v, MAX) * .35}px)` : '';
+  };
+  document.addEventListener('touchstart', e => { if(ocupado || window.scrollY > 0 || document.querySelector('.hoja')) { y0 = null; return; } y0 = e.touches[0].clientY; d = 0; }, {passive:true});
+  document.addEventListener('touchmove', e => {
+    if(y0 === null) return; const dy = e.touches[0].clientY - y0;
+    if(dy <= 0 || window.scrollY > 0){ if(d){ d = 0; mover(0, true); } return; }
+    e.preventDefault(); d = dy * .55; mover(d);
+  }, {passive:false});
+  document.addEventListener('touchend', () => {
+    if(y0 === null) return; y0 = null;
+    if(d < UMBRAL){ d = 0; mover(0, true); return; }
+    ocupado = true; mover(UMBRAL * .9, true); bola.classList.add('girando');
+    const trabajo = (D.nube && D.nube.refresh) ? sincronizar() : Promise.resolve('Actualizado. Para compartir pagos inicia sesión en Mi perfil → Cuenta.');
+    trabajo.then(r => r, e => e.message || 'No hay conexión').then(r => {
+      bola.classList.remove('girando'); bola.classList.add('hecho'); aviso(r); pintar();
+      setTimeout(() => { bola.classList.remove('hecho'); d = 0; mover(0, true); ocupado = false; }, 600);
+    });
+  });
+})();
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>
