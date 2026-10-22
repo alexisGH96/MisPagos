@@ -129,10 +129,18 @@ input,select{width:100%;font:inherit;color:var(--fg);background:var(--surf);bord
   --t-nar:rgba(255,255,255,.42); --t-ama:rgba(255,255,255,.42); --t-ver:rgba(255,255,255,.42); --t-azu:rgba(255,255,255,.42); --t-roj:rgba(255,255,255,.42)}
 :root[data-tema="glassn"]{--bg:#0E0C1C; --fg:#F5F5FC; --gr:#C4C3D8; --surf:rgba(255,255,255,.13); --line:rgba(255,255,255,.28); --acc:#F5F5FC; --accTxt:#0E0C1C; --nav:rgba(24,22,40,.35); --pill:rgba(255,255,255,.18); --icoSel:#FF8C6E; --ico:#E8E8F4;
   --t-nar:rgba(255,255,255,.13); --t-ama:rgba(255,255,255,.13); --t-ver:rgba(255,255,255,.13); --t-azu:rgba(255,255,255,.13); --t-roj:rgba(255,255,255,.13); --tile:rgba(255,255,255,.14); color-scheme:dark}
-:root[data-tema^="glass"] body{background:radial-gradient(40% 35% at 18% 15%, #9646E6 0, transparent 70%), radial-gradient(40% 35% at 85% 30%, #F05A96 0, transparent 70%), radial-gradient(45% 40% at 25% 75%, #3278FA 0, transparent 70%), radial-gradient(40% 35% at 85% 85%, #FF963C 0, transparent 70%), var(--bg);background-attachment:fixed}
-:root[data-tema="glass"] body{background-color:#C9D2F5}
+:root[data-tema="glassn"] body{background:radial-gradient(40% 35% at 18% 15%, #9646E6 0, transparent 70%), radial-gradient(40% 35% at 85% 30%, #F05A96 0, transparent 70%), radial-gradient(45% 40% at 25% 75%, #3278FA 0, transparent 70%), radial-gradient(40% 35% at 85% 85%, #FF963C 0, transparent 70%), var(--bg);background-attachment:fixed}
+/* Glass (opción A): fondo nítido y cada tarjeta lo desenfoca poco, como la barra */
+:root[data-tema="glass"] body{background:#C9D2F5 url(fondo-glass.jpg) center/cover fixed}
+/* Glass blanco: blanco con toques de color */
+:root[data-tema="glassb"]{--bg:#FFFFFF; --fg:#12121C; --gr:#5A5A6E; --surf:rgba(255,255,255,.16); --line:rgba(0,0,0,.08); --acc:#12121C; --accTxt:#fff; --nav:rgba(255,255,255,.3); --pill:#F9DED4; --icoSel:#963C1E; --ico:#28283A;
+  --t-nar:rgba(255,255,255,.16); --t-ama:rgba(255,255,255,.16); --t-ver:rgba(255,255,255,.16); --t-azu:rgba(255,255,255,.16); --t-roj:rgba(255,255,255,.16); --tile:rgba(255,255,255,.8); --hero1:rgba(255,255,255,.16); --hero2:rgba(255,255,255,.16); --heroTxt:#12121C}
+:root[data-tema="glassb"] body{background:#fff url(fondo-blanco.jpg) center/cover fixed}
 :root[data-tema^="glass"] .caja,:root[data-tema^="glass"] .pago,:root[data-tema^="glass"] .pc,:root[data-tema^="glass"] .seg,:root[data-tema^="glass"] .hero,:root[data-tema^="glass"] .hoja,:root[data-tema^="glass"] input,:root[data-tema^="glass"] select{
-  -webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);border:.5px solid rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+  -webkit-backdrop-filter:blur(10px) saturate(130%);backdrop-filter:blur(10px) saturate(130%);border:.5px solid rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+:root[data-tema="glass"] .caja,:root[data-tema="glass"] .pago,:root[data-tema="glass"] .pc,:root[data-tema="glass"] .hero{background-color:rgba(255,255,255,.16)}
+:root[data-tema="glassb"] .caja,:root[data-tema="glassb"] .pago,:root[data-tema="glassb"] .pc,:root[data-tema="glassb"] .hero,:root[data-tema="glassb"] .seg{border-color:rgba(0,0,0,.07);box-shadow:0 8px 24px rgba(40,40,70,.08)}
+:root[data-tema="glassb"] .barra{background:rgba(0,0,0,.08)}
 :root[data-tema="glassn"] .caja,:root[data-tema="glassn"] .pago,:root[data-tema="glassn"] .pc,:root[data-tema="glassn"] .seg,:root[data-tema="glassn"] .hero{border-color:rgba(255,255,255,.1)}
 :root[data-tema^="glass"] nav{-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 10px 30px rgba(0,0,0,.12)}
 :root[data-tema^="glass"] .dato{border-bottom-color:rgba(255,255,255,.18)}
@@ -419,7 +427,7 @@ function grupo(titulo, filas){
   return `<div class="gris chico b" style="margin:22px 8px 8px">${titulo}</div><div class="caja" style="padding:4px 16px">${filas.map(([n, extra, act]) => `<button class="dato" style="width:100%;padding:14px 0" data-act="${act}"><span>${n}</span><span class="gris" style="max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${extra} ›</span></button>`).join('')}</div>`;
 }
 function ajustes(){
-  const temas = [['auto','Auto'],['claro1','Claro 1'],['claro2','Claro 2'],['oscuro','Oscuro'],['glass','Glass']];
+  const temas = [['auto','Auto'],['claro1','Claro 1'],['claro2','Claro 2'],['oscuro','Oscuro'],['glass','Glass'],['glassb','Glass blanco']];
   const correo = D.nube && D.nube.correo ? D.nube.correo : '';
   const ini = esc((D.nombre || '?')[0].toUpperCase());
   return `<div style="position:relative;height:232px">
@@ -432,7 +440,7 @@ function ajustes(){
     <div class="gris" style="text-align:center;margin:4px 0">${correo ? esc(correo) : 'Sin cuenta'} · ${D.pagos.length} ${D.pagos.length === 1 ? 'pago' : 'pagos'}</div>
     ${grupo('Datos personales', [['Nombre', esc(D.nombre || 'Agregar'), 'nombre'], ['Correo', correo ? esc(correo) : 'Sin cuenta', 'cuenta'], ['Teléfono', esc(D.miTel || 'Agregar'), 'tel'], ['Días de quincena', (D.quincena||15) + ' y fin de mes', 'quincena'], ['Ingreso', D.ingreso > 0 ? dinero(Math.round(D.ingreso)) + ' al mes' : 'Agregar', 'presupuesto']])}
     ${grupo('Cuenta y personas', [['Cuenta y pagos compartidos', correo ? (D.nube.verif ? 'Conectada' : 'Sin verificar') : 'Sin cuenta', 'cuenta'], ['Personas con las que pagas', personas().length + ' personas', 'personas']])}
-    <div class="gris chico b" style="margin:22px 8px 8px">Apariencia</div><div class="caja"><div class="seg" style="margin:0">${temas.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div></div>
+    <div class="gris chico b" style="margin:22px 8px 8px">Apariencia</div><div class="caja">${[temas.slice(0,3), temas.slice(3)].map((fila,f) => `<div class="seg" style="margin:${f ? '8px' : '0'} 0 0">${fila.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div>`).join('')}<p class="gris chico" style="margin-bottom:0">Glass sigue al sistema (de noche es oscuro). Glass blanco es blanco con toques de color.</p></div>
     ${grupo('Perfil', [['Fondo del perfil', D.perfilFondo === -1 ? 'Foto' : FONDOS[D.perfilFondo == null ? 1 : D.perfilFondo][0], 'fondo']])}
     ${grupo('Tus datos', [['Guardar respaldo', 'archivo', 'exportar'], ['Cargar respaldo', 'archivo', 'importar']])}
     <input type="file" id="imp" accept="application/json" data-act="importar" hidden>
@@ -705,6 +713,7 @@ function aplicarTema(){
   const noche = matchMedia('(prefers-color-scheme: dark)').matches;
   if(t === 'auto') t = noche ? 'oscuro' : 'claro1';
   if(t === 'glass') t = noche ? 'glassn' : 'glass';
+  if(t === 'glassb') t = 'glassb';
   document.documentElement.dataset.tema = t;
   document.querySelector('meta[name=theme-color]').content = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
 }
