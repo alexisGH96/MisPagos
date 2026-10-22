@@ -131,7 +131,7 @@ input,select{width:100%;font:inherit;color:var(--fg);background:var(--surf);bord
   --t-nar:rgba(255,255,255,.13); --t-ama:rgba(255,255,255,.13); --t-ver:rgba(255,255,255,.13); --t-azu:rgba(255,255,255,.13); --t-roj:rgba(255,255,255,.13); --tile:rgba(255,255,255,.14); color-scheme:dark}
 :root[data-tema="glassn"] body{background:radial-gradient(40% 35% at 18% 15%, #9646E6 0, transparent 70%), radial-gradient(40% 35% at 85% 30%, #F05A96 0, transparent 70%), radial-gradient(45% 40% at 25% 75%, #3278FA 0, transparent 70%), radial-gradient(40% 35% at 85% 85%, #FF963C 0, transparent 70%), var(--bg);background-attachment:fixed}
 /* Glass (opción A): fondo nítido y cada tarjeta lo desenfoca poco, como la barra */
-:root[data-tema="glass"] body{background:#C9D2F5 var(--fondoGlass, url(fondo-glass.jpg)) center/cover fixed}
+:root[data-tema="glass"] body{background:#C9D2F5 var(--fondoGlass, url(fondo-glass-2.jpg)) center/cover fixed}
 /* Glass blanco: blanco con toques de color */
 :root[data-tema="glassb"]{--bg:#FFFFFF; --fg:#12121C; --gr:#5A5A6E; --surf:rgba(255,255,255,.16); --line:rgba(0,0,0,.08); --acc:#12121C; --accTxt:#fff; --nav:rgba(255,255,255,.3); --pill:#F9DED4; --icoSel:#963C1E; --ico:#28283A;
   --t-nar:rgba(255,255,255,.16); --t-ama:rgba(255,255,255,.16); --t-ver:rgba(255,255,255,.16); --t-azu:rgba(255,255,255,.16); --t-roj:rgba(255,255,255,.16); --tile:rgba(255,255,255,.8); --hero1:rgba(255,255,255,.16); --hero2:rgba(255,255,255,.16); --heroTxt:#12121C}
@@ -796,7 +796,9 @@ if(D.nube && D.nube.refresh && D.nube.verif) sincronizar().then(pintar).catch(()
     });
   });
 })();
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').then(r => r.update()).catch(() => {});
+// si llega una versión nueva de la web, recargar una vez para usarla
+if('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('controllerchange', () => { if(!sessionStorage.recargado){ sessionStorage.recargado = 1; location.reload(); } });
 </script>
 </body>
 </html>
