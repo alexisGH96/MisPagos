@@ -1,6 +1,6 @@
 {
-  "versionCode": 49,
-  "versionName": "6.3",
+  "versionCode": 50,
+  "versionName": "6.4",
   "apk": "MisPagos.apk",
-  "notas": "Glass: fondo desenfocado como el panel de Samsung y tarjetas con el desenfoque de la barra; arreglado el cristal al cambiar de pestaña. Gráficas animadas al aparecer."
+  "notas": "Glass y Glass blanco: menos desenfoque en fondo, tarjetas y barra, y la barra con el mismo contorno que las tarjetas."
 }
