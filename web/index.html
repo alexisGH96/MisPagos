@@ -162,7 +162,7 @@ function cargar(){
   try{ const d = JSON.parse(localStorage.getItem(LS)); if(d && d.pagos) return d; }catch(e){}
   return {pagos:[], nombre:'', tema:'auto', quincena:15, personas:[], ingreso:0, ingresoPago:'', ingresoFrec:0, otros:0};
 }
-function guardar(){ try{ localStorage.setItem(LS, JSON.stringify(D)); }catch(e){ aviso('No se pudo guardar en este navegador'); } }
+function guardar(){ try{ localStorage.setItem(LS, JSON.stringify(D)); }catch(e){ aviso('No se pudo guardar en este navegador'); } if(typeof programarAvisos === 'function') programarAvisos(); }
 
 const DIA = 86400000;
 function hoy(){ const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
@@ -439,12 +439,13 @@ function ajustes(){
     <button data-act="nombre" style="display:block;margin:6px auto 0;font-size:24px;font-weight:800">${esc(D.nombre || 'Tu nombre')}</button>
     <div class="gris" style="text-align:center;margin:4px 0">${correo ? esc(correo) : 'Sin cuenta'} · ${D.pagos.length} ${D.pagos.length === 1 ? 'pago' : 'pagos'}</div>
     ${grupo('Datos personales', [['Nombre', esc(D.nombre || 'Agregar'), 'nombre'], ['Correo', correo ? esc(correo) : 'Sin cuenta', 'cuenta'], ['Teléfono', esc(D.miTel || 'Agregar'), 'tel'], ['Días de quincena', (D.quincena||15) + ' y fin de mes', 'quincena'], ['Ingreso', D.ingreso > 0 ? dinero(Math.round(D.ingreso)) + ' al mes' : 'Agregar', 'presupuesto']])}
+    ${grupo('Avisos', [['Avisos de pagos en este celular', D.avisos ? 'Activados' : 'Activar', 'avisos']])}
     ${grupo('Cuenta y personas', [['Cuenta y pagos compartidos', correo ? (D.nube.verif ? 'Conectada' : 'Sin verificar') : 'Sin cuenta', 'cuenta'], ['Personas con las que pagas', personas().length + ' personas', 'personas']])}
     <div class="gris chico b" style="margin:22px 8px 8px">Apariencia</div><div class="caja">${[temas.slice(0,3), temas.slice(3)].map((fila,f) => `<div class="seg" style="margin:${f ? '8px' : '0'} 0 0">${fila.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div>`).join('')}<p class="gris chico" style="margin-bottom:0">Glass sigue al sistema (de noche es oscuro). Glass blanco es blanco con toques de color.</p></div>
     ${grupo('Perfil', [['Fondo del perfil', D.perfilFondo === -1 ? 'Foto' : FONDOS[D.perfilFondo == null ? 1 : D.perfilFondo][0], 'fondo']])}
     ${grupo('Tus datos', [['Guardar respaldo', 'archivo', 'exportar'], ['Cargar respaldo', 'archivo', 'importar']])}
     <input type="file" id="imp" accept="application/json" data-act="importar" hidden>
-    <div class="gris chico b" style="margin:22px 8px 8px">Acerca de</div><div class="caja"><p class="chico" style="margin-top:0"><b>Ponla en tu iPhone como app:</b> en Safari toca Compartir y luego "Agregar a pantalla de inicio".</p><p class="gris chico" style="margin-bottom:0">La versión web no puede sonar alarmas ni mandar recordatorios con la app cerrada. Tus pagos se guardan en este navegador; usa "Guardar respaldo" de vez en cuando.</p></div>`;
+    <div class="gris chico b" style="margin:22px 8px 8px">Acerca de</div><div class="caja"><p class="chico" style="margin-top:0"><b>Ponla en tu iPhone como app:</b> en Safari toca Compartir y luego "Agregar a pantalla de inicio".</p><p class="gris chico" style="margin-bottom:0">Los avisos llegan cada mañana a las 9:00 (necesitas cuenta y activarlos en "Avisos"). El iPhone no permite que una web vibre por su cuenta. Tus pagos se guardan en este navegador; usa "Guardar respaldo" de vez en cuando.</p></div>`;
 }
 /* reduce una imagen y la devuelve como dataURL */
 function reducir(archivo, max, recorte){
@@ -652,6 +653,32 @@ function enlazarCuenta(){
   };
 }
 
+
+/* ===================== avisos (Web Push) ===================== */
+const VAPID_PUB = 'BBWWlUcYHEoRWfJrS4J4p2rj-XzlQkzoSu9eCR5LhdSggqxL34HEPqwGJMD1YiPAczz6aJDKoOonXTQ_W5BTMVU';
+function b64u(s){ const p = '='.repeat((4 - s.length % 4) % 4), b = atob((s + p).replace(/-/g,'+').replace(/_/g,'/')); return Uint8Array.from([...b].map(c => c.charCodeAt(0))); }
+function proximosParaAviso(){ return ordenados().filter(p => !p.pagado && dias(p.vence) <= 40).slice(0, 25).map(p => ({mapValue:{fields:{n:sv(sinPrefijo(p.nombre)), v:sv(p.vence)}}})); }
+async function guardarAvisos(sub){
+  const fields = {proximos:{arrayValue:{values:proximosParaAviso()}}, actualizado:iv(Date.now())};
+  if(sub) fields.sub = sv(JSON.stringify(sub));
+  const mask = Object.keys(fields).map(k => 'updateMask.fieldPaths=' + k).join('&');
+  await pedir('PATCH', DOCS + '/avisos/' + D.nube.uid + '?' + mask, {fields}, await token());
+}
+async function activarAvisos(){
+  if(!D.nube || !D.nube.refresh) return 'Primero crea tu cuenta en Mi perfil → Cuenta y pagos compartidos.';
+  if(!D.nube.verif && !(await revisarVerif())) return 'Primero verifica tu correo.';
+  if(!('serviceWorker' in navigator) || !('PushManager' in window))
+    return 'Este navegador no permite avisos. En iPhone: ábrela en Safari, toca Compartir → "Agregar a pantalla de inicio" y ábrela desde ese ícono (iOS 16.4 o más nuevo).';
+  const perm = await Notification.requestPermission();
+  if(perm !== 'granted') return 'No diste permiso de notificaciones. Puedes activarlo en Ajustes del iPhone → Notificaciones → Mis Pagos.';
+  const reg = await navigator.serviceWorker.ready;
+  const sub = (await reg.pushManager.getSubscription()) || await reg.pushManager.subscribe({userVisibleOnly:true, applicationServerKey:b64u(VAPID_PUB)});
+  await guardarAvisos(sub); D.avisos = true; guardar();
+  return 'Avisos activados. Cada mañana a las 9:00 te avisará de los pagos que vencen en 3 días, mañana u hoy.';
+}
+let avisoT = null;
+function programarAvisos(){ if(!D.avisos || !D.nube || !D.nube.verif) return; clearTimeout(avisoT); avisoT = setTimeout(() => guardarAvisos().catch(() => {}), 3000); }
+
 /* ===================== acciones ===================== */
 function aviso(t){ const e = document.getElementById('toast'); e.textContent = t; e.classList.add('ver'); clearTimeout(aviso.t); aviso.t = setTimeout(() => e.classList.remove('ver'), 1800); }
 document.addEventListener('click', (ev) => {
@@ -688,6 +715,7 @@ document.addEventListener('click', (ev) => {
     case 'tel': { const v = prompt('Tu teléfono', D.miTel || ''); if(v !== null){ D.miTel = v.trim(); guardar(); pintar(); } break; }
     case 'importar': document.getElementById('imp').click(); break;
     case 'cuenta': hojaCuenta(); break;
+    case 'avisos': tarea(activarAvisos); break;
     case 'sync': cerrarHoja(); tarea(sincronizar); break;
     case 'verif': cerrarHoja(); tarea(async () => (await revisarVerif()) ? 'Correo verificado. ' + await sincronizar() : 'Todavía no aparece verificado. Revisa tu correo (también en spam).'); break;
     case 'salir': delete D.nube; guardar(); cerrarHoja(); pintar(); aviso('Sesión cerrada'); break;
