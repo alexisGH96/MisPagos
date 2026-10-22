@@ -1,6 +1,6 @@
 {
-  "versionCode": 48,
-  "versionName": "6.2",
+  "versionCode": 49,
+  "versionName": "6.3",
   "apk": "MisPagos.apk",
-  "notas": "Nuevo en Mi perfil → Tus datos: respaldo de tus pagos en la nube o en un archivo."
+  "notas": "Glass: fondo desenfocado como el panel de Samsung y tarjetas con el desenfoque de la barra; arreglado el cristal al cambiar de pestaña. Gráficas animadas al aparecer."
 }
