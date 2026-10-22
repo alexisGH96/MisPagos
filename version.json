@@ -1,6 +1,6 @@
 {
-  "versionCode": 40,
-  "versionName": "5.4",
+  "versionCode": 41,
+  "versionName": "5.5",
   "apk": "MisPagos.apk",
-  "notas": "El aviso del día de corte ahora llega al día siguiente, cuando ya está calculado lo que debes (puedes cambiarlo en Ajustes)."
+  "notas": "Nuevo en Ajustes: Personas con las que pagas. Cambia nombres en todos tus pagos y guarda teléfono y correo; el recordatorio se manda directo a su WhatsApp."
 }
