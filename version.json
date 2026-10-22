@@ -1,6 +1,6 @@
 {
-  "versionCode": 44,
-  "versionName": "5.8",
+  "versionCode": 45,
+  "versionName": "5.9",
   "apk": "MisPagos.apk",
-  "notas": "Nueva pestaña Mi perfil con portada y foto, datos personales y ajustes agrupados. Ahorros ahora con gráficas de pastel."
+  "notas": "Fondos de perfil nuevos (Atardecer, Noche, Aurora, Bokeh, Geométrico, Cristal). Gráficas con líneas rectas y flecha al porcentaje."
 }
