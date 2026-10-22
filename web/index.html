@@ -123,6 +123,18 @@ input,select{width:100%;font:inherit;color:var(--fg);background:var(--surf);bord
 .pastel path[fill=none],.pastel circle,.pastel text{animation:pastelTexto .4s .7s both}
 @keyframes pastelEntra{from{transform:rotate(-70deg) scale(.6);opacity:0}to{transform:none;opacity:1}}
 @keyframes pastelTexto{from{opacity:0}to{opacity:1}}
+/* ---- Glass: cristal sobre manchas de color, de día claro y de noche oscuro ---- */
+:root[data-tema="glass"],:root[data-tema="glassn"]{--tile:rgba(255,255,255,.75); --hero1:rgba(255,255,255,.35); --hero2:rgba(255,255,255,.18); --heroTxt:var(--fg)}
+:root[data-tema="glass"]{--bg:#E9ECFA; --fg:#12121C; --gr:#3E3E52; --surf:rgba(255,255,255,.42); --line:rgba(255,255,255,.75); --acc:#12121C; --accTxt:#fff; --nav:rgba(255,255,255,.28); --pill:rgba(255,255,255,.75); --icoSel:#CE502C; --ico:#28283A;
+  --t-nar:rgba(255,255,255,.42); --t-ama:rgba(255,255,255,.42); --t-ver:rgba(255,255,255,.42); --t-azu:rgba(255,255,255,.42); --t-roj:rgba(255,255,255,.42)}
+:root[data-tema="glassn"]{--bg:#0E0C1C; --fg:#F5F5FC; --gr:#C4C3D8; --surf:rgba(255,255,255,.13); --line:rgba(255,255,255,.28); --acc:#F5F5FC; --accTxt:#0E0C1C; --nav:rgba(24,22,40,.35); --pill:rgba(255,255,255,.18); --icoSel:#FF8C6E; --ico:#E8E8F4;
+  --t-nar:rgba(255,255,255,.13); --t-ama:rgba(255,255,255,.13); --t-ver:rgba(255,255,255,.13); --t-azu:rgba(255,255,255,.13); --t-roj:rgba(255,255,255,.13); --tile:rgba(255,255,255,.14); color-scheme:dark}
+:root[data-tema^="glass"] body{background:radial-gradient(40% 35% at 18% 15%, #9646E6 0, transparent 70%), radial-gradient(40% 35% at 85% 30%, #F05A96 0, transparent 70%), radial-gradient(45% 40% at 25% 75%, #3278FA 0, transparent 70%), radial-gradient(40% 35% at 85% 85%, #FF963C 0, transparent 70%), var(--bg);background-attachment:fixed}
+:root[data-tema="glass"] body{background-color:#C9D2F5}
+:root[data-tema^="glass"] .caja,:root[data-tema^="glass"] .pago,:root[data-tema^="glass"] .pc,:root[data-tema^="glass"] nav,:root[data-tema^="glass"] .seg,:root[data-tema^="glass"] .hero,:root[data-tema^="glass"] .hoja,:root[data-tema^="glass"] input,:root[data-tema^="glass"] select{
+  -webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);border:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 10px 30px rgba(0,0,0,.12)}
+:root[data-tema^="glass"] .hoja{background:color-mix(in srgb, var(--bg) 70%, transparent)}
+:root[data-tema^="glass"] .barra{background:rgba(255,255,255,.35)} :root[data-tema^="glass"] .barra i{background:var(--fg)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -340,7 +352,9 @@ function pastel(vals, cols, total, centro, sub){
     let next = 1e9; for(let k = l.length-1; k >= 0; k--){ l[k].y1 = Math.min(l[k].y1, next - 20, H - 12); next = l[k].y1; }
     l.forEach(e => {
       const d = lado === 0, xf = d ? Math.max(e.x1 + 14, cx + R + 8) : Math.min(e.x1 - 14, cx - R - 8);
-      h += `<path d="M${e.x0} ${e.y0}L${e.x1} ${e.y1}L${xf} ${e.y1}" stroke="var(--gr)" stroke-width="1.2" fill="none"/><circle cx="${e.x0}" cy="${e.y0}" r="2.4" fill="var(--gr)"/><circle cx="${xf}" cy="${e.y1}" r="2.4" fill="var(--gr)"/>`;
+      const recta = Math.abs(e.y1 - e.y0) < 12; if(recta) e.y1 = e.y0;
+      const sg = d ? 1 : -1, a = 5.5;
+      h += `<path d="M${e.x0} ${e.y0}${recta ? '' : `L${e.x1} ${e.y1}`}L${xf} ${e.y1}M${xf - sg*a} ${e.y1 - a*.75}L${xf} ${e.y1}L${xf - sg*a} ${e.y1 + a*.75}" stroke="var(--gr)" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/><circle cx="${e.x0}" cy="${e.y0}" r="2.4" fill="var(--gr)"/>`;
       h += `<text x="${xf + (d ? 6 : -6)}" y="${e.y1}" text-anchor="${d ? 'start' : 'end'}" dominant-baseline="middle" font-size="13" font-weight="700" fill="var(--fg)">${Math.round(vals[e.i]/tot*100)}%</text>`;
     });
   });
@@ -393,17 +407,16 @@ function ahorros(){
     <h2>Consejos para ti</h2>${tips.map(t => `<div class="fila" style="align-items:flex-start;margin:0 4px 12px"><span class="punto" style="width:8px;height:8px;margin-top:7px;background:var(--r-azu)"></span><span class="peso">${t}</span></div>`).join('')}
     <p class="gris chico">Son sugerencias generales con base en lo que registraste, no asesoría financiera.</p>`;
 }
-const FONDOS = [['Atardecer','linear-gradient(135deg,#FF9A6B,#E8577A)'],['Océano','linear-gradient(135deg,#1C326E,#3A8DDE)'],['Aurora','linear-gradient(135deg,#5B4BC4,#2EC4B6)'],['Menta','linear-gradient(135deg,#43C59E,#2A7F9E)'],['Uva','linear-gradient(135deg,#8E5BD8,#E46FA5)']];
+const FONDOS = ['Atardecer','Noche','Aurora','Bokeh','Geométrico','Cristal'].map((n,i) => [n, `url(perfil_${i}.jpg) center/cover`]);
 function portadaCSS(){
   if(D.fondoFoto && D.perfilFondo === -1) return `url(${D.fondoFoto}) center/cover`;
-  const k = FONDOS[D.perfilFondo == null ? 1 : Math.max(0, D.perfilFondo)][1];
-  return `radial-gradient(circle at 15% 20%, rgba(255,255,255,.28), transparent 45%), radial-gradient(circle at 85% 90%, rgba(255,255,255,.22), transparent 50%), ${k}`;
+  return FONDOS[Math.max(0, Math.min(FONDOS.length - 1, D.perfilFondo == null ? 1 : D.perfilFondo))][1];
 }
 function grupo(titulo, filas){
   return `<div class="gris chico b" style="margin:22px 8px 8px">${titulo}</div><div class="caja" style="padding:4px 16px">${filas.map(([n, extra, act]) => `<button class="dato" style="width:100%;padding:14px 0" data-act="${act}"><span>${n}</span><span class="gris" style="max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${extra} ›</span></button>`).join('')}</div>`;
 }
 function ajustes(){
-  const temas = [['auto','Auto'],['claro1','Claro 1'],['claro2','Claro 2'],['oscuro','Oscuro']];
+  const temas = [['auto','Auto'],['claro1','Claro 1'],['claro2','Claro 2'],['oscuro','Oscuro'],['glass','Glass']];
   const correo = D.nube && D.nube.correo ? D.nube.correo : '';
   const ini = esc((D.nombre || '?')[0].toUpperCase());
   return `<div style="position:relative;height:232px">
@@ -434,7 +447,7 @@ function reducir(archivo, max, recorte){
 }
 function elegirImagen(fn){ const i = document.createElement('input'); i.type = 'file'; i.accept = 'image/*'; i.onchange = () => i.files[0] && fn(i.files[0]); i.click(); }
 function hojaFondo(){
-  abrirHoja(`<h1>Fondo del perfil</h1><div class="dos">${FONDOS.map(([n,g],i) => `<button data-act="fondoSel" data-n="${i}" style="height:80px;border-radius:18px;background:${g};color:#fff;font-weight:700;${(D.perfilFondo == null ? 1 : D.perfilFondo) === i ? 'box-shadow:0 0 0 3px var(--fg)' : ''}">${n}</button>`).join('')}<button data-act="fondoFoto" class="btn borde" style="height:80px;border-radius:18px">Foto de tu galería</button></div><button class="btn borde" style="margin-top:16px" data-act="cerrar">Cerrar</button>`);
+  abrirHoja(`<h1>Fondo del perfil</h1><div class="dos">${FONDOS.map(([n,g],i) => `<button data-act="fondoSel" data-n="${i}" style="height:80px;border-radius:18px;background:${g};color:#fff;font-weight:700;text-shadow:0 1px 6px rgba(0,0,0,.5);${(D.perfilFondo == null ? 1 : D.perfilFondo) === i ? 'box-shadow:0 0 0 3px var(--fg)' : ''}">${n}</button>`).join('')}<button data-act="fondoFoto" class="btn borde" style="height:80px;border-radius:18px">Foto de tu galería</button></div><button class="btn borde" style="margin-top:16px" data-act="cerrar">Cerrar</button>`);
 }
 /* ===================== hojas: detalle y editor ===================== */
 function abrirHoja(html){
@@ -686,11 +699,13 @@ document.addEventListener('change', (ev) => {
 /* ===================== pintar ===================== */
 function aplicarTema(){
   let t = D.tema || 'auto';
-  if(t === 'auto') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'oscuro' : 'claro1';
+  const noche = matchMedia('(prefers-color-scheme: dark)').matches;
+  if(t === 'auto') t = noche ? 'oscuro' : 'claro1';
+  if(t === 'glass') t = noche ? 'glassn' : 'glass';
   document.documentElement.dataset.tema = t;
   document.querySelector('meta[name=theme-color]').content = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
 }
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { aplicarTema(); });
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { aplicarTema(); pintar(); });
 function pintar(anim){
   avanzar();
   const app = document.getElementById('app');
