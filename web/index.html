@@ -118,6 +118,11 @@ input,select{width:100%;font:inherit;color:var(--fg);background:var(--surf);bord
 .regla{height:10px;border-radius:10px;background:var(--line);position:relative;overflow:hidden;margin-top:6px}
 .regla i{position:absolute;inset:0 auto 0 0;border-radius:10px}
 .regla s{position:absolute;top:0;bottom:0;width:2px;background:var(--fg)}
+/* la dona aparece girando y creciendo, y luego los porcentajes */
+.pastel path[fill]:not([fill=none]){transform-box:view-box;transform-origin:50% 50%;animation:pastelEntra .8s cubic-bezier(.2,.8,.2,1) both}
+.pastel path[fill=none],.pastel circle,.pastel text{animation:pastelTexto .4s .7s both}
+@keyframes pastelEntra{from{transform:rotate(-70deg) scale(.6);opacity:0}to{transform:none;opacity:1}}
+@keyframes pastelTexto{from{opacity:0}to{opacity:1}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -310,7 +315,7 @@ function carteraV(){
   return h + `<h1 style="margin-top:0">Quincenas</h1><p class="gris" style="text-align:center;margin-top:-10px">Cuánto apartar de cada pago de nómina</p>` + bloque('Quincena actual', a, b, true) + bloque('Siguiente', sigA, sigB, false);
 }
 /* ---- gráfica de pastel: sectores separados, esquinas redondeadas, líneas guía con punto ---- */
-function pastel(vals, cols, total){
+function pastel(vals, cols, total, centro, sub){
   const W = 320, H = 230, cx = W/2, cy = H/2, R = 82, ri = R*.66, tot = vals.reduce((a,b)=>a+b,0);
   if(!tot) return '';
   const P = (r,a) => [cx + r*Math.cos(a*Math.PI/180), cy + r*Math.sin(a*Math.PI/180)];
@@ -339,8 +344,8 @@ function pastel(vals, cols, total){
       h += `<text x="${xf + (d ? 6 : -6)}" y="${e.y1}" text-anchor="${d ? 'start' : 'end'}" dominant-baseline="middle" font-size="13" font-weight="700" fill="var(--fg)">${Math.round(vals[e.i]/tot*100)}%</text>`;
     });
   });
-  h += `<text x="${cx}" y="${cy+2}" text-anchor="middle" font-size="19" font-weight="800" fill="var(--fg)">${dinero(Math.round(total))}</text><text x="${cx}" y="${cy+20}" text-anchor="middle" font-size="11" fill="var(--gr)">al mes</text>`;
-  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Gastos por tipo">${h}</svg>`;
+  h += `<text x="${cx}" y="${cy+2}" text-anchor="middle" font-size="19" font-weight="800" fill="var(--fg)">${centro || dinero(Math.round(total))}</text><text x="${cx}" y="${cy+20}" text-anchor="middle" font-size="11" fill="var(--gr)">${sub || 'al mes'}</text>`;
+  return `<svg class="pastel" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Gráfica de pastel">${h}</svg>`;
 }
 function estadisticas(){
   let h = `<div class="seg"><button class="${estad===0?'sel':''}" data-act="estad" data-n="0">Estadísticas</button><button class="${estad===1?'sel':''}" data-act="estad" data-n="1">Ahorros</button></div>`;
@@ -376,30 +381,61 @@ function ahorros(){
   if(D.pagos.some(p => p.credito)) tips.push('Paga el total para no generar intereses de tus tarjetas; pagar solo el mínimo sale mucho más caro.');
   if(sug) tips.push(`Aparta ${dinero(Math.round(sug/2))} el mismo día que te pagan, antes de gastar.`);
   if(!tips.length) tips.push('¡Vas muy bien! Mantén tus pagos al día y revisa tu presupuesto cada mes.');
+  const reparto = [Math.min(gastos, ing), Math.max(0, libre - sug), sug], ideal = [.5, .3, .2], rn = ['Necesidades','Gustos','Ahorro'], rc = ['var(--r-nar)','var(--r-ama)','var(--r-ver)'];
+  const fila = (n, v, col) => `<div class="f"><span class="punto" style="background:${col}"></span><span class="peso">${n}</span><span class="gris chico" style="width:52px;text-align:right">${Math.round(v/ing*100)} %</span><span class="b" style="width:92px;text-align:right">${dinero(Math.round(v))}</span></div>`;
   return `<div class="caja est-azu"><div class="gris chico b">Tu mes</div><div style="font-size:34px;font-weight:800;margin:6px 0 0">${dinero(Math.round(libre))}</div><div class="gris chico">${libre >= 0 ? 'te queda libre al mes' : 'te falta al mes'}</div>
-    <div class="dato" style="margin-top:12px"><span>Ingresos</span><b>${dinero(Math.round(ing))}</b></div><div class="dato"><span>Pagos fijos (${Math.round(pagos/ing*100)} %)</span><b>${dinero(Math.round(pagos))}</b></div><div class="dato"><span>Otros gastos</span><b>${dinero(Math.round(otros))}</b></div>
+    ${pastel([pagos, otros, Math.max(0, libre)], rc, ing, dinero(Math.round(ing)), 'ingreso al mes')}
+    <div class="leyenda">${fila('Pagos fijos', pagos, rc[0])}${fila('Otros gastos', otros, rc[1])}${libre > 0 ? fila('Libre', libre, rc[2]) : ''}</div>
     <button class="btn borde" style="margin-top:12px" data-act="presupuesto">Editar ingresos y gastos</button></div>
     <div class="caja est-ver" style="margin-top:12px"><div class="gris chico b">Te sugiero ahorrar</div><div style="font-size:28px;font-weight:800;margin:6px 0 2px">${dinero(Math.round(sug))} al mes</div><div class="gris chico">≈ ${dinero(Math.round(sug/2))} por quincena · ${dinero(Math.round(sug*12))} al año</div></div>
-    <h2>Regla 50 / 30 / 20</h2><div class="caja">${regla('Necesidades (pagos y gastos)', gastos/ing, .5, 'var(--r-nar)')}${regla('Gustos', Math.max(0, libre - sug)/ing, .3, 'var(--r-ama)')}${regla('Ahorro', sug/ing, .2, 'var(--r-ver)')}</div>
+    <h2>Regla 50 / 30 / 20</h2><div class="caja">${pastel(reparto, rc, ing, '50/30/20', 'tu reparto')}<div class="leyenda">${reparto.map((v,i) => { const a = v/ing, ok = Math.abs(a-ideal[i]) <= .05 || (i === 0 && a < ideal[i]) || (i === 2 && a > ideal[i]); return `<div class="f"><span class="punto" style="background:${rc[i]}"></span><span class="peso">${rn[i]}</span><b>${Math.round(a*100)} %</b><span class="chico" style="width:110px;text-align:right;color:${ok ? 'var(--r-ver)' : 'var(--gr)'}">ideal ${Math.round(ideal[i]*100)} % ${ok ? '✓' : '•'}</span></div>`; }).join('')}</div></div>
     <h2>Fondo de emergencia</h2><div class="caja"><div class="b" style="font-size:22px">${dinero(Math.round(gastos*3))}</div><div class="gris chico">Equivale a 3 meses de tus gastos.${sug ? ' Ahorrando lo sugerido lo juntas en ' + Math.ceil(gastos*3/sug) + ' meses.' : ''}</div></div>
     <h2>Consejos para ti</h2>${tips.map(t => `<div class="fila" style="align-items:flex-start;margin:0 4px 12px"><span class="punto" style="width:8px;height:8px;margin-top:7px;background:var(--r-azu)"></span><span class="peso">${t}</span></div>`).join('')}
     <p class="gris chico">Son sugerencias generales con base en lo que registraste, no asesoría financiera.</p>`;
 }
+const FONDOS = [['Atardecer','linear-gradient(135deg,#FF9A6B,#E8577A)'],['Océano','linear-gradient(135deg,#1C326E,#3A8DDE)'],['Aurora','linear-gradient(135deg,#5B4BC4,#2EC4B6)'],['Menta','linear-gradient(135deg,#43C59E,#2A7F9E)'],['Uva','linear-gradient(135deg,#8E5BD8,#E46FA5)']];
+function portadaCSS(){
+  if(D.fondoFoto && D.perfilFondo === -1) return `url(${D.fondoFoto}) center/cover`;
+  const k = FONDOS[D.perfilFondo == null ? 1 : Math.max(0, D.perfilFondo)][1];
+  return `radial-gradient(circle at 15% 20%, rgba(255,255,255,.28), transparent 45%), radial-gradient(circle at 85% 90%, rgba(255,255,255,.22), transparent 50%), ${k}`;
+}
+function grupo(titulo, filas){
+  return `<div class="gris chico b" style="margin:22px 8px 8px">${titulo}</div><div class="caja" style="padding:4px 16px">${filas.map(([n, extra, act]) => `<button class="dato" style="width:100%;padding:14px 0" data-act="${act}"><span>${n}</span><span class="gris" style="max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${extra} ›</span></button>`).join('')}</div>`;
+}
 function ajustes(){
   const temas = [['auto','Auto'],['claro1','Claro 1'],['claro2','Claro 2'],['oscuro','Oscuro']];
-  return `<h1>Ajustes</h1><div class="caja"><div class="b">Apariencia</div><div class="seg" style="margin:12px 0 0">${temas.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div></div>
-   <div class="caja" style="margin-top:14px">
-    <button class="dato" style="width:100%" data-act="nombre"><span>Tu nombre</span><span class="gris">${esc(D.nombre)} ›</span></button>
-    <button class="dato" style="width:100%" data-act="quincena"><span>Días de quincena</span><span class="gris">${D.quincena||15} y fin de mes ›</span></button>
-    <button class="dato" style="width:100%" data-act="cuenta"><span>Cuenta y pagos compartidos</span><span class="gris">${D.nube && D.nube.correo ? esc(D.nube.correo) : 'Sin cuenta'} ›</span></button>
-    <button class="dato" style="width:100%" data-act="personas"><span>Personas con las que pagas</span><span class="gris">${personas().length} ›</span></button>
-    <button class="dato" style="width:100%" data-act="exportar"><span>Guardar respaldo</span><span class="gris">archivo ›</span></button>
-    <label class="dato" style="width:100%;margin:0;color:inherit;font-size:16px;cursor:pointer"><span>Cargar respaldo</span><span class="gris">archivo ›</span><input type="file" accept="application/json" data-act="importar" hidden></label>
-   </div>
-   <div class="caja" style="margin-top:14px"><div class="b">Ponla en tu iPhone como app</div><p class="gris chico" style="margin-bottom:0">En Safari toca Compartir y luego "Agregar a pantalla de inicio". Tus pagos se guardan solo en este navegador; usa "Guardar respaldo" de vez en cuando.</p></div>
-   <div class="caja" style="margin-top:14px"><div class="b">Avisos</div><p class="gris chico" style="margin-bottom:0">La versión web no puede sonar alarmas ni mandar recordatorios con la app cerrada. Revisa la pestaña de inicio para ver lo que vence pronto.</p></div>`;
+  const correo = D.nube && D.nube.correo ? D.nube.correo : '';
+  const ini = esc((D.nombre || '?')[0].toUpperCase());
+  return `<div style="position:relative;height:232px">
+      <div style="height:170px;border-radius:26px;background:${portadaCSS()}"></div>
+      <button data-act="fondo" aria-label="Cambiar fondo" style="position:absolute;right:12px;top:118px;width:40px;height:40px;border-radius:50%;background:rgba(0,0,0,.4);color:#fff">📷</button>
+      <button data-act="foto" aria-label="Cambiar foto" style="position:absolute;left:50%;top:108px;transform:translateX(-50%);width:122px;height:122px;border-radius:50%;background:var(--bg);display:grid;place-items:center;box-shadow:var(--sombra)">
+        ${D.foto ? `<img src="${D.foto}" alt="" style="width:112px;height:112px;border-radius:50%;object-fit:cover">` : `<span style="width:112px;height:112px;border-radius:50%;background:var(--acc);color:var(--accTxt);display:grid;place-items:center;font-size:46px;font-weight:800">${ini}</span>`}
+      </button></div>
+    <button data-act="nombre" style="display:block;margin:6px auto 0;font-size:24px;font-weight:800">${esc(D.nombre || 'Tu nombre')}</button>
+    <div class="gris" style="text-align:center;margin:4px 0">${correo ? esc(correo) : 'Sin cuenta'} · ${D.pagos.length} ${D.pagos.length === 1 ? 'pago' : 'pagos'}</div>
+    ${grupo('Datos personales', [['Nombre', esc(D.nombre || 'Agregar'), 'nombre'], ['Correo', correo ? esc(correo) : 'Sin cuenta', 'cuenta'], ['Teléfono', esc(D.miTel || 'Agregar'), 'tel'], ['Días de quincena', (D.quincena||15) + ' y fin de mes', 'quincena'], ['Ingreso', D.ingreso > 0 ? dinero(Math.round(D.ingreso)) + ' al mes' : 'Agregar', 'presupuesto']])}
+    ${grupo('Cuenta y personas', [['Cuenta y pagos compartidos', correo ? (D.nube.verif ? 'Conectada' : 'Sin verificar') : 'Sin cuenta', 'cuenta'], ['Personas con las que pagas', personas().length + ' personas', 'personas']])}
+    <div class="gris chico b" style="margin:22px 8px 8px">Apariencia</div><div class="caja"><div class="seg" style="margin:0">${temas.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div></div>
+    ${grupo('Perfil', [['Fondo del perfil', D.perfilFondo === -1 ? 'Foto' : FONDOS[D.perfilFondo == null ? 1 : D.perfilFondo][0], 'fondo']])}
+    ${grupo('Tus datos', [['Guardar respaldo', 'archivo', 'exportar'], ['Cargar respaldo', 'archivo', 'importar']])}
+    <input type="file" id="imp" accept="application/json" data-act="importar" hidden>
+    <div class="gris chico b" style="margin:22px 8px 8px">Acerca de</div><div class="caja"><p class="chico" style="margin-top:0"><b>Ponla en tu iPhone como app:</b> en Safari toca Compartir y luego "Agregar a pantalla de inicio".</p><p class="gris chico" style="margin-bottom:0">La versión web no puede sonar alarmas ni mandar recordatorios con la app cerrada. Tus pagos se guardan en este navegador; usa "Guardar respaldo" de vez en cuando.</p></div>`;
 }
-
+/* reduce una imagen y la devuelve como dataURL */
+function reducir(archivo, max, recorte){
+  return new Promise((ok, mal) => { const im = new Image(); im.onload = () => {
+    let w = im.width, h = im.height, sx = 0, sy = 0;
+    if(recorte === 'cuadro'){ const m = Math.min(w,h); sx = (w-m)/2; sy = (h-m)/2; w = h = m; }
+    if(recorte === 'portada'){ const nh = Math.min(h, w/2), nw = Math.min(w, nh*2); sx = (w-nw)/2; sy = (h-nh)/2; w = nw; h = nh; }
+    const k = Math.min(1, max / Math.max(w,h)), cv = document.createElement('canvas'); cv.width = Math.round(w*k); cv.height = Math.round(h*k);
+    cv.getContext('2d').drawImage(im, sx, sy, w, h, 0, 0, cv.width, cv.height); ok(cv.toDataURL('image/jpeg', .85)); URL.revokeObjectURL(im.src); };
+    im.onerror = mal; im.src = URL.createObjectURL(archivo); });
+}
+function elegirImagen(fn){ const i = document.createElement('input'); i.type = 'file'; i.accept = 'image/*'; i.onchange = () => i.files[0] && fn(i.files[0]); i.click(); }
+function hojaFondo(){
+  abrirHoja(`<h1>Fondo del perfil</h1><div class="dos">${FONDOS.map(([n,g],i) => `<button data-act="fondoSel" data-n="${i}" style="height:80px;border-radius:18px;background:${g};color:#fff;font-weight:700;${(D.perfilFondo == null ? 1 : D.perfilFondo) === i ? 'box-shadow:0 0 0 3px var(--fg)' : ''}">${n}</button>`).join('')}<button data-act="fondoFoto" class="btn borde" style="height:80px;border-radius:18px">Foto de tu galería</button></div><button class="btn borde" style="margin-top:16px" data-act="cerrar">Cerrar</button>`);
+}
 /* ===================== hojas: detalle y editor ===================== */
 function abrirHoja(html){
   const capa = document.getElementById('capa');
@@ -619,6 +655,14 @@ document.addEventListener('click', (ev) => {
     case 'nombre': { const v = prompt('¿Cómo te llamas?', D.nombre); if(v !== null){ D.nombre = v.trim(); guardar(); pintar(); } break; }
     case 'quincena': { const v = prompt('¿Qué día es tu primera quincena?', D.quincena||15); if(v){ D.quincena = Math.max(1, Math.min(28, parseInt(v)||15)); guardar(); pintar(); } break; }
     case 'personas': hojaPersonas(); break;
+    case 'fondo': hojaFondo(); break;
+    case 'fondoSel': D.perfilFondo = +n; guardar(); cerrarHoja(); pintar(); break;
+    case 'fondoFoto': cerrarHoja(); elegirImagen(f => reducir(f, 1200, 'portada').then(u => { D.fondoFoto = u; D.perfilFondo = -1; guardar(); pintar(); }).catch(() => aviso('No pude usar esa imagen'))); break;
+    case 'foto':
+      if(D.foto && confirm('¿Quitar tu foto de perfil? (Cancelar para elegir otra)')){ delete D.foto; guardar(); pintar(); break; }
+      elegirImagen(f => reducir(f, 400, 'cuadro').then(u => { D.foto = u; guardar(); pintar(); }).catch(() => aviso('No pude usar esa imagen'))); break;
+    case 'tel': { const v = prompt('Tu teléfono', D.miTel || ''); if(v !== null){ D.miTel = v.trim(); guardar(); pintar(); } break; }
+    case 'importar': document.getElementById('imp').click(); break;
     case 'cuenta': hojaCuenta(); break;
     case 'sync': cerrarHoja(); tarea(sincronizar); break;
     case 'verif': cerrarHoja(); tarea(async () => (await revisarVerif()) ? 'Correo verificado. ' + await sincronizar() : 'Todavía no aparece verificado. Revisa tu correo (también en spam).'); break;
