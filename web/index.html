@@ -391,6 +391,7 @@ function ajustes(){
    <div class="caja" style="margin-top:14px">
     <button class="dato" style="width:100%" data-act="nombre"><span>Tu nombre</span><span class="gris">${esc(D.nombre)} ›</span></button>
     <button class="dato" style="width:100%" data-act="quincena"><span>Días de quincena</span><span class="gris">${D.quincena||15} y fin de mes ›</span></button>
+    <button class="dato" style="width:100%" data-act="cuenta"><span>Cuenta y pagos compartidos</span><span class="gris">${D.nube && D.nube.correo ? esc(D.nube.correo) : 'Sin cuenta'} ›</span></button>
     <button class="dato" style="width:100%" data-act="personas"><span>Personas con las que pagas</span><span class="gris">${personas().length} ›</span></button>
     <button class="dato" style="width:100%" data-act="exportar"><span>Guardar respaldo</span><span class="gris">archivo ›</span></button>
     <label class="dato" style="width:100%;margin:0;color:inherit;font-size:16px;cursor:pointer"><span>Cargar respaldo</span><span class="gris">archivo ›</span><input type="file" accept="application/json" data-act="importar" hidden></label>
@@ -414,6 +415,7 @@ function detalle(id){
   const p = D.pagos.find(x => x.id === id); if(!p) return;
   const d = dias(p.vence);
   let h = `<div class="pago est-${estado(p)}" style="display:block"><div class="fila">${icono(p)}<div class="peso"><div class="nom">${esc(p.nombre)}</div><div class="gris chico">${p.monto ? dinero(num(p.monto)) + ' · ' : ''}${FRECS[p.frec]}</div></div>${anillo(p,44)}</div>
+    ${p.creadoPor ? `<div class="gris chico b" style="margin-top:10px">☁ Creado por ${esc(p.creadoPor)}</div>` : ''}
     <div class="b" style="margin:14px 0">Vence ${corto(p.vence)} · ${p.pagado ? 'pagado ✓' : d < 0 ? 'venció hace ' + (-d) + ' días' : d === 0 ? 'vence hoy' : d === 1 ? 'vence mañana' : 'faltan ' + d + ' días'}</div>
     <button class="btn lleno" data-act="pagar" data-id="${p.id}">${p.pagado ? 'Marcar como pendiente' : 'Ya pagué ✓'}</button></div>`;
   if(p.cuenta || p.referencia || p.titular){
@@ -483,6 +485,113 @@ function hojaPersonas(){
   });
 }
 
+
+/* ===================== nube (Firebase por REST) ===================== */
+const FB = {key:'AIzaSyAgWdj1dZ9olzq7tWN5IRDHMRYIru6EInE', proyecto:'mispagos-bb986'};
+const AUTHU = 'https://identitytoolkit.googleapis.com/v1/accounts:';
+const DOCS = `https://firestore.googleapis.com/v1/projects/${FB.proyecto}/databases/(default)/documents`;
+function errNube(m){
+  m = String(m||'');
+  if(m.includes('EMAIL_EXISTS')) return 'Ya existe una cuenta con ese correo. Inicia sesión.';
+  if(/EMAIL_NOT_FOUND|INVALID_LOGIN_CREDENTIALS|INVALID_PASSWORD/.test(m)) return 'Correo o contraseña incorrectos.';
+  if(m.includes('WEAK_PASSWORD')) return 'La contraseña debe tener al menos 6 caracteres.';
+  if(m.includes('INVALID_EMAIL')) return 'Ese correo no es válido.';
+  if(m.includes('TOO_MANY_ATTEMPTS')) return 'Demasiados intentos. Espera unos minutos.';
+  if(m.includes('PERMISSION_DENIED')) return 'Sin permiso: verifica tu correo.';
+  return m;
+}
+async function pedir(metodo, url, cuerpo, token){
+  const r = await fetch(url, {method:metodo, headers:Object.assign({'Content-Type':'application/json'}, token ? {Authorization:'Bearer ' + token} : {}), body: cuerpo ? JSON.stringify(cuerpo) : undefined});
+  const t = await r.text(); let j = {}; try{ j = t ? JSON.parse(t) : {}; }catch(e){}
+  if(!r.ok) throw new Error(errNube((j.error && j.error.message) || (Array.isArray(j) && j[0] && j[0].error && j[0].error.message) || t));
+  return j;
+}
+function sesion(r){ D.nube = Object.assign(D.nube||{}, {token:r.idToken||r.id_token, refresh:r.refreshToken||r.refresh_token, uid:r.localId||r.user_id, vence:Date.now() + 50*60000}); guardar(); }
+async function token(){
+  if(!D.nube || !D.nube.refresh) throw new Error('Inicia sesión primero.');
+  if(Date.now() > D.nube.vence){
+    const r = await fetch('https://securetoken.googleapis.com/v1/token?key=' + FB.key, {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:'grant_type=refresh_token&refresh_token=' + encodeURIComponent(D.nube.refresh)});
+    if(!r.ok) throw new Error('Tu sesión expiró. Vuelve a iniciar sesión.');
+    sesion(await r.json());
+  }
+  return D.nube.token;
+}
+async function crearCuenta(correo, clave){
+  sesion(await pedir('POST', AUTHU + 'signUp?key=' + FB.key, {email:correo.trim(), password:clave, returnSecureToken:true}));
+  D.nube.correo = correo.trim().toLowerCase(); D.nube.verif = false; guardar();
+  await pedir('POST', AUTHU + 'sendOobCode?key=' + FB.key, {requestType:'VERIFY_EMAIL', idToken: await token()});
+}
+async function entrar(correo, clave){
+  sesion(await pedir('POST', AUTHU + 'signInWithPassword?key=' + FB.key, {email:correo.trim(), password:clave, returnSecureToken:true}));
+  D.nube.correo = correo.trim().toLowerCase(); guardar(); await revisarVerif();
+}
+async function revisarVerif(){
+  const r = await pedir('POST', AUTHU + 'lookup?key=' + FB.key, {idToken: await token()});
+  const v = !!r.users[0].emailVerified, antes = D.nube.verif; D.nube.verif = v;
+  if(v && !antes) D.nube.vence = 0;      // renovar el token para que incluya el correo verificado
+  guardar(); return v;
+}
+const sv = v => ({stringValue: v == null ? '' : String(v)}), iv = v => ({integerValue: String(v)});
+const gs = (f,k) => (f[k] && f[k].stringValue) || '', gi = (f,k,d) => f[k] && f[k].integerValue != null ? +f[k].integerValue : d;
+async function sincronizar(){
+  if(!D.nube || !D.nube.refresh) throw new Error('Inicia sesión primero.');
+  if(!D.nube.verif && !(await revisarVerif())) throw new Error('Primero verifica tu correo con el enlace que te enviamos.');
+  const yo = D.nube.correo, uid = D.nube.uid; let sub = 0, nue = 0, cam = 0, qui = 0;
+  for(const p of D.pagos){
+    if(p.creadoPor || !p.compartido || !p.conQuien) continue;
+    const per = personas().find(z => z.nombre.toLowerCase() === p.conQuien.toLowerCase());
+    const otro = per && per.mail ? per.mail.trim().toLowerCase() : '';
+    if(!otro.includes('@') || otro === yo) continue;
+    const firma = [p.nombre, p.monto, p.vence, p.frec, p.miParte, p.conQuien, otro].join('|');
+    if(p.nubeId && firma === p.nubeFirma) continue;
+    const fields = {nombre:sv(p.nombre), monto:sv(p.monto), vence:sv(p.vence), frec:sv(p.frec), cat:sv(p.cat), parteCreador:iv(p.miParte||50),
+      creadoPor:sv(uid), creadorNombre:sv(D.nombre || yo), creadorCorreo:sv(yo), otroNombre:sv(p.conQuien), otroCorreo:sv(otro),
+      participantes:{arrayValue:{values:[sv(yo), sv(otro)]}}, actualizado:iv(Date.now())};
+    if(!p.nubeId){ const r = await pedir('POST', DOCS + '/compartidos', {fields}, await token()); p.nubeId = r.name.split('/').pop(); }
+    else await pedir('PATCH', DOCS + '/compartidos/' + p.nubeId, {fields}, await token());
+    p.nubeFirma = firma; sub++;
+  }
+  const res = await pedir('POST', DOCS + ':runQuery', {structuredQuery:{from:[{collectionId:'compartidos'}], where:{fieldFilter:{field:{fieldPath:'participantes'}, op:'ARRAY_CONTAINS', value:sv(yo)}}}}, await token());
+  const vistos = new Set();
+  (Array.isArray(res) ? res : []).forEach(x => {
+    const d = x.document; if(!d) return; const id = d.name.split('/').pop(), f = d.fields; vistos.add(id);
+    if(gs(f,'creadoPor') === uid) return;
+    let p = D.pagos.find(z => z.nubeId === id); const nuevo = !p;
+    if(nuevo) p = {id: Date.now() + Math.floor(Math.random()*1000), nubeId:id, pagado:false, hist:[]};
+    const firma = [gs(f,'nombre'), gs(f,'monto'), gs(f,'vence'), gs(f,'frec'), gi(f,'parteCreador',50)].join('|');
+    if(!nuevo && firma === p.nubeFirma) return;
+    if(!nuevo && p.vence !== gs(f,'vence')) p.pagado = false;
+    Object.assign(p, {nombre:gs(f,'nombre'), monto:gs(f,'monto'), vence:gs(f,'vence'), frec:gs(f,'frec') || 'M1', cat:gs(f,'cat') || adivinarCat(gs(f,'nombre')),
+      compartido:true, miParte:100 - gi(f,'parteCreador',50), conQuien:gs(f,'creadorNombre'), creadoPor:gs(f,'creadorNombre'), nubeFirma:firma});
+    p.ancla = fecha(p.vence).getDate();
+    if(nuevo){ D.pagos.push(p); nue++; } else cam++;
+  });
+  const antes = D.pagos.length; D.pagos = D.pagos.filter(p => !(p.creadoPor && p.nubeId && !vistos.has(p.nubeId))); qui = antes - D.pagos.length;
+  D.nube.ultima = Date.now(); guardar();
+  const r = []; if(sub) r.push(sub + (sub === 1 ? ' pago compartido subido' : ' pagos compartidos subidos')); if(nue) r.push(nue + (nue === 1 ? ' pago nuevo para ti' : ' pagos nuevos para ti')); if(cam) r.push(cam + ' actualizados'); if(qui) r.push(qui + ' quitados');
+  return r.length ? r.join(' · ') : 'Todo al día';
+}
+function borrarNube(p){ if(!p.creadoPor && p.nubeId && D.nube && D.nube.refresh) token().then(t => fetch(DOCS + '/compartidos/' + p.nubeId, {method:'DELETE', headers:{Authorization:'Bearer ' + t}})).catch(() => {}); }
+async function tarea(fn){ try{ const r = await fn(); if(r) alert(r); }catch(e){ alert(e.message || 'No hay conexión'); } pintar(); }
+function hojaCuenta(){
+  const n = D.nube || {};
+  if(!n.refresh) return abrirHoja(`<h1>Cuenta de Mis Pagos</h1><p class="gris">Con una cuenta, los pagos que compartes con alguien le aparecen en su app, con quién los creó.</p>
+    <form id="cta"><label>Correo</label><input name="c" type="email" autocomplete="email" required><label>Contraseña (mínimo 6)</label><input name="k" type="password" autocomplete="current-password">
+    <button class="btn lleno" style="margin-top:18px" type="submit" name="a" value="entrar">Entrar</button>
+    <div class="dos" style="margin-top:10px"><button class="btn borde" type="submit" name="a" value="crear">Crear cuenta</button><button class="btn borde" type="submit" name="a" value="olvide">Olvidé mi contraseña</button></div></form>`) || enlazarCuenta();
+  abrirHoja(`<h1>Cuenta</h1><div class="caja"><div class="b">${esc(n.correo)}</div><p class="gris chico">${n.verif ? 'Tus pagos compartidos con alguien que tiene correo en "Personas" se comparten con su cuenta.' : 'Falta verificar tu correo: abre el enlace que te enviamos y toca "Ya verifiqué".'}</p>
+    ${n.verif ? '<button class="btn lleno" data-act="sync">Sincronizar ahora</button>' : '<button class="btn lleno" data-act="verif">Ya verifiqué</button>'}
+    <button class="btn borde" style="margin-top:10px" data-act="salir">Cerrar sesión</button></div>`);
+}
+function enlazarCuenta(){
+  const fm = document.getElementById('cta'); if(!fm) return;
+  fm.onsubmit = (ev) => { ev.preventDefault(); const a = ev.submitter ? ev.submitter.value : 'entrar', c = fm.c.value, k = fm.k.value; cerrarHoja();
+    if(a === 'entrar') tarea(async () => { await entrar(c, k); return D.nube.verif ? 'Sesión iniciada. ' + await sincronizar() : 'Sesión iniciada. Falta verificar tu correo con el enlace que te enviamos.'; });
+    if(a === 'crear') tarea(async () => { await crearCuenta(c, k); return 'Te enviamos un correo a ' + c.trim() + '. Toca el enlace para verificarlo y luego entra a Ajustes → Cuenta → Ya verifiqué.'; });
+    if(a === 'olvide') tarea(async () => { await pedir('POST', AUTHU + 'sendOobCode?key=' + FB.key, {requestType:'PASSWORD_RESET', email:c.trim()}); return 'Te enviamos un correo para cambiar tu contraseña.'; });
+  };
+}
+
 /* ===================== acciones ===================== */
 function aviso(t){ const e = document.getElementById('toast'); e.textContent = t; e.classList.add('ver'); clearTimeout(aviso.t); aviso.t = setTimeout(() => e.classList.remove('ver'), 1800); }
 document.addEventListener('click', (ev) => {
@@ -495,7 +604,7 @@ document.addEventListener('click', (ev) => {
     case 'nuevo': editor(null); break;
     case 'editar': cerrarHoja(); setTimeout(() => editor(id), 280); break;
     case 'cerrar': cerrarHoja(); break;
-    case 'borrar': if(confirm('¿Eliminar este pago?')){ D.pagos = D.pagos.filter(p => p.id !== id); guardar(); cerrarHoja(); pintar(); aviso('Pago eliminado'); } break;
+    case 'borrar': if(confirm('¿Eliminar este pago?')){ const bp = D.pagos.find(p => p.id === id); if(bp) borrarNube(bp); D.pagos = D.pagos.filter(p => p.id !== id); guardar(); cerrarHoja(); pintar(); aviso('Pago eliminado'); } break;
     case 'pagar': {
       const p = D.pagos.find(x => x.id === id);
       if(!p.pagado){ p.pagado = true; (p.hist = p.hist||[]).push({f:iso(hoy()), v:p.vence, m:p.monto}); aviso('✓ Marcado como pagado'); }
@@ -510,6 +619,10 @@ document.addEventListener('click', (ev) => {
     case 'nombre': { const v = prompt('¿Cómo te llamas?', D.nombre); if(v !== null){ D.nombre = v.trim(); guardar(); pintar(); } break; }
     case 'quincena': { const v = prompt('¿Qué día es tu primera quincena?', D.quincena||15); if(v){ D.quincena = Math.max(1, Math.min(28, parseInt(v)||15)); guardar(); pintar(); } break; }
     case 'personas': hojaPersonas(); break;
+    case 'cuenta': hojaCuenta(); break;
+    case 'sync': cerrarHoja(); tarea(sincronizar); break;
+    case 'verif': cerrarHoja(); tarea(async () => (await revisarVerif()) ? 'Correo verificado. ' + await sincronizar() : 'Todavía no aparece verificado. Revisa tu correo (también en spam).'); break;
+    case 'salir': delete D.nube; guardar(); cerrarHoja(); pintar(); aviso('Sesión cerrada'); break;
     case 'presupuesto': {
       const fr = prompt('¿Cada cuándo te pagan? Escribe 1 = quincena, 2 = mes, 3 = semana', (D.ingresoFrec||0)+1); if(fr === null) break;
       const v = prompt('¿Cuánto te pagan cada vez?', D.ingresoPago||''); if(v === null) break;
@@ -545,6 +658,7 @@ function pintar(anim){
 aplicarTema();
 if(!D.nombre && !D.pagos.length){ setTimeout(() => { const v = prompt('¡Bienvenido a Mis Pagos! ¿Cómo te llamas?'); if(v){ D.nombre = v.trim(); guardar(); pintar(); } }, 400); }
 pintar();
+if(D.nube && D.nube.refresh && D.nube.verif) sincronizar().then(pintar).catch(() => {});
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>
