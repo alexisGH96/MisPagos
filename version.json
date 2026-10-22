@@ -1,6 +1,6 @@
 {
-  "versionCode": 41,
-  "versionName": "5.5",
+  "versionCode": 42,
+  "versionName": "5.6",
   "apk": "MisPagos.apk",
-  "notas": "Nuevo en Ajustes: Personas con las que pagas. Cambia nombres en todos tus pagos y guarda teléfono y correo; el recordatorio se manda directo a su WhatsApp."
+  "notas": "Nuevo: cuenta de Mis Pagos. Los pagos que compartes con alguien le aparecen en su app con quién los creó."
 }
