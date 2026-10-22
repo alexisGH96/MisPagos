@@ -1,6 +1,6 @@
 {
-  "versionCode": 39,
-  "versionName": "5.3",
+  "versionCode": 40,
+  "versionName": "5.4",
   "apk": "MisPagos.apk",
-  "notas": "Gráfica de pastel con grosor parejo y esquinas redondeadas. En el calendario, hoy ya no va relleno: se marca con la palabra hoy."
+  "notas": "El aviso del día de corte ahora llega al día siguiente, cuando ya está calculado lo que debes (puedes cambiarlo en Ajustes)."
 }
