@@ -1,6 +1,6 @@
 {
-  "versionCode": 63,
-  "versionName": "7.7",
+  "versionCode": 64,
+  "versionName": "7.8",
   "apk": "MisPagos.apk",
-  "notas": "Tarjetas de crédito compartidas: aparecen en tus Tarjetas marcadas como compartidas. Menú de colores con esquinas redondeadas y animación."
+  "notas": "Comparte pagos escribiendo el correo o el número de la otra persona. Íconos de colores para cada categoría."
 }
