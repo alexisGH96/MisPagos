@@ -1,6 +1,6 @@
 {
-  "versionCode": 52,
-  "versionName": "6.6",
+  "versionCode": 53,
+  "versionName": "6.7",
   "apk": "MisPagos.apk",
-  "notas": "Glass: botones de cristal sin contorno negro."
+  "notas": "Glass blanco: manchas de color definidas y tarjetas con más desenfoque que el fondo, para que se note el cristal."
 }
