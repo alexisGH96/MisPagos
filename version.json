@@ -1,6 +1,6 @@
 {
-  "versionCode": 62,
-  "versionName": "7.6",
+  "versionCode": 63,
+  "versionName": "7.7",
   "apk": "MisPagos.apk",
-  "notas": "Claro 1: el selector de Quincenas/Tarjetas ahora es azul marino."
+  "notas": "Tarjetas de crédito compartidas: aparecen en tus Tarjetas marcadas como compartidas. Menú de colores con esquinas redondeadas y animación."
 }
