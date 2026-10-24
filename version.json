@@ -1,6 +1,6 @@
 {
-  "versionCode": 66,
-  "versionName": "8.0",
+  "versionCode": 67,
+  "versionName": "8.1",
   "apk": "MisPagos.apk",
-  "notas": "Guardar el ajuste de foto. Colores de Por pagar este mes para Oscuro y Glass. Claro 1: Ver todos y flechas en azul."
+  "notas": "Animaciones en todos los botones, selectores que se deslizan, calendario que se desliza entre meses y ventanas con el diseño de la app."
 }
