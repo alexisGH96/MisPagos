@@ -142,8 +142,8 @@ input,select{width:100%;font:inherit;color:var(--fg);background:var(--surf);bord
 :root[data-tema="glassb"]{--bg:#FFFFFF; --fg:#12121C; --gr:#5A5A6E; --surf:rgba(255,255,255,.16); --line:rgba(0,0,0,.08); --acc:#12121C; --accTxt:#fff; --nav:rgba(255,255,255,.3); --pill:#F9DED4; --icoSel:#963C1E; --ico:#28283A;
   --t-nar:rgba(255,255,255,.16); --t-ama:rgba(255,255,255,.16); --t-ver:rgba(255,255,255,.16); --t-azu:rgba(255,255,255,.16); --t-roj:rgba(255,255,255,.16); --tile:rgba(255,255,255,.8); --hero1:rgba(255,255,255,.16); --hero2:rgba(255,255,255,.16); --heroTxt:#12121C}
 :root[data-tema="glassb"] body{background:transparent} :root[data-tema="glassb"]{background:#fff}
-:root[data-tema="glassb"] #fondoGlass{display:block;position:fixed;inset:-40px;z-index:-1;background:url(fondo-blanco-2.jpg) center/cover;filter:blur(13px)}
-:root[data-tema="glassb"] .caja,:root[data-tema="glassb"] .pago,:root[data-tema="glassb"] .pc,:root[data-tema="glassb"] .hero,:root[data-tema="glassb"] .seg,:root[data-tema="glassb"] nav,:root[data-tema="glassb"] .pildora,:root[data-tema="glassb"] .btn.borde,:root[data-tema="glassb"] .mas{-webkit-backdrop-filter:blur(12px) saturate(130%);backdrop-filter:blur(12px) saturate(130%)}
+:root[data-tema="glassb"] #fondoGlass{display:block;position:fixed;inset:-40px;z-index:-1;background:url(fondo-blanco-2.jpg) center/cover;filter:blur(22px)}
+:root[data-tema="glassb"] .caja,:root[data-tema="glassb"] .pago,:root[data-tema="glassb"] .pc,:root[data-tema="glassb"] .hero,:root[data-tema="glassb"] .seg,:root[data-tema="glassb"] nav,:root[data-tema="glassb"] .pildora,:root[data-tema="glassb"] .btn.borde,:root[data-tema="glassb"] .mas{-webkit-backdrop-filter:blur(12px) saturate(130%);backdrop-filter:blur(20px) saturate(130%)}
 :root[data-tema^="glass"] .caja,:root[data-tema^="glass"] .pago,:root[data-tema^="glass"] .pc,:root[data-tema^="glass"] .seg,:root[data-tema^="glass"] .hero,:root[data-tema^="glass"] .hoja,:root[data-tema^="glass"] input,:root[data-tema^="glass"] select{
   -webkit-backdrop-filter:blur(5px) saturate(130%);backdrop-filter:blur(5px) saturate(130%);border:.5px solid rgba(255,255,255,.18)}
 :root[data-tema="glass"] .caja,:root[data-tema="glass"] .pago,:root[data-tema="glass"] .pc,:root[data-tema="glass"] .hero{background-color:rgba(255,255,255,.16)}
@@ -171,6 +171,8 @@ html,body{overscroll-behavior-y:contain}
 :root[data-tema="oscuro"] .mas,:root[data-tema="oscuro"] .pildora,:root[data-tema="glassn"] .mas,:root[data-tema="glassn"] .pildora{box-shadow:0 8px 18px -6px rgba(0,0,0,.6)}
 .pastel.tarde.ver path[fill]:not([fill=none]){animation-delay:1.5s}
 .pastel.tarde.ver path[fill=none],.pastel.tarde.ver circle,.pastel.tarde.ver text{animation-delay:2.2s}
+:root[data-tema="glassb"] nav button.sel{background:radial-gradient(120% 100% at 50% 58%, rgba(255,255,255,.08) 0, rgba(255,255,255,.12) 62%, rgba(255,255,255,.45) 100%), linear-gradient(to bottom, transparent 55%, rgba(255,255,255,.35));
+  border:1px solid rgba(255,255,255,.85);border-bottom-color:rgba(40,48,80,.12);box-shadow:0 4px 10px -3px rgba(40,48,80,.25), inset 10px 6px 10px -6px rgba(255,255,255,.9);color:#963C1E}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
