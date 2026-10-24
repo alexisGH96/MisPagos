@@ -299,6 +299,9 @@ function inicio(){
   let h = `<div class="hola"><span class="ava">${esc((D.nombre||'?')[0].toUpperCase())}</span>
     <div class="peso"><div class="b" style="font-size:22px">Hola${D.nombre ? ', ' + esc(D.nombre) : ''}</div><div class="gris chico">Bienvenido de nuevo</div></div>
     <button class="mas" data-act="nuevo" aria-label="Agregar pago">+</button></div>
+    ${(D.invitaciones || []).map(x => `<button class="pago est-ama" style="display:block" data-act="invitacion" data-i="${x.id}"><b>✉ ${esc(x.de)} compartió ${esc(sinPrefijo(x.nombre))} contigo</b><div class="gris chico">Toca para aceptarlo o rechazarlo</div></button>`).join('')}
+    ${D.pagos.filter(p => p.nubeSolVista && !p.creadoPor).map(p => `<button class="pago est-ama" style="display:block" data-act="solicitud" data-id="${p.id}"><b>✎ Piden un cambio en ${esc(sinPrefijo(p.nombre))}</b><div class="gris chico">Toca para revisarlo</div></button>`).join('')}
+    ${(D.avisosNube || []).length ? `<button class="pago est-azu" style="display:block" data-act="avisoNubeOk">${D.avisosNube.map(esc).join('<br>')}<div class="gris chico">Toca para ocultar</div></button>` : ''}
     <div class="hero"><div class="fila"><span class="peso">Por pagar este mes</span><span class="chico">${pag} de ${delMes.length} pagados</span></div>
     <div class="monto">${dinero(tot)}</div><div class="barra"><i style="width:${delMes.length ? pag/delMes.length*100 : 0}%"></i></div></div>`;
   if(!D.pagos.length) return h + `<div class="vacio"><p>Agrega tu primer pago con el botón +.</p><button class="btn lleno" data-act="nuevo">Agregar pago</button></div>`;
@@ -339,6 +342,9 @@ function carteraV(){
   let h = `<div class="seg"><button class="${cartera===0?'sel':''}" data-act="cartera" data-n="0">Quincenas</button><button class="${cartera===1?'sel':''}" data-act="cartera" data-n="1">Tarjetas</button></div>`;
   if(cartera === 1){
     const cs = D.pagos.filter(p => p.credito);
+    const corteDe = (dia, desde) => { let d = new Date(desde.getFullYear(), desde.getMonth(), 1); for(let k = 0; k < 3; k++){ const m = new Date(d.getFullYear(), d.getMonth() + k, 1); const f = new Date(m.getFullYear(), m.getMonth(), Math.min(dia, new Date(m.getFullYear(), m.getMonth()+1, 0).getDate())); if(f >= desde) return f; } };
+    const h0 = hoy(), conC = cs.filter(p => p.diaCorte > 0).map(p => { const sig = corteDe(p.diaCorte, new Date(h0.getTime() + DIA)); return {p, faltan: Math.round((sig - h0)/DIA), sig}; }).sort((a,b) => b.faltan - a.faltan);
+    if(conC.length) h += `<div class="caja est-ver" style="margin-bottom:16px"><div class="b" style="font-size:17px">¿Con cuál comprar hoy?</div><div class="gris chico" style="margin:4px 0 8px">Usa la que ya hizo corte: lo que compres entra hasta el siguiente estado de cuenta y tienes más días para pagar sin intereses.</div>${conC.map((z,i) => `<div class="fila" style="padding:8px 0"><span class="punto" style="width:24px;height:24px;display:grid;place-items:center;color:#fff;font-weight:800;background:${z.faltan >= 15 ? 'var(--r-ver)' : z.faltan <= 5 ? 'var(--r-roj)' : 'var(--r-ama)'}">${z.faltan >= 15 ? '✓' : z.faltan <= 5 ? '!' : '•'}</span><div class="peso"><div class="b">${esc(sinPrefijo(z.p.nombre))}${i === 0 ? ' · la mejor hoy' : ''}</div><div class="gris chico">${z.faltan >= 15 ? 'Ya hizo corte. Corta otra vez el ' + z.sig.getDate() + ' ' + MESES[z.sig.getMonth()] + '.' : 'Corta en ' + z.faltan + (z.faltan === 1 ? ' día' : ' días') + ': mejor espera o usa otra.'}</div></div></div>`).join('')}</div>`;
     if(!cs.length) return h + `<div class="vacio">Aquí aparecen tus tarjetas de crédito y créditos departamentales. Para agregar uno, abre un pago, toca editar y elige el tipo de crédito.</div>`;
     return h + cs.map(p => `<button class="pago est-${estado(p)}" style="display:block" data-act="detalle" data-id="${p.id}"><div class="fila">${icono(p)}<div class="peso"><div class="nom">${esc(sinPrefijo(p.nombre))}</div><div class="gris chico">${p.tipoCred==='departamental'?'Crédito departamental':'Tarjeta de crédito'}</div></div></div>
       <div class="dos" style="margin-top:12px"><div><div class="gris chico">Corte</div><div class="b">${p.diaCorte ? 'día ' + p.diaCorte : '—'}</div></div><div><div class="gris chico">Límite de pago</div><div class="b">${corto(p.vence)}</div></div>
@@ -479,7 +485,9 @@ function hojaFondo(){
   abrirHoja(`<h1>Fondo del perfil</h1><div class="dos">${FONDOS.map(([n,g],i) => `<button data-act="fondoSel" data-n="${i}" style="height:80px;border-radius:18px;background:${g};color:#fff;font-weight:700;text-shadow:0 1px 6px rgba(0,0,0,.5);${(D.perfilFondo == null ? 1 : D.perfilFondo) === i ? 'box-shadow:0 0 0 3px var(--fg)' : ''}">${n}</button>`).join('')}<button data-act="fondoFoto" class="btn borde" style="height:80px;border-radius:18px">Foto de tu galería</button></div><button class="btn borde" style="margin-top:16px" data-act="cerrar">Cerrar</button>`);
 }
 /* ===================== hojas: detalle y editor ===================== */
+let hojaT = null;
 function abrirHoja(html){
+  clearTimeout(hojaT);
   const capa = document.getElementById('capa');
   capa.innerHTML = `<div class="velo" data-act="cerrar"></div><div class="hoja" role="dialog" aria-modal="true"><div class="asa"></div>${html}</div>`;
   requestAnimationFrame(() => { capa.querySelector('.velo').classList.add('ver'); capa.querySelector('.hoja').classList.add('ver'); });
@@ -487,7 +495,7 @@ function abrirHoja(html){
 function cerrarHoja(){
   const capa = document.getElementById('capa'); const h = capa.querySelector('.hoja'); if(!h) return;
   h.classList.remove('ver'); capa.querySelector('.velo').classList.remove('ver');
-  setTimeout(() => { capa.innerHTML = ''; }, 300);
+  hojaT = setTimeout(() => { capa.innerHTML = ''; }, 300);
 }
 function detalle(id){
   const p = D.pagos.find(x => x.id === id); if(!p) return;
@@ -536,7 +544,10 @@ function editor(id){
   document.getElementById('ed').onsubmit = (ev) => {
     ev.preventDefault(); const f = Object.fromEntries(new FormData(ev.target));
     const x = id ? D.pagos.find(z => z.id === id) : {id: Date.now(), pagado:false, hist:[]};
-    x.nombre = f.nombre.trim(); x.monto = f.monto.trim(); if(x.vence !== f.vence){ x.vence = f.vence; x.ancla = fecha(f.vence).getDate(); }
+    if(id && x.creadoPor){
+      const cam = {}; if(f.nombre.trim() !== x.nombre) cam.nombre = f.nombre.trim(); if(f.monto.trim() !== x.monto) cam.monto = f.monto.trim(); if(f.vence !== x.vence) cam.vence = f.vence;
+      if(Object.keys(cam).length){ enviarSolicitud(x, cam).then(() => aviso('Solicitud enviada a ' + x.creadoPor)).catch(e => alert(e.message)); }
+    } else { x.nombre = f.nombre.trim(); x.monto = f.monto.trim(); if(x.vence !== f.vence){ x.vence = f.vence; x.ancla = fecha(f.vence).getDate(); } }
     x.frec = f.frec; x.cat = f.cat || adivinarCat(x.nombre); x.credito = f.credito !== 'no'; x.tipoCred = f.credito === 'departamental' ? 'departamental' : 'tarjeta';
     x.diaCorte = parseInt(f.diaCorte)||0; x.minimo = f.minimo.trim(); x.cuenta = f.cuenta.trim(); x.referencia = f.referencia.trim(); x.titular = f.titular.trim();
     x.compartido = !!f.compartido; x.conQuien = f.conQuien.trim(); x.miParte = Math.max(0, Math.min(100, parseInt(f.miParte)||50));
@@ -544,6 +555,7 @@ function editor(id){
     if(!id) D.pagos.push(x);
     if(x.conQuien && !personas().some(z => z.nombre.toLowerCase() === x.conQuien.toLowerCase())) D.personas.push({nombre:x.conQuien, tel:'', mail:''});
     guardar(); cerrarHoja(); pintar(); aviso('✓ Guardado');
+    if(x.compartido && !x.creadoPor && D.nube && D.nube.verif) sincronizar().then(pintar).catch(() => {});
   };
 }
 function personas(){
@@ -625,16 +637,37 @@ async function sincronizar(){
     const fields = {nombre:sv(p.nombre), monto:sv(p.monto), vence:sv(p.vence), frec:sv(p.frec), cat:sv(p.cat), parteCreador:iv(p.miParte||50),
       creadoPor:sv(uid), creadorNombre:sv(D.nombre || yo), creadorCorreo:sv(yo), otroNombre:sv(p.conQuien), otroCorreo:sv(otro),
       participantes:{arrayValue:{values:[sv(yo), sv(otro)]}}, actualizado:iv(Date.now())};
-    if(!p.nubeId){ const r = await pedir('POST', DOCS + '/compartidos', {fields}, await token()); p.nubeId = r.name.split('/').pop(); }
-    else await pedir('PATCH', DOCS + '/compartidos/' + p.nubeId, {fields}, await token());
+    if(!p.nubeId){ fields.estado = sv('pendiente'); fields.solicitud = sv(''); const r = await pedir('POST', DOCS + '/compartidos', {fields}, await token()); p.nubeId = r.name.split('/').pop(); p.nubeEstado = 'pendiente'; }
+    else await pedir('PATCH', DOCS + '/compartidos/' + p.nubeId + '?' + Object.keys(fields).map(k => 'updateMask.fieldPaths=' + k).join('&'), {fields}, await token());
     p.nubeFirma = firma; sub++;
   }
   const res = await pedir('POST', DOCS + ':runQuery', {structuredQuery:{from:[{collectionId:'compartidos'}], where:{fieldFilter:{field:{fieldPath:'participantes'}, op:'ARRAY_CONTAINS', value:sv(yo)}}}}, await token());
   const vistos = new Set();
   (Array.isArray(res) ? res : []).forEach(x => {
     const d = x.document; if(!d) return; const id = d.name.split('/').pop(), f = d.fields; vistos.add(id);
-    if(gs(f,'creadoPor') === uid) return;
-    let p = D.pagos.find(z => z.nubeId === id); const nuevo = !p;
+    const estado = gs(f,'estado') || 'aceptado', sol = gs(f,'solicitud');
+    let p = D.pagos.find(z => z.nubeId === id);
+    D.avisosNube = D.avisosNube || [];
+    if(gs(f,'creadoPor') === uid){
+      if(!p) return; const otroN = gs(f,'otroNombre') || gs(f,'otroCorreo');
+      if(estado !== (p.nubeEstado || '')){
+        if(estado === 'aceptado' && p.nubeEstado === 'pendiente') D.avisosNube.push(`✓ ${otroN} aceptó el pago compartido ${sinPrefijo(p.nombre)}.`);
+        if(estado === 'rechazado') D.avisosNube.push(`✕ ${otroN} rechazó el pago compartido ${sinPrefijo(p.nombre)}. Revísalo.`);
+        p.nubeEstado = estado;
+      }
+      if(sol && sol !== p.nubeSolVista) p.nubeSolVista = sol;
+      return;
+    }
+    D.invitaciones = (D.invitaciones || []).filter(z => z.id !== id);
+    if(estado !== 'aceptado'){
+      if(estado === 'pendiente' && !p) D.invitaciones.push({id, nombre:gs(f,'nombre'), monto:gs(f,'monto'), vence:gs(f,'vence'), parte:100 - gi(f,'parteCreador',50), de:gs(f,'creadorNombre')});
+      return;
+    }
+    if(p && p.solicitudEnviada && !sol){
+      let ok = false; try{ const q = JSON.parse(p.solicitudEnviada); ok = (q.monto == null || q.monto === gs(f,'monto')) && (q.vence == null || q.vence === gs(f,'vence')); }catch(e){}
+      D.avisosNube.push(`${gs(f,'creadorNombre')} ${ok ? 'aprobó' : 'no aprobó'} tu cambio en ${sinPrefijo(p.nombre)}.`); p.solicitudEnviada = '';
+    }
+    const nuevo = !p;
     if(nuevo) p = {id: Date.now() + Math.floor(Math.random()*1000), nubeId:id, pagado:false, hist:[]};
     const firma = [gs(f,'nombre'), gs(f,'monto'), gs(f,'vence'), gs(f,'frec'), gi(f,'parteCreador',50)].join('|');
     if(!nuevo && firma === p.nubeFirma) return;
@@ -644,11 +677,30 @@ async function sincronizar(){
     p.ancla = fecha(p.vence).getDate();
     if(nuevo){ D.pagos.push(p); nue++; } else cam++;
   });
+  D.invitaciones = (D.invitaciones || []).filter(z => vistos.has(z.id));
   const antes = D.pagos.length; D.pagos = D.pagos.filter(p => !(p.creadoPor && p.nubeId && !vistos.has(p.nubeId))); qui = antes - D.pagos.length;
   D.nube.ultima = Date.now(); guardar();
   const r = []; if(sub) r.push(sub + (sub === 1 ? ' pago compartido subido' : ' pagos compartidos subidos')); if(nue) r.push(nue + (nue === 1 ? ' pago nuevo para ti' : ' pagos nuevos para ti')); if(cam) r.push(cam + ' actualizados'); if(qui) r.push(qui + ' quitados');
   return r.length ? r.join(' · ') : 'Todo al día';
 }
+async function responderInvitacion(id, aceptar){
+  await pedir('PATCH', DOCS + '/compartidos/' + id + '?updateMask.fieldPaths=estado&updateMask.fieldPaths=actualizado', {fields:{estado:sv(aceptar ? 'aceptado' : 'rechazado'), actualizado:iv(Date.now())}}, await token());
+  D.invitaciones = (D.invitaciones || []).filter(z => z.id !== id); guardar();
+  if(aceptar){ await sincronizar(); return 'Aceptado. Ya aparece en tus pagos.'; }
+  return 'Rechazado. Le avisaremos a quien te lo compartió.';
+}
+async function enviarSolicitud(p, cambios){
+  cambios.de = D.nombre || D.nube.correo;
+  await pedir('PATCH', DOCS + '/compartidos/' + p.nubeId + '?updateMask.fieldPaths=solicitud&updateMask.fieldPaths=actualizado', {fields:{solicitud:sv(JSON.stringify(cambios)), actualizado:iv(Date.now())}}, await token());
+  p.solicitudEnviada = JSON.stringify(cambios); guardar();
+}
+async function responderSolicitud(p, aprobar){
+  if(aprobar){ const o = JSON.parse(p.nubeSolVista); if(o.nombre) p.nombre = o.nombre; if(o.monto != null) p.monto = o.monto; if(o.vence){ p.vence = o.vence; p.ancla = fecha(o.vence).getDate(); p.pagado = false; } }
+  await pedir('PATCH', DOCS + '/compartidos/' + p.nubeId + '?updateMask.fieldPaths=solicitud', {fields:{solicitud:sv('')}}, await token());
+  p.nubeSolVista = ''; guardar(); await sincronizar();
+  return aprobar ? 'Cambio aprobado y compartido.' : 'Cambio rechazado.';
+}
+function describir(sol){ try{ const o = JSON.parse(sol); return [o.nombre && 'Nombre: ' + o.nombre, o.monto != null && 'Monto: $' + o.monto, o.vence && 'Fecha: ' + corto(o.vence)].filter(Boolean).join(' · '); }catch(e){ return ''; } }
 function borrarNube(p){ if(!p.creadoPor && p.nubeId && D.nube && D.nube.refresh) token().then(t => fetch(DOCS + '/compartidos/' + p.nubeId, {method:'DELETE', headers:{Authorization:'Bearer ' + t}})).catch(() => {}); }
 async function tarea(fn){ try{ const r = await fn(); if(r) alert(r); }catch(e){ alert(e.message || 'No hay conexión'); } pintar(); }
 function hojaCuenta(){
@@ -706,7 +758,7 @@ document.addEventListener('click', (ev) => {
     case 'tab': tab = +n; pintar(true); window.scrollTo({top:0}); break;
     case 'detalle': detalle(id); break;
     case 'nuevo': editor(null); break;
-    case 'editar': cerrarHoja(); setTimeout(() => editor(id), 280); break;
+    case 'editar': cerrarHoja(); setTimeout(() => editor(id), 320); break;
     case 'cerrar': cerrarHoja(); break;
     case 'borrar': if(confirm('¿Eliminar este pago?')){ const bp = D.pagos.find(p => p.id === id); if(bp) borrarNube(bp); D.pagos = D.pagos.filter(p => p.id !== id); guardar(); cerrarHoja(); pintar(); aviso('Pago eliminado'); } break;
     case 'pagar': {
@@ -748,6 +800,18 @@ document.addEventListener('click', (ev) => {
     case 'tel': { const v = prompt('Tu teléfono', D.miTel || ''); if(v !== null){ D.miTel = v.trim(); guardar(); pintar(); } break; }
     case 'importar': document.getElementById('imp').click(); break;
     case 'cuenta': hojaCuenta(); break;
+    case 'invitacion': { const x = (D.invitaciones || []).find(z => z.id === b.dataset.i);
+      if(!x) break; const m = num(x.monto) * x.parte / 100;
+      abrirHoja(`<h1>${esc(x.de)} compartió un pago contigo</h1><div class="caja"><div class="b">${esc(sinPrefijo(x.nombre))}</div><div class="gris">Vence ${corto(x.vence)} · te toca ${x.parte} %${m ? ': ' + dinero(Math.round(m)) : ''}</div></div>
+        <button class="btn lleno" style="margin-top:16px" data-act="invSi" data-i="${x.id}">Aceptar</button><button class="btn borde" style="margin-top:10px" data-act="invNo" data-i="${x.id}">Rechazar</button>`); break; }
+    case 'invSi': cerrarHoja(); tarea(() => responderInvitacion(b.dataset.i, true)); break;
+    case 'invNo': cerrarHoja(); tarea(() => responderInvitacion(b.dataset.i, false)); break;
+    case 'solicitud': { const p = D.pagos.find(z => z.id === id); if(!p || !p.nubeSolVista) break; let q = {}; try{ q = JSON.parse(p.nubeSolVista); }catch(e){}
+      abrirHoja(`<h1>${esc(q.de || 'La otra persona')} pide un cambio</h1><div class="caja"><div class="b">${esc(sinPrefijo(p.nombre))}</div><div class="gris">Ahora: ${p.monto ? '$' + esc(p.monto) + ' · ' : ''}${corto(p.vence)}</div><div style="margin-top:6px">Pide: ${esc(describir(p.nubeSolVista))}</div></div>
+        <button class="btn lleno" style="margin-top:16px" data-act="solSi" data-id="${p.id}">Aprobar</button><button class="btn borde" style="margin-top:10px" data-act="solNo" data-id="${p.id}">Rechazar</button>`); break; }
+    case 'solSi': { const p = D.pagos.find(z => z.id === id); cerrarHoja(); tarea(() => responderSolicitud(p, true)); break; }
+    case 'solNo': { const p = D.pagos.find(z => z.id === id); cerrarHoja(); tarea(() => responderSolicitud(p, false)); break; }
+    case 'avisoNubeOk': D.avisosNube = []; guardar(); pintar(); break;
     case 'avisos': tarea(activarAvisos); break;
     case 'sync': cerrarHoja(); tarea(sincronizar); break;
     case 'verif': cerrarHoja(); tarea(async () => (await revisarVerif()) ? 'Correo verificado. ' + await sincronizar() : 'Todavía no aparece verificado. Revisa tu correo (también en spam).'); break;
