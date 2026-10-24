@@ -1,6 +1,6 @@
 {
-  "versionCode": 65,
-  "versionName": "7.9",
+  "versionCode": 66,
+  "versionName": "8.0",
   "apk": "MisPagos.apk",
-  "notas": "Sin parpadeo al volver a la app. Fondo de perfil distinto para Claro, Oscuro y Glass. Ajusta tu foto de perfil dentro del círculo."
+  "notas": "Guardar el ajuste de foto. Colores de Por pagar este mes para Oscuro y Glass. Claro 1: Ver todos y flechas en azul."
 }
