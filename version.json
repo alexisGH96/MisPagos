@@ -1,6 +1,6 @@
 {
-  "versionCode": 57,
-  "versionName": "7.1",
+  "versionCode": 58,
+  "versionName": "7.2",
   "apk": "MisPagos.apk",
-  "notas": "Sombras suaves que se desvanecen, sin cambiar el tamaño de las tarjetas."
+  "notas": "Sombra de las tarjetas más visible y la gota de la barra más clara."
 }
