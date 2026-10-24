@@ -1,6 +1,6 @@
 {
-  "versionCode": 58,
-  "versionName": "7.2",
+  "versionCode": 59,
+  "versionName": "7.3",
   "apk": "MisPagos.apk",
-  "notas": "Sombra de las tarjetas más visible y la gota de la barra más clara."
+  "notas": "Barra: selección redonda y centrada en el ícono; gota de vidrio más clara."
 }
