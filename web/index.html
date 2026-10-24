@@ -315,8 +315,8 @@ function inicio(){
     ${(D.invitaciones || []).map(x => `<button class="pago est-ama" style="display:block" data-act="invitacion" data-i="${x.id}"><b>✉ ${esc(x.de)} compartió ${esc(sinPrefijo(x.nombre))} contigo</b><div class="gris chico">Toca para aceptarlo o rechazarlo</div></button>`).join('')}
     ${D.pagos.filter(p => p.nubeSolVista && !p.creadoPor).map(p => `<button class="pago est-ama" style="display:block" data-act="solicitud" data-id="${p.id}"><b>✎ Piden un cambio en ${esc(sinPrefijo(p.nombre))}</b><div class="gris chico">Toca para revisarlo</div></button>`).join('')}
     ${(D.avisosNube || []).length ? `<button class="pago est-azu" style="display:block" data-act="avisoNubeOk">${D.avisosNube.map(esc).join('<br>')}<div class="gris chico">Toca para ocultar</div></button>` : ''}
-    <div class="hero"><div class="fila"><span class="peso">Por pagar este mes</span><span class="chico">${pag} de ${delMes.length} pagados</span></div>
-    <div class="monto">${dinero(tot)}</div><div class="barra"><i style="width:${delMes.length ? pag/delMes.length*100 : 0}%"></i></div></div>`;
+    <div class="hero" id="hero" style="${estiloHero()}"><div class="fila"><span class="peso">Por pagar este mes</span><span class="chico">${pag} de ${delMes.length} pagados</span></div>
+    <div class="monto">${dinero(tot)}</div><div class="barra" style="${estiloBarra()}"><i style="width:${delMes.length ? pag/delMes.length*100 : 0}%;${estiloRelleno()}"></i></div></div>`;
   if(!D.pagos.length) return h + `<div class="vacio"><p>Agrega tu primer pago con el botón +.</p><button class="btn lleno" data-act="nuevo">Agregar pago</button></div>`;
   h += `<div class="sec"><h2>Próximos</h2><button class="pildora" data-act="tab" data-n="1">Ver todos ›</button></div><div class="prox">`;
   prox.forEach(p => { h += `<button class="pc" data-act="detalle" data-id="${p.id}"><div class="fila">${icono(p)}<div class="peso"><div class="b">${p.monto ? dinero(num(p.monto)) : ''}</div><div class="gris chico">${dias(p.vence) <= 0 ? 'hoy' : dias(p.vence) === 1 ? 'mañana' : 'en ' + dias(p.vence) + ' días'}</div></div>${anillo(p,36)}</div><div class="b" style="margin-top:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sinPrefijo(p.nombre))}</div><div class="gris chico">Vence ${corto(p.vence)}</div></button>`; });
@@ -478,7 +478,7 @@ function ajustes(){
     ${grupo('Cuenta y personas', [['Cuenta y pagos compartidos', correo ? (D.nube.verif ? 'Conectada' : 'Sin verificar') : 'Sin cuenta', 'cuenta'], ['Personas con las que pagas', personas().length + ' personas', 'personas']])}
     <div class="gris chico b" style="margin:22px 8px 8px">Apariencia</div><div class="caja">${[temas.slice(0,3), temas.slice(3)].map((fila,f) => `<div class="seg" style="margin:${f ? '8px' : '0'} 0 0">${fila.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div>`).join('')}<p class="gris chico" style="margin-bottom:0">Glass sigue al sistema (de noche es oscuro). Glass blanco es blanco con toques de color.</p></div>
     ${grupo('Fondo del modo Glass', [['Tu imagen de fondo', D.fondoGlass ? 'Tu foto' : 'Predeterminado', 'fondoGlass']])}
-    ${grupo('Perfil', [['Fondo del perfil', D.perfilFondo === -1 ? 'Foto' : FONDOS[D.perfilFondo == null ? 1 : D.perfilFondo][0], 'fondo']])}
+    ${grupo('Perfil y colores', [['Fondo del perfil', D.perfilFondo === -1 ? 'Foto' : FONDOS[D.perfilFondo == null ? 1 : D.perfilFondo][0], 'fondo'], ['Color de "Por pagar este mes"', COLRES[D.colorResumen || 0][0], 'colores']])}
     ${grupo('Tus datos', [['Respaldo en la nube', D.respaldoNube ? 'Guardado' : 'Guardar', 'respNube'], ['Guardar respaldo en archivo', 'archivo', 'exportar'], ['Cargar respaldo de archivo', 'archivo', 'importar']])}
     <input type="file" id="imp" accept="application/json" data-act="importar" hidden>
     <div class="gris chico b" style="margin:22px 8px 8px">Acerca de</div><div class="caja"><p class="chico" style="margin-top:0"><b>Ponla en tu iPhone como app:</b> en Safari toca Compartir y luego "Agregar a pantalla de inicio".</p><p class="gris chico" style="margin-bottom:0">Los avisos llegan cada mañana a las 9:00 (necesitas cuenta y activarlos en "Avisos"). El iPhone no permite que una web vibre por su cuenta. Tus pagos se guardan en este navegador; usa "Guardar respaldo" de vez en cuando.</p></div>`;
@@ -764,6 +764,25 @@ async function activarAvisos(){
 let avisoT = null;
 function programarAvisos(){ if(!D.avisos || !D.nube || !D.nube.verif) return; clearTimeout(avisoT); avisoT = setTimeout(() => guardarAvisos().catch(() => {}), 3000); }
 
+
+/* ---- color de la tarjeta "Por pagar este mes" (temas claros) ---- */
+const COLRES = [['Blanco con borde','#fff','#fff','#121A35','#4A5268','#E2E8F2','#1C326E'],['Azul marino','#162E6C','#2C58A8','#fff','#DCE6FA','#7896D2','#6EAAFF'],['Azul cielo suave','#D6E4FF','#BACEFC','#121A35','#2E3A5C','#fff','#1C326E'],
+  ['Lavanda','#E8E2FF','#CBC0FA','#1E1846','#3C3466','#fff','#6E5ADC'],['Aurora azul-violeta','#3C5ADC','#8C5AE6','#fff','#E6E6FF','rgba(255,255,255,.35)','#fff'],['Menta','#D6F4E8','#B4E6D6','#103228','#2C5A4A','#fff','#1E8C64'],['Durazno','#FFE4D6','#FCCAB6','#3C1E14','#6A4032','#fff','#E66E46']];
+const claroHero = () => ['claro1','claro2'].includes(document.documentElement.dataset.tema);
+const cr = () => COLRES[D.colorResumen || 0];
+function estiloHero(){ if(!claroHero()) return ''; const c = cr(); return `background:linear-gradient(120deg,${c[1]},${c[2]});color:${c[3]};${(D.colorResumen||0) === 0 ? 'border:1px solid #E2E6EE;' : ''}`; }
+function estiloBarra(){ return claroHero() ? `background:${cr()[5]}` : ''; }
+function estiloRelleno(){ return claroHero() ? `background:${cr()[6]}` : ''; }
+function hojaColores(){
+  abrirHoja(`<h1>Color de "Por pagar este mes"</h1>${COLRES.map((c,i) => `<div class="gris chico b" style="margin:12px 4px 6px">${c[0]}${(D.colorResumen||0) === i ? ' ✓' : ''}</div><button data-act="colorRes" data-n="${i}" style="display:block;width:100%;text-align:left;border-radius:18px;padding:14px;background:linear-gradient(120deg,${c[1]},${c[2]});color:${c[3]};${i === 0 ? 'border:1px solid #E2E6EE' : ''}"><div class="chico">Por pagar este mes</div><div style="font-size:24px;font-weight:800;margin:4px 0 8px">$1,019</div><div style="height:5px;border-radius:5px;background:${c[5]}"><i style="display:block;height:100%;width:30%;border-radius:5px;background:${c[6]}"></i></div></button>`).join('')}<button class="btn borde" style="margin-top:16px" data-act="cerrar">Cerrar</button>`);
+}
+/* mantener presionada la tarjeta: se menea y abre los colores */
+(() => { let tm = null;
+  document.addEventListener('pointerdown', e => { const h = e.target.closest('#hero'); if(!h || !claroHero()) return;
+    tm = setTimeout(() => { if(navigator.vibrate) navigator.vibrate(20); h.animate([{transform:'scale(1)'},{transform:'scale(1.04) rotate(-1.5deg)'},{transform:'scale(1.04) rotate(1.5deg)'},{transform:'scale(1.04) rotate(-1deg)'},{transform:'none'}], {duration:460}); setTimeout(hojaColores, 470); }, 500); });
+  ['pointerup','pointercancel','pointermove'].forEach(ev => document.addEventListener(ev, e => { if(ev !== 'pointermove' || Math.abs(e.movementY) > 4) clearTimeout(tm); }));
+})();
+
 /* ===================== acciones ===================== */
 function aviso(t){ const e = document.getElementById('toast'); e.textContent = t; e.classList.add('ver'); clearTimeout(aviso.t); aviso.t = setTimeout(() => e.classList.remove('ver'), 1800); }
 document.addEventListener('click', (ev) => {
@@ -805,6 +824,8 @@ document.addEventListener('click', (ev) => {
       if(!confirm('Se reemplazan tus pagos y ajustes actuales por los del respaldo. ¿Continuar?')) return '';
       const nube = D.nube; D = JSON.parse(t); D.nube = nube; guardar(); aplicarTema(); return 'Respaldo recuperado.'; }); break;
     case 'fondo': hojaFondo(); break;
+    case 'colores': hojaColores(); break;
+    case 'colorRes': D.colorResumen = +n; guardar(); cerrarHoja(); pintar(); break;
     case 'fondoGlass':
       if(D.fondoGlass && confirm('¿Volver al fondo predeterminado de Glass? (Cancelar para elegir otra imagen)')){ delete D.fondoGlass; guardar(); aplicarTema(); pintar(); break; }
       elegirImagen(f => reducir(f, 1400).then(u => { D.fondoGlass = u; if(!String(D.tema).startsWith('glass')) D.tema = 'glass'; guardar(); aplicarTema(); pintar(); aviso('✓ Tip: elige la misma imagen de tu fondo de pantalla'); }).catch(() => aviso('No pude usar esa imagen'))); break;
