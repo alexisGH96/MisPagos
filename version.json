@@ -1,6 +1,6 @@
 {
-  "versionCode": 54,
-  "versionName": "6.8",
+  "versionCode": 55,
+  "versionName": "6.9",
   "apk": "MisPagos.apk",
-  "notas": "Tarjetas y botones flotando con sombra en todas las apariencias. Historial y consejos en tarjeta. Ajustes en Tarjetas y en la gráfica de Ahorros."
+  "notas": "Glass blanco: fondo más desenfocado y la selección de la barra como una gota de agua."
 }
