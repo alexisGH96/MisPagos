@@ -359,7 +359,7 @@ function carteraV(){
     const h0 = hoy(), conC = cs.filter(p => p.diaCorte > 0).map(p => { const sig = corteDe(p.diaCorte, new Date(h0.getTime() + DIA)); return {p, faltan: Math.round((sig - h0)/DIA), sig}; }).sort((a,b) => b.faltan - a.faltan);
     if(conC.length) h += `<div class="caja est-ver" style="margin-bottom:16px"><div class="b" style="font-size:17px">¿Con cuál comprar hoy?</div><div class="gris chico" style="margin:4px 0 8px">Usa la que ya hizo corte: lo que compres entra hasta el siguiente estado de cuenta y tienes más días para pagar sin intereses.</div>${conC.map((z,i) => `<div class="fila" style="padding:8px 0"><span class="punto" style="width:24px;height:24px;display:grid;place-items:center;color:#fff;font-weight:800;background:${z.faltan >= 15 ? 'var(--r-ver)' : z.faltan <= 5 ? 'var(--r-roj)' : 'var(--r-ama)'}">${z.faltan >= 15 ? '✓' : z.faltan <= 5 ? '!' : '•'}</span><div class="peso"><div class="b">${esc(sinPrefijo(z.p.nombre))}${i === 0 ? ' · la mejor hoy' : ''}</div><div class="gris chico">${z.faltan >= 15 ? 'Ya hizo corte. Corta otra vez el ' + z.sig.getDate() + ' ' + MESES[z.sig.getMonth()] + '.' : 'Corta en ' + z.faltan + (z.faltan === 1 ? ' día' : ' días') + ': mejor espera o usa otra.'}</div></div></div>`).join('')}</div>`;
     if(!cs.length) return h + `<div class="vacio">Aquí aparecen tus tarjetas de crédito y créditos departamentales. Para agregar uno, abre un pago, toca editar y elige el tipo de crédito.</div>`;
-    return h + cs.map(p => `<button class="pago est-${estado(p)}" style="display:block" data-act="detalle" data-id="${p.id}"><div class="fila">${icono(p)}<div class="peso"><div class="nom">${esc(sinPrefijo(p.nombre))}</div><div class="gris chico">${p.tipoCred==='departamental'?'Crédito departamental':'Tarjeta de crédito'}</div></div></div>
+    return h + cs.map(p => `<button class="pago est-${estado(p)}" style="display:block" data-act="detalle" data-id="${p.id}"><div class="fila">${icono(p)}<div class="peso"><div class="nom">${esc(sinPrefijo(p.nombre))}</div><div class="gris chico">${p.tipoCred==='departamental'?'Crédito departamental':'Tarjeta de crédito'}${p.creadoPor ? ' · <b>compartida de ' + esc(p.creadoPor) + '</b>' : ''}</div></div></div>
       <div class="dos" style="margin-top:12px"><div><div class="gris chico">Corte</div><div class="b">${p.diaCorte ? 'día ' + p.diaCorte : '—'}</div></div><div><div class="gris chico">Límite de pago</div><div class="b">${corto(p.vence)}</div></div>
       <div><div class="gris chico">Sin intereses</div><div class="b">${p.monto ? dinero(num(p.monto)) : '—'}</div></div><div><div class="gris chico">Mínimo</div><div class="b">${p.minimo ? dinero(num(p.minimo)) : '—'}</div></div></div></button>`).join('');
   }
@@ -646,9 +646,10 @@ async function sincronizar(){
     const per = personas().find(z => z.nombre.toLowerCase() === p.conQuien.toLowerCase());
     const otro = per && per.mail ? per.mail.trim().toLowerCase() : '';
     if(!otro.includes('@') || otro === yo) continue;
-    const firma = [p.nombre, p.monto, p.vence, p.frec, p.miParte, p.conQuien, otro].join('|');
+    const firma = [p.nombre, p.monto, p.vence, p.frec, p.miParte, p.conQuien, otro, p.credito ? p.tipoCred || 'tarjeta' : '', p.diaCorte || 0, p.minimo || ''].join('|');
     if(p.nubeId && firma === p.nubeFirma) continue;
     const fields = {nombre:sv(p.nombre), monto:sv(p.monto), vence:sv(p.vence), frec:sv(p.frec), cat:sv(p.cat), parteCreador:iv(p.miParte||50),
+      credito:sv(p.credito ? p.tipoCred || 'tarjeta' : ''), diaCorte:iv(p.diaCorte || 0), minimo:sv(p.minimo || ''),
       creadoPor:sv(uid), creadorNombre:sv(D.nombre || yo), creadorCorreo:sv(yo), otroNombre:sv(p.conQuien), otroCorreo:sv(otro),
       participantes:{arrayValue:{values:[sv(yo), sv(otro)]}}, actualizado:iv(Date.now())};
     if(!p.nubeId){ fields.estado = sv('pendiente'); fields.solicitud = sv(''); const r = await pedir('POST', DOCS + '/compartidos', {fields}, await token()); p.nubeId = r.name.split('/').pop(); p.nubeEstado = 'pendiente'; }
@@ -685,11 +686,12 @@ async function sincronizar(){
     }
     const nuevo = !p;
     if(nuevo) p = {id: Date.now() + Math.floor(Math.random()*1000), nubeId:id, pagado:false, hist:[]};
-    const firma = [gs(f,'nombre'), gs(f,'monto'), gs(f,'vence'), gs(f,'frec'), gi(f,'parteCreador',50)].join('|');
+    const firma = [gs(f,'nombre'), gs(f,'monto'), gs(f,'vence'), gs(f,'frec'), gi(f,'parteCreador',50), gs(f,'credito'), gi(f,'diaCorte',0), gs(f,'minimo')].join('|');
     if(!nuevo && firma === p.nubeFirma) return;
     if(!nuevo && p.vence !== gs(f,'vence')) p.pagado = false;
     Object.assign(p, {nombre:gs(f,'nombre'), monto:gs(f,'monto'), vence:gs(f,'vence'), frec:gs(f,'frec') || 'M1', cat:gs(f,'cat') || adivinarCat(gs(f,'nombre')),
-      compartido:true, miParte:100 - gi(f,'parteCreador',50), conQuien:gs(f,'creadorNombre'), creadoPor:gs(f,'creadorNombre'), nubeFirma:firma});
+      compartido:true, miParte:100 - gi(f,'parteCreador',50), conQuien:gs(f,'creadorNombre'), creadoPor:gs(f,'creadorNombre'), nubeFirma:firma,
+      credito:!!gs(f,'credito'), tipoCred:gs(f,'credito') || 'tarjeta', diaCorte:gi(f,'diaCorte',0), minimo:gs(f,'minimo')});
     p.ancla = fecha(p.vence).getDate();
     if(nuevo){ D.pagos.push(p); nue++; } else cam++;
   });
