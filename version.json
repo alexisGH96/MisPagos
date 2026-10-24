@@ -1,6 +1,6 @@
 {
-  "versionCode": 59,
-  "versionName": "7.3",
+  "versionCode": 60,
+  "versionName": "7.4",
   "apk": "MisPagos.apk",
-  "notas": "Barra: selección redonda y centrada en el ícono; gota de vidrio más clara."
+  "notas": "Recordatorios por Mis Pagos además de WhatsApp. Historial del pago en tarjeta, Deshacer sin color y arreglada la barra del detalle en Glass."
 }
