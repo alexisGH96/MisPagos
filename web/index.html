@@ -516,7 +516,7 @@ function detalle(id){
   let h = `<div class="pago est-${estado(p)}" style="display:block"><div class="fila">${icono(p)}<div class="peso"><div class="nom">${esc(p.nombre)}</div><div class="gris chico">${p.monto ? dinero(num(p.monto)) + ' · ' : ''}${FRECS[p.frec]}</div></div>${anillo(p,44)}</div>
     ${p.creadoPor ? `<div class="gris chico b" style="margin-top:10px">☁ Creado por ${esc(p.creadoPor)}</div>` : ''}
     <div class="b" style="margin:14px 0">Vence ${corto(p.vence)} · ${p.pagado ? 'pagado ✓' : d < 0 ? 'venció hace ' + (-d) + ' días' : d === 0 ? 'vence hoy' : d === 1 ? 'vence mañana' : 'faltan ' + d + ' días'}</div>
-    <button class="btn lleno" data-act="pagar" data-id="${p.id}">${p.pagado ? 'Marcar como pendiente' : 'Ya pagué ✓'}</button></div>`;
+    <button class="btn ${p.pagado ? 'borde' : 'lleno'}" data-act="pagar" data-id="${p.id}">${p.pagado ? 'Deshacer' : 'Ya pagué ✓'}</button></div>`;
   if(p.cuenta || p.referencia || p.titular){
     h += `<h2>Datos para pagar</h2><div class="caja">` + [['Cuenta',p.cuenta],['Referencia',p.referencia],['Titular',p.titular]].filter(x => x[1]).map(([a,b]) => `<div class="dato"><span class="gris">${a}</span><span class="fila"><b>${esc(b)}</b><button class="pildora" data-act="copiar" data-t="${esc(b)}">Copiar</button></span></div>`).join('') + `</div>`;
   }
@@ -529,7 +529,8 @@ function detalle(id){
     const msg = `Hola, el pago de ${sinPrefijo(p.nombre)} vence el ${corto(p.vence)}. Te toca ${dinero(Math.round(otra))}.`;
     const tel = per && per.tel ? per.tel.replace(/\D/g,'') : ''; const telI = tel.length === 10 ? '52' + tel : tel;
     h += `<h2>¿Quién paga?</h2><div class="caja"><div class="dato"><span>Tú · ${p.miParte||50} %</span><b>${dinero(Math.round(mi))}</b></div><div class="dato"><span>${esc(quien)} · ${100-(p.miParte||50)} %</span><b>${dinero(Math.round(otra))}</b></div>
-      <a class="btn lleno" style="margin-top:12px;text-decoration:none" href="https://wa.me/${telI}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">Enviar recordatorio por WhatsApp</a></div>`;
+      ${p.nubeId && D.nube && D.nube.verif ? `<button class="btn lleno" style="margin-top:12px" data-act="recordar" data-id="${p.id}" data-m="${esc(msg)}">Enviar recordatorio por Mis Pagos</button>` : ''}
+      <a class="btn ${p.nubeId && D.nube && D.nube.verif ? 'borde' : 'lleno'}" style="margin-top:10px;text-decoration:none" href="https://wa.me/${telI}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">Enviar recordatorio por WhatsApp</a></div>`;
   }
   if((p.hist||[]).length){
     h += `<h2>Historial</h2><div class="caja">` + p.hist.slice().reverse().slice(0, 12).map(r => { const t = Math.round((fecha(r.f) - fecha(r.v))/DIA); return `<div class="dato"><span>${corto(r.f)} · ${t <= 0 ? 'a tiempo' : t + (t === 1 ? ' día tarde' : ' días tarde')}</span><b>${r.m ? dinero(num(r.m)) : ''}</b></div>`; }).join('') + `</div>`;
@@ -658,6 +659,8 @@ async function sincronizar(){
   const vistos = new Set();
   (Array.isArray(res) ? res : []).forEach(x => {
     const d = x.document; if(!d) return; const id = d.name.split('/').pop(), f = d.fields; vistos.add(id);
+    try{ const ro = JSON.parse(gs(f,'recordatorio') || 'null'); D.recVisto = D.recVisto || {};
+      if(ro && ro.deCorreo !== yo && ro.t > (D.recVisto[id] || 0)){ D.recVisto[id] = ro.t; (D.avisosNube = D.avisosNube || []).push(`🔔 ${ro.de} te recuerda: ${ro.msg}`); } }catch(e){}
     const estado = gs(f,'estado') || 'aceptado', sol = gs(f,'solicitud');
     let p = D.pagos.find(z => z.nubeId === id);
     D.avisosNube = D.avisosNube || [];
@@ -825,6 +828,9 @@ document.addEventListener('click', (ev) => {
     case 'solSi': { const p = D.pagos.find(z => z.id === id); cerrarHoja(); tarea(() => responderSolicitud(p, true)); break; }
     case 'solNo': { const p = D.pagos.find(z => z.id === id); cerrarHoja(); tarea(() => responderSolicitud(p, false)); break; }
     case 'avisoNubeOk': D.avisosNube = []; guardar(); pintar(); break;
+    case 'recordar': { const p = D.pagos.find(z => z.id === id); tarea(async () => {
+      await pedir('PATCH', DOCS + '/compartidos/' + p.nubeId + '?updateMask.fieldPaths=recordatorio&updateMask.fieldPaths=actualizado', {fields:{recordatorio:sv(JSON.stringify({de:D.nombre || D.nube.correo, deCorreo:D.nube.correo, msg:b.dataset.m, t:Date.now()})), actualizado:iv(Date.now())}}, await token());
+      return 'Recordatorio enviado. Le llegará una notificación de Mis Pagos.'; }); break; }
     case 'avisos': tarea(activarAvisos); break;
     case 'sync': cerrarHoja(); tarea(sincronizar); break;
     case 'verif': cerrarHoja(); tarea(async () => (await revisarVerif()) ? 'Correo verificado. ' + await sincronizar() : 'Todavía no aparece verificado. Revisa tu correo (también en spam).'); break;
