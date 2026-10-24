@@ -173,7 +173,10 @@ html,body{overscroll-behavior-y:contain}
 .pastel.tarde.ver path[fill=none],.pastel.tarde.ver circle,.pastel.tarde.ver text{animation-delay:1.2s}
 :root[data-tema="glassb"] nav button.sel{background:radial-gradient(120% 100% at 50% 58%, rgba(255,255,255,.75) 0, rgba(255,255,255,.8) 62%, rgba(255,255,255,.95) 100%), linear-gradient(to bottom, transparent 55%, rgba(255,255,255,.35));
   border:1px solid rgba(255,255,255,.85);border-bottom-color:rgba(40,48,80,.12);box-shadow:inset 10px 6px 10px -6px rgba(255,255,255,1);color:#963C1E}
-:root[data-tema="claro1"] .pildora,:root[data-tema="claro1"] .flechaCal{background:#1C326E;color:#fff;border-color:#1C326E}
+:root[data-tema="claro1"] .pildora{background:#fff;color:#121A35;border-color:transparent}
+:root[data-tema="claro1"] .pildora.flechaCal{background:#1C326E;color:#fff}
+button,.pago,.pc,a.btn{transition:transform .22s cubic-bezier(.34,1.8,.64,1)}
+button:active,.pago:active,.pc:active,a.btn:active{transform:scale(.95);transition-duration:.09s}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -329,7 +332,7 @@ function calendario(){
   const h0 = hoy(); if(!calMes) calMes = new Date(h0.getFullYear(), h0.getMonth(), 1); if(!calSel) calSel = iso(h0);
   const y = calMes.getFullYear(), m = calMes.getMonth();
   const primero = (new Date(y, m, 1).getDay() + 6) % 7, ndias = new Date(y, m+1, 0).getDate();
-  let h = `<h1>Calendario</h1><div class="caja"><div class="fila" style="margin-bottom:8px"><button class="pildora" data-act="mes" data-n="-1" aria-label="Mes anterior">‹</button><div class="peso b" style="text-align:center;font-size:19px">${MESESL[m][0].toUpperCase()+MESESL[m].slice(1)} ${y}</div><button class="pildora" data-act="mes" data-n="1" aria-label="Mes siguiente">›</button></div><div class="cal">`;
+  let h = `<h1>Calendario</h1><div class="caja"><div class="fila" style="margin-bottom:8px"><button class="pildora flechaCal" data-act="mes" data-n="-1" aria-label="Mes anterior">‹</button><div class="peso b" style="text-align:center;font-size:19px">${MESESL[m][0].toUpperCase()+MESESL[m].slice(1)} ${y}</div><button class="pildora flechaCal" data-act="mes" data-n="1" aria-label="Mes siguiente">›</button></div><div class="cal">`;
   ['L','M','M','J','V','S','D'].forEach(d => h += `<div class="dn">${d}</div>`);
   for(let i = 0; i < primero; i++) h += '<div></div>';
   for(let d = 1; d <= ndias; d++){
@@ -823,6 +826,16 @@ function ajustarFoto(src){
     g.drawImage(im, st.x * e, st.y * e, im.naturalWidth * st.b * st.k * e, im.naturalHeight * st.b * st.k * e);
     D.foto = cv.toDataURL('image/jpeg', .88); guardar(); cerrarHoja(); pintar(); };
 }
+/* la pastilla del selector se desliza a la opción elegida */
+function deslizar(b, fin){
+  const seg = b.parentElement, act = seg.querySelector('.sel');
+  if(!act || act === b){ fin(); return; }
+  const dx = b.offsetLeft - act.offsetLeft;
+  act.style.color = 'var(--fg)';
+  const p = act.animate([{transform:'translateX(0) scaleX(1)'},{transform:`translateX(${dx*0.5}px) scaleX(1.12)`},{transform:`translateX(${dx}px) scaleX(1)`}], {duration:280, easing:'cubic-bezier(.3,1.3,.5,1)', fill:'forwards'});
+  b.style.color = 'var(--accTxt)'; b.style.position = 'relative'; b.style.zIndex = 1; act.style.zIndex = 0;
+  p.onfinish = fin;
+}
 function hojaColores(){
   const L = listaHero(), gl = grupoHero() === 'glass';
   abrirHoja(`<h1>Color de "Por pagar este mes"</h1>${L.map((c,i) => {
@@ -845,7 +858,7 @@ document.addEventListener('click', (ev) => {
   switch(a){
     case 'tab': tab = +n; pintar(true); window.scrollTo({top:0}); break;
     case 'detalle': detalle(id); break;
-    case 'nuevo': editor(null); break;
+    case 'nuevo': b.animate([{transform:'rotate(0) scale(1)'},{transform:'rotate(90deg) scale(1.12)'},{transform:'rotate(90deg) scale(1)'}], {duration:260, easing:'cubic-bezier(.3,1.6,.5,1)'}); setTimeout(() => editor(null), 200); break;
     case 'editar': cerrarHoja(); setTimeout(() => editor(id), 320); break;
     case 'cerrar': cerrarHoja(); break;
     case 'borrar': if(confirm('¿Eliminar este pago?')){ const bp = D.pagos.find(p => p.id === id); if(bp) borrarNube(bp); D.pagos = D.pagos.filter(p => p.id !== id); guardar(); cerrarHoja(); pintar(); aviso('Pago eliminado'); } break;
@@ -855,10 +868,14 @@ document.addEventListener('click', (ev) => {
       else { p.pagado = false; if(p.hist && p.hist.length && p.hist[p.hist.length-1].v === p.vence) p.hist.pop(); aviso('Marcado como pendiente'); }
       guardar(); pintar(); detalle(id); break; }
     case 'copiar': navigator.clipboard && navigator.clipboard.writeText(b.dataset.t).then(() => aviso('✓ Copiado')); break;
-    case 'mes': calMes = new Date(calMes.getFullYear(), calMes.getMonth() + +n, 1); pintar(); break;
+    case 'mes': { const d = +n, cal = document.querySelector('.cal');
+      const ir = () => { calMes = new Date(calMes.getFullYear(), calMes.getMonth() + d, 1); pintar();
+        const c2 = document.querySelector('.cal'); if(c2) c2.animate([{transform:`translateX(${d*35}%)`, opacity:0},{transform:'none', opacity:1}], {duration:260, easing:'cubic-bezier(.2,.8,.2,1)'}); };
+      if(!cal) { ir(); break; }
+      cal.animate([{transform:'none', opacity:1},{transform:`translateX(${-d*35}%)`, opacity:0}], {duration:150, easing:'ease-in'}).onfinish = ir; break; }
     case 'dia': calSel = b.dataset.d; pintar(); break;
-    case 'cartera': cartera = +n; pintar(); break;
-    case 'estad': estad = +n; pintar(); break;
+    case 'cartera': deslizar(b, () => { cartera = +n; pintar(); }); break;
+    case 'estad': deslizar(b, () => { estad = +n; pintar(); }); break;
     case 'tema': D.tema = n; guardar(); aplicarTema(); pintar(); break;
     case 'nombre': { const v = prompt('¿Cómo te llamas?', D.nombre); if(v !== null){ D.nombre = v.trim(); guardar(); pintar(); } break; }
     case 'quincena': { const v = prompt('¿Qué día es tu primera quincena?', D.quincena||15); if(v){ D.quincena = Math.max(1, Math.min(28, parseInt(v)||15)); guardar(); pintar(); } break; }
