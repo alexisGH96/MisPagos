@@ -1,6 +1,6 @@
 {
-  "versionCode": 55,
-  "versionName": "6.9",
+  "versionCode": 56,
+  "versionName": "7.0",
   "apk": "MisPagos.apk",
-  "notas": "Glass blanco: fondo más desenfocado y la selección de la barra como una gota de agua."
+  "notas": "Sombra de las tarjetas corregida: suave y difuminada, sin cortes."
 }
