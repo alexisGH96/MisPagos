@@ -456,8 +456,9 @@ function ahorros(){
 }
 const FONDOS = ['Atardecer','Noche','Aurora','Bokeh','Geométrico','Cristal'].map((n,i) => [n, `url(perfil_${i}.jpg) center/cover`]);
 function portadaCSS(){
-  if(D.fondoFoto && D.perfilFondo === -1) return `url(${D.fondoFoto}) center/cover`;
-  return FONDOS[Math.max(0, Math.min(FONDOS.length - 1, D.perfilFondo == null ? 1 : D.perfilFondo))][1];
+  const g = grupoTema(), pf = fondoSel(), foto = (D.fondoFotos || {})[g] || D.fondoFoto;
+  if(foto && pf === -1) return `url(${foto}) center/cover`;
+  return FONDOS[Math.max(0, Math.min(FONDOS.length - 1, pf))][1];
 }
 function grupo(titulo, filas){
   return `<div class="gris chico b" style="margin:22px 8px 8px">${titulo}</div><div class="caja" style="padding:4px 16px">${filas.map(([n, extra, act]) => `<button class="dato" style="width:100%;padding:14px 0" data-act="${act}"><span>${n}</span><span class="gris" style="max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${extra} ›</span></button>`).join('')}</div>`;
@@ -479,7 +480,7 @@ function ajustes(){
     ${grupo('Cuenta y personas', [['Cuenta y pagos compartidos', correo ? (D.nube.verif ? 'Conectada' : 'Sin verificar') : 'Sin cuenta', 'cuenta'], ['Personas con las que pagas', personas().length + ' personas', 'personas']])}
     <div class="gris chico b" style="margin:22px 8px 8px">Apariencia</div><div class="caja">${[temas.slice(0,3), temas.slice(3)].map((fila,f) => `<div class="seg" style="margin:${f ? '8px' : '0'} 0 0">${fila.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div>`).join('')}<p class="gris chico" style="margin-bottom:0">Glass sigue al sistema (de noche es oscuro). Glass blanco es blanco con toques de color.</p></div>
     ${grupo('Fondo del modo Glass', [['Tu imagen de fondo', D.fondoGlass ? 'Tu foto' : 'Predeterminado', 'fondoGlass']])}
-    ${grupo('Perfil y colores', [['Fondo del perfil', D.perfilFondo === -1 ? 'Foto' : FONDOS[D.perfilFondo == null ? 1 : D.perfilFondo][0], 'fondo'], ['Color de "Por pagar este mes"', COLRES[D.colorResumen || 0][0], 'colores']])}
+    ${grupo('Perfil y colores', [['Fondo del perfil', fondoSel() === -1 ? 'Foto' : FONDOS[fondoSel()][0], 'fondo'], ['Color de "Por pagar este mes"', COLRES[D.colorResumen || 0][0], 'colores']])}
     ${grupo('Tus datos', [['Respaldo en la nube', D.respaldoNube ? 'Guardado' : 'Guardar', 'respNube'], ['Guardar respaldo en archivo', 'archivo', 'exportar'], ['Cargar respaldo de archivo', 'archivo', 'importar']])}
     <input type="file" id="imp" accept="application/json" data-act="importar" hidden>
     <div class="gris chico b" style="margin:22px 8px 8px">Acerca de</div><div class="caja"><p class="chico" style="margin-top:0"><b>Ponla en tu iPhone como app:</b> en Safari toca Compartir y luego "Agregar a pantalla de inicio".</p><p class="gris chico" style="margin-bottom:0">Los avisos llegan cada mañana a las 9:00 (necesitas cuenta y activarlos en "Avisos"). El iPhone no permite que una web vibre por su cuenta. Tus pagos se guardan en este navegador; usa "Guardar respaldo" de vez en cuando.</p></div>`;
@@ -496,7 +497,7 @@ function reducir(archivo, max, recorte){
 }
 function elegirImagen(fn){ const i = document.createElement('input'); i.type = 'file'; i.accept = 'image/*'; i.onchange = () => i.files[0] && fn(i.files[0]); i.click(); }
 function hojaFondo(){
-  abrirHoja(`<h1>Fondo del perfil</h1><div class="dos">${FONDOS.map(([n,g],i) => `<button data-act="fondoSel" data-n="${i}" style="height:80px;border-radius:18px;background:${g};color:#fff;font-weight:700;text-shadow:0 1px 6px rgba(0,0,0,.5);${(D.perfilFondo == null ? 1 : D.perfilFondo) === i ? 'box-shadow:0 0 0 3px var(--fg)' : ''}">${n}</button>`).join('')}<button data-act="fondoFoto" class="btn borde" style="height:80px;border-radius:18px">Foto de tu galería</button></div><button class="btn borde" style="margin-top:16px" data-act="cerrar">Cerrar</button>`);
+  abrirHoja(`<h1>Fondo del perfil</h1><div class="dos">${FONDOS.map(([n,g],i) => `<button data-act="fondoSel" data-n="${i}" style="height:80px;border-radius:18px;background:${g};color:#fff;font-weight:700;text-shadow:0 1px 6px rgba(0,0,0,.5);${fondoSel() === i ? 'box-shadow:0 0 0 3px var(--fg)' : ''}">${n}</button>`).join('')}<button data-act="fondoFoto" class="btn borde" style="height:80px;border-radius:18px">Foto de tu galería</button></div><button class="btn borde" style="margin-top:16px" data-act="cerrar">Cerrar</button>`);
 }
 /* ===================== hojas: detalle y editor ===================== */
 let hojaT = null;
@@ -790,6 +791,28 @@ const cr = () => COLRES[D.colorResumen || 0];
 function estiloHero(){ if(!claroHero()) return ''; const c = cr(); return `background:linear-gradient(120deg,${c[1]},${c[2]});color:${c[3]};${(D.colorResumen||0) === 0 ? 'border:1px solid #E2E6EE;' : ''}`; }
 function estiloBarra(){ return claroHero() ? `background:${cr()[5]}` : ''; }
 function estiloRelleno(){ return claroHero() ? `background:${cr()[6]}` : ''; }
+function grupoTema(){ const t = document.documentElement.dataset.tema; return t.startsWith('glass') ? 'glass' : t === 'oscuro' ? 'oscuro' : 'claro'; }
+function fondoSel(){ const v = (D.fondosPerfil || {})[grupoTema()]; return v != null ? v : (D.perfilFondo == null ? 1 : D.perfilFondo); }
+/* ajustar la foto dentro del círculo: arrastrar y acercar */
+function ajustarFoto(src){
+  abrirHoja(`<h1>Ajusta tu foto</h1><p class="gris chico">Arrastra para moverla y usa la barra para acercar.</p>
+    <div id="rc" style="position:relative;width:280px;height:280px;margin:10px auto;border-radius:50%;overflow:hidden;touch-action:none;box-shadow:0 0 0 3px #fff, 0 8px 24px rgba(0,0,0,.25)"><img id="rcI" src="${src}" style="position:absolute;left:0;top:0;transform-origin:0 0;user-select:none;-webkit-user-drag:none" draggable="false"></div>
+    <input id="rcZ" type="range" min="1" max="4" step="0.01" value="1" style="width:100%;margin:12px 0">
+    <button class="btn lleno" data-act="fotoGuardar">Guardar</button><button class="btn borde" style="margin-top:10px" data-act="cerrar">Cancelar</button>`);
+  const box = document.getElementById('rc'), im = document.getElementById('rcI'), z = document.getElementById('rcZ'), S = 280;
+  const st = {x:0, y:0, k:1, b:1};
+  const lim = () => { const w = im.naturalWidth * st.b * st.k, h = im.naturalHeight * st.b * st.k; st.x = Math.min(0, Math.max(S - w, st.x)); st.y = Math.min(0, Math.max(S - h, st.y)); im.style.transform = `translate(${st.x}px,${st.y}px) scale(${st.b * st.k})`; };
+  const ini = () => { st.b = Math.max(S / im.naturalWidth, S / im.naturalHeight); st.x = (S - im.naturalWidth * st.b) / 2; st.y = (S - im.naturalHeight * st.b) / 2; lim(); };
+  if(im.complete) ini(); else im.onload = ini;
+  let px = 0, py = 0, arr = false;
+  box.onpointerdown = e => { arr = true; px = e.clientX; py = e.clientY; box.setPointerCapture(e.pointerId); };
+  box.onpointermove = e => { if(!arr) return; st.x += e.clientX - px; st.y += e.clientY - py; px = e.clientX; py = e.clientY; lim(); };
+  box.onpointerup = () => arr = false;
+  z.oninput = () => { const c = S / 2, k0 = st.k; st.k = +z.value; st.x = c - (c - st.x) * st.k / k0; st.y = c - (c - st.y) * st.k / k0; lim(); };
+  window._rcGuardar = () => { const cv = document.createElement('canvas'); cv.width = cv.height = 500; const g = cv.getContext('2d'), e = 500 / S;
+    g.drawImage(im, st.x * e, st.y * e, im.naturalWidth * st.b * st.k * e, im.naturalHeight * st.b * st.k * e);
+    D.foto = cv.toDataURL('image/jpeg', .88); guardar(); cerrarHoja(); pintar(); };
+}
 function hojaColores(){
   abrirHoja(`<h1>Color de "Por pagar este mes"</h1>${COLRES.map((c,i) => `<div class="gris chico b" style="margin:12px 4px 6px">${c[0]}${(D.colorResumen||0) === i ? ' ✓' : ''}</div><button data-act="colorRes" data-n="${i}" style="display:block;width:100%;text-align:left;border-radius:18px;padding:14px;background:linear-gradient(120deg,${c[1]},${c[2]});color:${c[3]};${i === 0 ? 'border:1px solid #E2E6EE' : ''}"><div class="chico">Por pagar este mes</div><div style="font-size:24px;font-weight:800;margin:4px 0 8px">$1,019</div><div style="height:5px;border-radius:5px;background:${c[5]}"><i style="display:block;height:100%;width:30%;border-radius:5px;background:${c[6]}"></i></div></button>`).join('')}<button class="btn borde" style="margin-top:16px" data-act="cerrar">Cerrar</button>`);
 }
@@ -842,15 +865,18 @@ document.addEventListener('click', (ev) => {
       const nube = D.nube; D = JSON.parse(t); D.nube = nube; guardar(); aplicarTema(); return 'Respaldo recuperado.'; }); break;
     case 'fondo': hojaFondo(); break;
     case 'colores': hojaColores(); break;
+    case 'fotoGuardar': if(window._rcGuardar) window._rcGuardar(); break;
     case 'colorRes': D.colorResumen = +n; guardar(); cerrarHoja(); pintar(); break;
     case 'fondoGlass':
       if(D.fondoGlass && confirm('¿Volver al fondo predeterminado de Glass? (Cancelar para elegir otra imagen)')){ delete D.fondoGlass; guardar(); aplicarTema(); pintar(); break; }
       elegirImagen(f => reducir(f, 1400).then(u => { D.fondoGlass = u; if(!String(D.tema).startsWith('glass')) D.tema = 'glass'; guardar(); aplicarTema(); pintar(); aviso('✓ Tip: elige la misma imagen de tu fondo de pantalla'); }).catch(() => aviso('No pude usar esa imagen'))); break;
-    case 'fondoSel': D.perfilFondo = +n; guardar(); cerrarHoja(); pintar(); break;
-    case 'fondoFoto': cerrarHoja(); elegirImagen(f => reducir(f, 1200, 'portada').then(u => { D.fondoFoto = u; D.perfilFondo = -1; guardar(); pintar(); }).catch(() => aviso('No pude usar esa imagen'))); break;
+    case 'fondoSel': (D.fondosPerfil = D.fondosPerfil || {})[grupoTema()] = +n; guardar(); cerrarHoja(); pintar(); break;
+    case 'fondoFoto': cerrarHoja(); elegirImagen(f => reducir(f, 1200, 'portada').then(u => { (D.fondoFotos = D.fondoFotos || {})[grupoTema()] = u; (D.fondosPerfil = D.fondosPerfil || {})[grupoTema()] = -1; guardar(); pintar(); }).catch(() => aviso('No pude usar esa imagen'))); break;
     case 'foto':
-      if(D.foto && confirm('¿Quitar tu foto de perfil? (Cancelar para elegir otra)')){ delete D.foto; guardar(); pintar(); break; }
-      elegirImagen(f => reducir(f, 400, 'cuadro').then(u => { D.foto = u; guardar(); pintar(); }).catch(() => aviso('No pude usar esa imagen'))); break;
+      abrirHoja(`<h1>Foto de perfil</h1>${D.foto ? '<button class="btn lleno" data-act="fotoAjustar">Ajustar foto</button><button class="btn borde" style="margin-top:10px" data-act="fotoNueva">Elegir otra foto</button><button class="btn borde" style="margin-top:10px" data-act="fotoQuitar">Quitar foto</button>' : '<button class="btn lleno" data-act="fotoNueva">Elegir foto</button>'}<button class="btn borde" style="margin-top:16px" data-act="cerrar">Cerrar</button>`); break;
+    case 'fotoQuitar': delete D.foto; delete D.fotoOriginal; guardar(); cerrarHoja(); pintar(); break;
+    case 'fotoNueva': cerrarHoja(); elegirImagen(f => reducir(f, 1200, 'portada').then(u => { D.fotoOriginal = u; guardar(); setTimeout(() => ajustarFoto(u), 350); }).catch(() => aviso('No pude usar esa imagen'))); break;
+    case 'fotoAjustar': cerrarHoja(); setTimeout(() => ajustarFoto(D.fotoOriginal || D.foto), 350); break;
     case 'tel': { const v = prompt('Tu teléfono', D.miTel || ''); if(v !== null){ D.miTel = v.trim(); guardar(); pintar(); } break; }
     case 'importar': document.getElementById('imp').click(); break;
     case 'cuenta': hojaCuenta(); break;
