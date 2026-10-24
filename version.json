@@ -1,6 +1,6 @@
 {
-  "versionCode": 61,
-  "versionName": "7.5",
+  "versionCode": 62,
+  "versionName": "7.6",
   "apk": "MisPagos.apk",
-  "notas": "Elige el color de la tarjeta Por pagar este mes: mantenla presionada o desde Mi perfil."
+  "notas": "Claro 1: el selector de Quincenas/Tarjetas ahora es azul marino."
 }
