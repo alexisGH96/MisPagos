@@ -1,6 +1,6 @@
 {
-  "versionCode": 56,
-  "versionName": "7.0",
+  "versionCode": 57,
+  "versionName": "7.1",
   "apk": "MisPagos.apk",
-  "notas": "Sombra de las tarjetas corregida: suave y difuminada, sin cortes."
+  "notas": "Sombras suaves que se desvanecen, sin cambiar el tamaño de las tarjetas."
 }
