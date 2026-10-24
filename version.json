@@ -1,6 +1,6 @@
 {
-  "versionCode": 51,
-  "versionName": "6.5",
+  "versionCode": 52,
+  "versionName": "6.6",
   "apk": "MisPagos.apk",
-  "notas": "Pagos compartidos con invitación (aceptar/rechazar) y solicitudes de cambio. Sin avisos duplicados; si descartas un aviso vuelve cuando tú elijas. Nuevo: ¿con cuál tarjeta comprar hoy?"
+  "notas": "Glass: botones de cristal sin contorno negro."
 }
