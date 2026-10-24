@@ -173,6 +173,7 @@ html,body{overscroll-behavior-y:contain}
 .pastel.tarde.ver path[fill=none],.pastel.tarde.ver circle,.pastel.tarde.ver text{animation-delay:1.2s}
 :root[data-tema="glassb"] nav button.sel{background:radial-gradient(120% 100% at 50% 58%, rgba(255,255,255,.75) 0, rgba(255,255,255,.8) 62%, rgba(255,255,255,.95) 100%), linear-gradient(to bottom, transparent 55%, rgba(255,255,255,.35));
   border:1px solid rgba(255,255,255,.85);border-bottom-color:rgba(40,48,80,.12);box-shadow:inset 10px 6px 10px -6px rgba(255,255,255,1);color:#963C1E}
+:root[data-tema="claro1"] .pildora,:root[data-tema="claro1"] .flechaCal{background:#1C326E;color:#fff;border-color:#1C326E}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -480,7 +481,7 @@ function ajustes(){
     ${grupo('Cuenta y personas', [['Cuenta y pagos compartidos', correo ? (D.nube.verif ? 'Conectada' : 'Sin verificar') : 'Sin cuenta', 'cuenta'], ['Personas con las que pagas', personas().length + ' personas', 'personas']])}
     <div class="gris chico b" style="margin:22px 8px 8px">Apariencia</div><div class="caja">${[temas.slice(0,3), temas.slice(3)].map((fila,f) => `<div class="seg" style="margin:${f ? '8px' : '0'} 0 0">${fila.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div>`).join('')}<p class="gris chico" style="margin-bottom:0">Glass sigue al sistema (de noche es oscuro). Glass blanco es blanco con toques de color.</p></div>
     ${grupo('Fondo del modo Glass', [['Tu imagen de fondo', D.fondoGlass ? 'Tu foto' : 'Predeterminado', 'fondoGlass']])}
-    ${grupo('Perfil y colores', [['Fondo del perfil', fondoSel() === -1 ? 'Foto' : FONDOS[fondoSel()][0], 'fondo'], ['Color de "Por pagar este mes"', COLRES[D.colorResumen || 0][0], 'colores']])}
+    ${grupo('Perfil y colores', [['Fondo del perfil', fondoSel() === -1 ? 'Foto' : FONDOS[fondoSel()][0], 'fondo'], ['Color de "Por pagar este mes"', listaHero()[selHero()][0], 'colores']])}
     ${grupo('Tus datos', [['Respaldo en la nube', D.respaldoNube ? 'Guardado' : 'Guardar', 'respNube'], ['Guardar respaldo en archivo', 'archivo', 'exportar'], ['Cargar respaldo de archivo', 'archivo', 'importar']])}
     <input type="file" id="imp" accept="application/json" data-act="importar" hidden>
     <div class="gris chico b" style="margin:22px 8px 8px">Acerca de</div><div class="caja"><p class="chico" style="margin-top:0"><b>Ponla en tu iPhone como app:</b> en Safari toca Compartir y luego "Agregar a pantalla de inicio".</p><p class="gris chico" style="margin-bottom:0">Los avisos llegan cada mañana a las 9:00 (necesitas cuenta y activarlos en "Avisos"). El iPhone no permite que una web vibre por su cuenta. Tus pagos se guardan en este navegador; usa "Guardar respaldo" de vez en cuando.</p></div>`;
@@ -786,9 +787,18 @@ function programarAvisos(){ if(!D.avisos || !D.nube || !D.nube.verif) return; cl
 /* ---- color de la tarjeta "Por pagar este mes" (temas claros) ---- */
 const COLRES = [['Blanco con borde','#fff','#fff','#121A35','#4A5268','#E2E8F2','#1C326E'],['Azul marino','#162E6C','#2C58A8','#fff','#DCE6FA','#7896D2','#6EAAFF'],['Azul cielo suave','#D6E4FF','#BACEFC','#121A35','#2E3A5C','#fff','#1C326E'],
   ['Lavanda','#E8E2FF','#CBC0FA','#1E1846','#3C3466','#fff','#6E5ADC'],['Aurora azul-violeta','#3C5ADC','#8C5AE6','#fff','#E6E6FF','rgba(255,255,255,.35)','#fff'],['Menta','#D6F4E8','#B4E6D6','#103228','#2C5A4A','#fff','#1E8C64'],['Durazno','#FFE4D6','#FCCAB6','#3C1E14','#6A4032','#fff','#E66E46']];
-const claroHero = () => ['claro1','claro2'].includes(document.documentElement.dataset.tema);
-const cr = () => COLRES[D.colorResumen || 0];
-function estiloHero(){ if(!claroHero()) return ''; const c = cr(); return `background:linear-gradient(120deg,${c[1]},${c[2]});color:${c[3]};${(D.colorResumen||0) === 0 ? 'border:1px solid #E2E6EE;' : ''}`; }
+const COLRES_OSC = [['Índigo ahumado','#2E2B52','#3D3972','#fff','#C4C0EC','rgba(255,255,255,.2)','#968FF5'],['Azul noche','#14213D','#22406E','#fff','#B9CBEA','rgba(255,255,255,.2)','#6EAAFF'],['Morado profundo','#2A1840','#4A2470','#fff','#D6C2F0','rgba(255,255,255,.2)','#C08CFF'],
+  ['Verde bosque','#0F2A24','#1C4A3C','#fff','#B4DECE','rgba(255,255,255,.2)','#4ED6A0'],['Vino','#2E1220','#5A1E38','#fff','#EBC0D0','rgba(255,255,255,.2)','#FF7AA2'],['Grafito','#1E1E24','#34343E','#fff','#C8C8D2','rgba(255,255,255,.2)','#fff'],['Aurora nocturna','#1A2A6C','#5A2A86','#fff','#D2CCF0','rgba(255,255,255,.25)','#fff']];
+const COLRES_GL = [['Cristal',''],['Cristal azul','rgba(90,140,255,.3)'],['Cristal lavanda','rgba(165,140,255,.3)'],['Cristal menta','rgba(80,210,160,.3)'],['Cristal durazno','rgba(255,160,120,.3)'],['Cristal rosa','rgba(255,122,180,.3)'],['Cristal ámbar','rgba(255,200,80,.3)']];
+const grupoHero = () => { const t = document.documentElement.dataset.tema; return t.startsWith('glass') ? 'glass' : t === 'oscuro' ? 'oscuro' : 'claro'; };
+const listaHero = () => grupoHero() === 'glass' ? COLRES_GL : grupoHero() === 'oscuro' ? COLRES_OSC : COLRES;
+const selHero = () => { const v = (D.coloresResumen || {})[grupoHero()]; return v != null ? v : grupoHero() === 'claro' ? (D.colorResumen || 0) : 0; };
+const claroHero = () => grupoHero() !== 'glass';
+const cr = () => listaHero()[selHero()];
+function estiloHero(){
+  if(grupoHero() === 'glass'){ const c = COLRES_GL[selHero()]; return c[1] ? `background-image:linear-gradient(${c[1]},${c[1]})` : ''; }
+  const c = cr(); return `background:linear-gradient(120deg,${c[1]},${c[2]});color:${c[3]};${grupoHero() === 'claro' && selHero() === 0 ? 'border:1px solid #E2E6EE;' : ''}`;
+}
 function estiloBarra(){ return claroHero() ? `background:${cr()[5]}` : ''; }
 function estiloRelleno(){ return claroHero() ? `background:${cr()[6]}` : ''; }
 function grupoTema(){ const t = document.documentElement.dataset.tema; return t.startsWith('glass') ? 'glass' : t === 'oscuro' ? 'oscuro' : 'claro'; }
@@ -814,11 +824,14 @@ function ajustarFoto(src){
     D.foto = cv.toDataURL('image/jpeg', .88); guardar(); cerrarHoja(); pintar(); };
 }
 function hojaColores(){
-  abrirHoja(`<h1>Color de "Por pagar este mes"</h1>${COLRES.map((c,i) => `<div class="gris chico b" style="margin:12px 4px 6px">${c[0]}${(D.colorResumen||0) === i ? ' ✓' : ''}</div><button data-act="colorRes" data-n="${i}" style="display:block;width:100%;text-align:left;border-radius:18px;padding:14px;background:linear-gradient(120deg,${c[1]},${c[2]});color:${c[3]};${i === 0 ? 'border:1px solid #E2E6EE' : ''}"><div class="chico">Por pagar este mes</div><div style="font-size:24px;font-weight:800;margin:4px 0 8px">$1,019</div><div style="height:5px;border-radius:5px;background:${c[5]}"><i style="display:block;height:100%;width:30%;border-radius:5px;background:${c[6]}"></i></div></button>`).join('')}<button class="btn borde" style="margin-top:16px" data-act="cerrar">Cerrar</button>`);
+  const L = listaHero(), gl = grupoHero() === 'glass';
+  abrirHoja(`<h1>Color de "Por pagar este mes"</h1>${L.map((c,i) => {
+    const bg = gl ? `background:linear-gradient(120deg,${c[1] || 'rgba(255,255,255,.35)'},${c[1] || 'rgba(255,255,255,.35)'}),var(--card);border:1px solid rgba(127,127,127,.25);color:var(--fg)` : `background:linear-gradient(120deg,${c[1]},${c[2]});color:${c[3]};${grupoHero() === 'claro' && i === 0 ? 'border:1px solid #E2E6EE' : ''}`;
+    return `<div class="gris chico b" style="margin:12px 4px 6px">${c[0]}${selHero() === i ? ' ✓' : ''}</div><button data-act="colorRes" data-n="${i}" class="colorOp" style="display:block;width:100%;text-align:left;border-radius:20px;padding:14px;${bg}"><div class="chico">Por pagar este mes</div><div style="font-size:24px;font-weight:800;margin:4px 0 8px">$1,019</div><div style="height:5px;border-radius:5px;background:${gl ? 'rgba(127,127,127,.3)' : c[5]}"><i style="display:block;height:100%;width:30%;border-radius:5px;background:${gl ? 'var(--fg)' : c[6]}"></i></div></button>`; }).join('')}<button class="btn borde" style="margin-top:16px" data-act="cerrar">Cerrar</button>`);
 }
 /* mantener presionada la tarjeta: se menea y abre los colores */
 (() => { let tm = null;
-  document.addEventListener('pointerdown', e => { const h = e.target.closest('#hero'); if(!h || !claroHero()) return;
+  document.addEventListener('pointerdown', e => { const h = e.target.closest('#hero'); if(!h) return;
     tm = setTimeout(() => { if(navigator.vibrate) navigator.vibrate(20); h.animate([{transform:'scale(1)'},{transform:'scale(1.04) rotate(-1.5deg)'},{transform:'scale(1.04) rotate(1.5deg)'},{transform:'scale(1.04) rotate(-1deg)'},{transform:'none'}], {duration:460}); setTimeout(hojaColores, 470); }, 500); });
   ['pointerup','pointercancel','pointermove'].forEach(ev => document.addEventListener(ev, e => { if(ev !== 'pointermove' || Math.abs(e.movementY) > 4) clearTimeout(tm); }));
 })();
@@ -866,7 +879,8 @@ document.addEventListener('click', (ev) => {
     case 'fondo': hojaFondo(); break;
     case 'colores': hojaColores(); break;
     case 'fotoGuardar': if(window._rcGuardar) window._rcGuardar(); break;
-    case 'colorRes': D.colorResumen = +n; guardar(); cerrarHoja(); pintar(); break;
+    case 'colorRes': (D.coloresResumen = D.coloresResumen || {})[grupoHero()] = +n; guardar();
+      b.animate([{transform:'scale(1)'},{transform:'scale(1.05)'},{transform:'scale(1)'}], {duration:240}); setTimeout(() => { cerrarHoja(); pintar(); }, 260); break;
     case 'fondoGlass':
       if(D.fondoGlass && confirm('¿Volver al fondo predeterminado de Glass? (Cancelar para elegir otra imagen)')){ delete D.fondoGlass; guardar(); aplicarTema(); pintar(); break; }
       elegirImagen(f => reducir(f, 1400).then(u => { D.fondoGlass = u; if(!String(D.tema).startsWith('glass')) D.tema = 'glass'; guardar(); aplicarTema(); pintar(); aviso('✓ Tip: elige la misma imagen de tu fondo de pantalla'); }).catch(() => aviso('No pude usar esa imagen'))); break;
