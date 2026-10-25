@@ -1,6 +1,6 @@
 {
-  "versionCode": 92,
-  "versionName": "10.6",
+  "versionCode": 93,
+  "versionName": "10.7",
   "apk": "MisPagos.apk",
-  "notas": "Ventanas sin líneas, con Cancelar y vibración en sus botones."
+  "notas": "Todas las ventanas vibran al tocar sus botones y opciones. Campos sin rayita."
 }
