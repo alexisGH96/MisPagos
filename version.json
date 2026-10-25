@@ -1,6 +1,6 @@
 {
-  "versionCode": 89,
-  "versionName": "10.3",
+  "versionCode": 90,
+  "versionName": "10.4",
   "apk": "MisPagos.apk",
-  "notas": "Ventanas con los colores de cada apariencia, contactos sin duplicar, avisos cuando te actualizan un pago compartido y más ajustes."
+  "notas": "Nuevo calendario con el día en la tarjeta principal. Copia rápida solo de tarjeta, vencimiento y CVV. Registro de pagos."
 }
