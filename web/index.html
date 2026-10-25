@@ -260,6 +260,7 @@ function estado(p){
   const d = dias(p.vence);
   if(d <= 0) return 'roj'; if(d <= 3) return 'nar'; if(d <= 7) return 'ama'; return 'azu';
 }
+const miMonto = p => num(p.monto) * (p.compartido ? (p.miParte || 50) / 100 : 1);   // solo tu parte si es compartido
 function mensual(p){
   let m = num(p.monto);
   m = {M2:m/2, M3:m/3, M12:m/12, D15:m*2, D7:m*4.33, U:0}[p.frec] ?? m;
@@ -342,7 +343,7 @@ function grupos(){
 }
 function heroNuevo(delMes, pag, tot){
   const g = grupos(), hy = hoy();
-  const suma = l => dinero(Math.round(l.reduce((s,p) => s + num(p.monto), 0)));
+  const suma = l => dinero(Math.round(l.reduce((s,p) => s + miMonto(p), 0)));
   let ult = -1, prox = null;
   D.pagos.forEach(p => { (p.hist || []).forEach(h => { const f = typeof h === 'object' ? (h.f || h.fecha) : null; if(f) ult = Math.max(ult, new Date(f).getTime()); }); if(p.pagadoEl) ult = Math.max(ult, new Date(p.pagadoEl).getTime());
     if(!p.pagado){ const f = fecha(p.vence); if(f >= hy && (!prox || f < prox)) prox = f; } });
@@ -367,7 +368,7 @@ function inicio(){
   const mes = hoy().getMonth(), anio = hoy().getFullYear();
   const delMes = D.pagos.filter(p => { const f = fecha(p.vence); return f.getMonth() === mes && f.getFullYear() === anio; });
   const pend = delMes.filter(p => !p.pagado);
-  const tot = pend.reduce((s,p) => s + num(p.monto), 0);
+  const tot = pend.reduce((s,p) => s + miMonto(p), 0);
   const pag = delMes.length - pend.length;
   const prox = ordenados().filter(p => !p.pagado).slice(0, 8);
   let h = `<div class="hola"><span class="ava">${esc((D.nombre||'?')[0].toUpperCase())}</span>
@@ -429,7 +430,7 @@ function quincenasV(){
   const sigA = new Date(b.getTime() + DIA), sigB = sigA.getDate() === 1 ? new Date(sigA.getFullYear(), sigA.getMonth(), D.quincena||15) : new Date(sigA.getFullYear(), sigA.getMonth()+1, 0);
   const bloque = (t, x, y, act) => {
     const ps = ordenados().filter(p => { const f = fecha(p.vence); return f >= x && f <= y; });
-    const pend = ps.filter(p => !p.pagado).reduce((s,p) => s + num(p.monto), 0);
+    const pend = ps.filter(p => !p.pagado).reduce((s,p) => s + miMonto(p), 0);
     return `<div class="caja" style="margin-bottom:14px"><div class="gris chico b">${t} · ${x.getDate()} – ${y.getDate()} ${MESES[y.getMonth()]}</div><div style="font-size:32px;font-weight:800;margin:6px 0 2px">${dinero(pend)}</div><div class="gris chico">por pagar · ${ps.filter(p=>!p.pagado).length} pagos</div><div style="margin-top:12px">${ps.map(tarjetaPago).join('') || '<span class="gris chico">Sin pagos en esta quincena.</span>'}</div></div>`;
   };
   return `<p class="gris chico" style="margin:0 4px 10px">Cuánto apartar de cada pago de nómina</p>` + bloque('Quincena actual', a, b, true) + bloque('Siguiente', sigA, sigB, false);
