@@ -1,6 +1,6 @@
 {
-  "versionCode": 67,
-  "versionName": "8.1",
+  "versionCode": 68,
+  "versionName": "8.2",
   "apk": "MisPagos.apk",
-  "notas": "Animaciones en todos los botones, selectores que se deslizan, calendario que se desliza entre meses y ventanas con el diseño de la app."
+  "notas": "Animaciones más suaves, barra de Android transparente, fondo de perfil del tema o sin fondo y ventanas que se cierran con animación."
 }
