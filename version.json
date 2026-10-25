@@ -1,6 +1,6 @@
 {
-  "versionCode": 85,
-  "versionName": "9.9",
+  "versionCode": 86,
+  "versionName": "10.0",
   "apk": "MisPagos.apk",
-  "notas": "Quincenas y Por pagar este mes cuentan solo tu parte de los pagos compartidos."
+  "notas": "Botón Confirmar pago con animación. Vibración solo al tocar (no al desplazar). Flechas del calendario sin relleno."
 }
