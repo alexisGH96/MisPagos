@@ -1,6 +1,6 @@
 {
-  "versionCode": 83,
-  "versionName": "9.7",
+  "versionCode": 84,
+  "versionName": "9.8",
   "apk": "MisPagos.apk",
-  "notas": "Se puede volver a editar pagos que ya compartías por nombre."
+  "notas": "Animaciones de los selectores al ritmo de la pastilla y tarjetas del calendario que se deslizan al cambiar de mes."
 }
