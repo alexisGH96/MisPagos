@@ -177,6 +177,7 @@ html,body{overscroll-behavior-y:contain}
 :root[data-tema="claro1"] .pildora.flechaCal{background:#1C326E;color:#fff}
 button,.pago,.pc,a.btn{transition:transform .38s cubic-bezier(.3,0,.15,1)}
 button:active,.pago:active,.pc:active,a.btn:active{transform:scale(.97);transition-duration:.16s}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.5s;animation-timing-function:cubic-bezier(.3,0,.15,1)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -805,7 +806,7 @@ function estiloHero(){
   const c = cr(); return `background:linear-gradient(120deg,${c[1]},${c[2]});color:${c[3]};${grupoHero() === 'claro' && selHero() === 0 ? 'border:1px solid #E2E6EE;' : ''}`;
 }
 function estiloBarra(){ return claroHero() ? `background:${cr()[5]}` : ''; }
-function estiloRelleno(){ return claroHero() ? `background:${cr()[6]}` : 'background:#963C1E'; }
+function estiloRelleno(){ return claroHero() ? `background:${cr()[6]}` : `background:${matchMedia('(prefers-color-scheme: dark)').matches ? '#E8E8F0' : '#41454F'}`; }
 function grupoTema(){ const t = document.documentElement.dataset.tema; return t.startsWith('glass') ? 'glass' : t === 'oscuro' ? 'oscuro' : 'claro'; }
 function fondoSel(){ const v = (D.fondosPerfil || {})[grupoTema()]; return v != null ? v : -2; }
 /* ajustar la foto dentro del círculo: arrastrar y acercar */
@@ -878,7 +879,8 @@ document.addEventListener('click', (ev) => {
     case 'dia': calSel = b.dataset.d; pintar(); break;
     case 'cartera': deslizar(b, () => { cartera = +n; pintar(); }); break;
     case 'estad': deslizar(b, () => { estad = +n; pintar(); }); break;
-    case 'tema': D.tema = n; guardar(); aplicarTema(); pintar(); break;
+    case 'tema': { const hacer = () => { D.tema = n; guardar(); aplicarTema(); pintar(); };
+      if(document.startViewTransition) document.startViewTransition(hacer); else { document.body.animate([{opacity:.4},{opacity:1}], {duration:480, easing:'cubic-bezier(.3,0,.15,1)'}); hacer(); } break; }
     case 'nombre': { const v = prompt('¿Cómo te llamas?', D.nombre); if(v !== null){ D.nombre = v.trim(); guardar(); pintar(); } break; }
     case 'quincena': { const v = prompt('¿Qué día es tu primera quincena?', D.quincena||15); if(v){ D.quincena = Math.max(1, Math.min(28, parseInt(v)||15)); guardar(); pintar(); } break; }
     case 'personas': hojaPersonas(); break;
