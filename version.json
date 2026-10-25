@@ -1,6 +1,6 @@
 {
-  "versionCode": 81,
-  "versionName": "9.5",
+  "versionCode": 82,
+  "versionName": "9.6",
   "apk": "MisPagos.apk",
-  "notas": "Corregido el cierre de la app al cambiar de apariencia."
+  "notas": "Calendario/Quincenas y Estadísticas/Ahorros cambian deslizándose."
 }
