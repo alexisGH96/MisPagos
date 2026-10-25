@@ -1,6 +1,6 @@
 {
-  "versionCode": 80,
-  "versionName": "9.4",
+  "versionCode": 81,
+  "versionName": "9.5",
   "apk": "MisPagos.apk",
-  "notas": "¿Con cuál comprar hoy? en blanco y al tocar una tarjeta te lleva hasta ella."
+  "notas": "Corregido el cierre de la app al cambiar de apariencia."
 }
