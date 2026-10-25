@@ -1,6 +1,6 @@
 {
-  "versionCode": 95,
-  "versionName": "10.9",
+  "versionCode": 96,
+  "versionName": "11.0",
   "apk": "MisPagos.apk",
-  "notas": "Pagados muestra la fecha en que pagaste. Perfil sin fondo."
+  "notas": "Registro de pagos: 'Pagado el…' en su propio renglón con palomita verde."
 }
