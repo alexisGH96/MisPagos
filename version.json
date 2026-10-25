@@ -1,6 +1,6 @@
 {
-  "versionCode": 84,
-  "versionName": "9.8",
+  "versionCode": 85,
+  "versionName": "9.9",
   "apk": "MisPagos.apk",
-  "notas": "Animaciones de los selectores al ritmo de la pastilla y tarjetas del calendario que se deslizan al cambiar de mes."
+  "notas": "Quincenas y Por pagar este mes cuentan solo tu parte de los pagos compartidos."
 }
