@@ -1,6 +1,6 @@
 {
-  "versionCode": 74,
-  "versionName": "8.8",
+  "versionCode": 75,
+  "versionName": "8.9",
   "apk": "MisPagos.apk",
-  "notas": "Datos de tus tarjetas cifrados y protegidos con huella o PIN. Copia rápida desde Tarjetas y datos compartidos solo con tu permiso."
+  "notas": "Nueva tarjeta principal: pagados, pendientes y vence pronto (tócalos para ver solo esos), con tu último y próximo pago."
 }
