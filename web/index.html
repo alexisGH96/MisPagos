@@ -184,6 +184,12 @@ button:active,.pago:active,.pc:active,a.btn:active{transform:scale(.97);transiti
 :root[data-tema="oscuro"] .seg button.sel{background:linear-gradient(90deg,#968FF5,#766EE2);color:#1A1830}
 .seg button:not(.sel){color:var(--fg)}
 .verde{color:#1FA463}
+:root[data-tema^="glass"] .mas,:root[data-tema="claro2"] .mas,:root[data-tema^="glass"] .pildora.flechaCal{color:#46464F}
+:root[data-tema="glassn"] .mas,:root[data-tema="glassn"] .pildora.flechaCal{color:#E8E8F4}
+:root:not([data-tema="claro1"]) .btn.lleno{background:#F9DED4;color:#963C1E}
+:root[data-tema^="glass"] .btn.lleno{background:radial-gradient(120% 100% at 50% 58%, rgba(255,255,255,.75), rgba(255,255,255,.8) 62%, rgba(255,255,255,.95));color:#963C1E;border:1px solid rgba(255,255,255,.85)}
+:root[data-tema="glassn"] .btn.lleno{background:rgba(255,255,255,.18);color:#FF8C6E}
+:root[data-tema="oscuro"] .btn.lleno{background:linear-gradient(90deg,#968FF5,#766EE2);color:#1A1830}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
