@@ -1,6 +1,6 @@
 {
-  "versionCode": 72,
-  "versionName": "8.6",
+  "versionCode": 73,
+  "versionName": "8.7",
   "apk": "MisPagos.apk",
-  "notas": "Ningún botón negro: lo elegido se ve como en la barra de navegación y los símbolos son grises. Flechas del calendario más chicas."
+  "notas": "Compartir solo por correo o número. Botones sin contornos de color, como tarjetas. Tarjetas compartidas con el texto en dos renglones."
 }
