@@ -926,9 +926,9 @@ function deslizar(b, fin){
   const p = act.animate([{transform:'translateX(0)'},{transform:`translateX(${dx}px)`}], {duration:420, easing:'cubic-bezier(.3,0,.15,1)', fill:'forwards'});
   b.style.color = 'var(--accTxt)'; b.style.position = 'relative'; b.style.zIndex = 1; act.style.zIndex = 0;
   const d = dx > 0 ? 1 : -1, sale = []; let n = seg.nextElementSibling; while(n){ sale.push(n); n = n.nextElementSibling; }
-  sale.forEach(e => e.animate([{transform:'none', opacity:1},{transform:`translateX(${-d*25}%)`, opacity:0}], {duration:200, easing:'cubic-bezier(.4,0,1,1)', fill:'forwards'}));
+  sale.forEach(e => e.animate([{transform:'none', opacity:1},{transform:`translateX(${-d*20}%)`, opacity:0}], {duration:140, easing:'cubic-bezier(.4,0,1,1)', fill:'forwards'}));
   setTimeout(() => { fin(); const s2 = document.querySelector('.seg'); let m = s2 && s2.nextElementSibling;
-    while(m){ m.animate([{transform:`translateX(${d*25}%)`, opacity:0},{transform:'none', opacity:1}], {duration:420, easing:'cubic-bezier(.3,0,.15,1)'}); m = m.nextElementSibling; } }, 200);
+    while(m){ m.animate([{transform:`translateX(${d*20}%)`, opacity:0},{transform:'none', opacity:1}], {duration:280, easing:'cubic-bezier(.3,0,.15,1)'}); m = m.nextElementSibling; } }, 140);
 }
 /* ===== Bóveda: los datos para pagar se guardan cifrados (AES-256-GCM) con una llave que el navegador
    genera y marca como NO extraíble; ni la propia página puede leer la llave, solo usarla. ===== */
@@ -1007,11 +1007,12 @@ document.addEventListener('click', (ev) => {
       Boveda.leer(+b.dataset.id).then(o => { const v = o[b.dataset.k] || '';
         if(act === 'verDato'){ const el = document.getElementById('dv-' + b.dataset.k); if(el){ const antes = el.textContent; el.textContent = v; setTimeout(() => { el.textContent = antes; }, 30000); } }
         else navigator.clipboard.writeText(v.replace(/\s/g,'')).then(() => { aviso('✓ Copiado (se borra en 1 min)'); setTimeout(() => navigator.clipboard.writeText('').catch(() => {}), 60000); }); }); break; }
-    case 'mes': { const d = +n, cal = document.querySelector('.cal');
+    case 'mes': { const d = +n;
+      const resto = () => { const sg = document.querySelector('#app .seg'); const r = []; let m = sg ? sg.nextElementSibling : document.querySelector('#app').firstElementChild; while(m){ r.push(m); m = m.nextElementSibling; } return r; };
       const ir = () => { calMes = new Date(calMes.getFullYear(), calMes.getMonth() + d, 1); pintar();
-        const c2 = document.querySelector('.cal'); if(c2) c2.animate([{transform:`translateX(${d*25}%)`, opacity:0},{transform:'none', opacity:1}], {duration:420, easing:'cubic-bezier(.3,0,.15,1)'}); };
-      if(!cal) { ir(); break; }
-      cal.animate([{transform:'none', opacity:1},{transform:`translateX(${-d*25}%)`, opacity:0}], {duration:200, easing:'cubic-bezier(.4,0,1,1)'}).onfinish = ir; break; }
+        resto().forEach(e => e.animate([{transform:`translateX(${d*25}%)`, opacity:0},{transform:'none', opacity:1}], {duration:420, easing:'cubic-bezier(.3,0,.15,1)'})); };
+      const vs = resto(); if(!vs.length){ ir(); break; }
+      vs.forEach((e,i) => { const a = e.animate([{transform:'none', opacity:1},{transform:`translateX(${-d*25}%)`, opacity:0}], {duration:200, easing:'cubic-bezier(.4,0,1,1)', fill:'forwards'}); if(i === 0) a.onfinish = ir; }); break; }
     case 'dia': calSel = b.dataset.d; pintar(); break;
     case 'cartera': deslizar(b, () => { cartera = +n; pintar(); }); break;
     case 'estad': deslizar(b, () => { estad = +n; pintar(); }); break;
