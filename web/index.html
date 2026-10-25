@@ -137,7 +137,7 @@ input,select{width:100%;font:inherit;color:var(--fg);background:var(--surf);bord
 :root[data-tema="glassn"] body{background:radial-gradient(40% 35% at 18% 15%, #9646E6 0, transparent 70%), radial-gradient(40% 35% at 85% 30%, #F05A96 0, transparent 70%), radial-gradient(45% 40% at 25% 75%, #3278FA 0, transparent 70%), radial-gradient(40% 35% at 85% 85%, #FF963C 0, transparent 70%), var(--bg);background-attachment:fixed}
 /* Glass (opción A): fondo nítido y cada tarjeta lo desenfoca poco, como la barra */
 :root[data-tema="glass"] body{background:transparent} :root[data-tema="glass"]{background:#C9D2F5}
-#fondoGlass{display:none} :root[data-tema="glass"] #fondoGlass{display:block;position:fixed;inset:-40px;z-index:-1;background:var(--fondoGlass, url(fondo-glass-2.jpg)) center/cover;filter:blur(5px) saturate(1.2)}
+#fondoGlass{display:none} :root[data-tema="glass"] #fondoGlass{display:block;position:fixed;inset:-40px;z-index:-1;background:var(--fondoGlass, url(fondo-glass-2.jpg)) center/cover;filter:blur(var(--blurGlass, 5px)) saturate(1.2)}
 /* Glass blanco: blanco con toques de color */
 :root[data-tema="glassb"]{--bg:#FFFFFF; --fg:#12121C; --gr:#5A5A6E; --surf:rgba(255,255,255,.16); --line:rgba(0,0,0,.08); --acc:#12121C; --accTxt:#fff; --nav:rgba(255,255,255,.3); --pill:#F9DED4; --icoSel:#963C1E; --ico:#28283A;
   --t-nar:rgba(255,255,255,.16); --t-ama:rgba(255,255,255,.16); --t-ver:rgba(255,255,255,.16); --t-azu:rgba(255,255,255,.16); --t-roj:rgba(255,255,255,.16); --tile:rgba(255,255,255,.8); --hero1:rgba(255,255,255,.16); --hero2:rgba(255,255,255,.16); --heroTxt:#12121C}
@@ -493,6 +493,7 @@ function ajustes(){
     ${grupo('Cuenta y personas', [['Cuenta y pagos compartidos', correo ? (D.nube.verif ? 'Conectada' : 'Sin verificar') : 'Sin cuenta', 'cuenta'], ['Personas con las que pagas', personas().length + ' personas', 'personas']])}
     <div class="gris chico b" style="margin:22px 8px 8px">Apariencia</div><div class="caja">${[temas.slice(0,3), temas.slice(3)].map((fila,f) => `<div class="seg" style="margin:${f ? '8px' : '0'} 0 0">${fila.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div>`).join('')}<p class="gris chico" style="margin-bottom:0">Glass sigue al sistema (de noche es oscuro). Glass blanco es blanco con toques de color.</p></div>
     ${grupo('Fondo del modo Glass', [['Tu imagen de fondo', D.fondoGlass ? 'Tu foto' : 'Predeterminado', 'fondoGlass']])}
+    ${document.documentElement.dataset.tema === 'glass' ? grupo('Glass', [['Desenfoque del fondo', ['Normal','30 % más','50 % más','80 % más'][D.glassBlur || 0], 'glassBlur']]) : ''}
     ${grupo('Perfil y colores', [['Fondo del perfil', fondoSel() === -1 ? 'Foto' : fondoSel() === -2 ? 'Del tema' : fondoSel() === -3 ? 'Sin fondo' : FONDOS[fondoSel()][0], 'fondo'], ['Color de "Por pagar este mes"', listaHero()[selHero()][0], 'colores']])}
     ${grupo('Tus datos', [['Respaldo en la nube', D.respaldoNube ? 'Guardado' : 'Guardar', 'respNube'], ['Guardar respaldo en archivo', 'archivo', 'exportar'], ['Cargar respaldo de archivo', 'archivo', 'importar']])}
     <input type="file" id="imp" accept="application/json" data-act="importar" hidden>
@@ -905,6 +906,8 @@ document.addEventListener('click', (ev) => {
       const nube = D.nube; D = JSON.parse(t); D.nube = nube; guardar(); aplicarTema(); return 'Respaldo recuperado.'; }); break;
     case 'fondo': hojaFondo(); break;
     case 'colores': hojaColores(); break;
+    case 'glassBlur': abrirHoja(`<h1>Desenfoque del fondo</h1>${['Normal','30 % más','50 % más','80 % más'].map((x,i) => `<button class="btn ${(D.glassBlur||0)===i?'lleno':'borde'}" style="margin-top:10px" data-act="glassBlurSel" data-n="${i}">${x}</button>`).join('')}<button class="btn borde" style="margin-top:16px" data-act="cerrar">Cerrar</button>`); break;
+    case 'glassBlurSel': D.glassBlur = +n; guardar(); aplicarTema(); cerrarHoja(); pintar(); break;
     case 'fotoGuardar': if(window._rcGuardar) window._rcGuardar(); break;
     case 'colorRes': (D.coloresResumen = D.coloresResumen || {})[grupoHero()] = +n; guardar();
       b.animate([{transform:'scale(1)'},{transform:'scale(1.05)'},{transform:'scale(1)'}], {duration:240}); setTimeout(() => { cerrarHoja(); pintar(); }, 260); break;
@@ -958,6 +961,7 @@ document.addEventListener('change', (ev) => {
 
 /* ===================== pintar ===================== */
 function aplicarTema(){
+  document.documentElement.style.setProperty('--blurGlass', [5, 6.5, 7.5, 9][D.glassBlur || 0] + 'px');
   let t = D.tema || 'auto';
   const noche = matchMedia('(prefers-color-scheme: dark)').matches;
   if(t === 'auto') t = noche ? 'oscuro' : 'claro1';
