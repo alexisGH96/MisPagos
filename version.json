@@ -1,6 +1,6 @@
 {
-  "versionCode": 77,
-  "versionName": "9.1",
+  "versionCode": 78,
+  "versionName": "9.2",
   "apk": "MisPagos.apk",
-  "notas": "Más rápida. Vibración al tocar cualquier botón. Los datos de tarjeta ya no van en el respaldo."
+  "notas": "Quincenas ahora en Calendario; la pestaña de cartera es solo Tarjetas. Vibración al tocar y lista de pagados corregida."
 }
