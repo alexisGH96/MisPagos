@@ -1,6 +1,6 @@
 {
-  "versionCode": 93,
-  "versionName": "10.7",
+  "versionCode": 94,
+  "versionName": "10.8",
   "apk": "MisPagos.apk",
-  "notas": "Todas las ventanas vibran al tocar sus botones y opciones. Campos sin rayita."
+  "notas": "Compartidos divididos en 'Te compartieron' y 'Tú compartiste'. Contactos con el nombre de su cuenta."
 }
