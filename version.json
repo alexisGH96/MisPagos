@@ -1,6 +1,6 @@
 {
-  "versionCode": 97,
-  "versionName": "11.1",
+  "versionCode": 98,
+  "versionName": "11.2",
   "apk": "MisPagos.apk",
-  "notas": "'Enviar actualización a (nombre) por Mis Pagos'."
+  "notas": "Los avisos de pagos compartidos llegan más rápido aunque no abras la app."
 }
