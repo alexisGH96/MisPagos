@@ -190,6 +190,15 @@ button:active,.pago:active,.pc:active,a.btn:active{transform:scale(.97);transiti
 :root[data-tema^="glass"] .btn.lleno{background:radial-gradient(120% 100% at 50% 58%, rgba(255,255,255,.75), rgba(255,255,255,.8) 62%, rgba(255,255,255,.95));color:#963C1E;border:1px solid rgba(255,255,255,.85)}
 :root[data-tema="glassn"] .btn.lleno{background:rgba(255,255,255,.18);color:#FF8C6E}
 :root[data-tema="oscuro"] .btn.lleno{background:linear-gradient(90deg,#968FF5,#766EE2);color:#1A1830}
+.heroN .heroIc{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:color-mix(in srgb, #963C1E 14%, transparent);color:#963C1E;flex:none}
+.heroN .heroIc svg{width:24px;height:24px}
+.heroLin{height:1px;background:currentColor;opacity:.12;margin:14px 0 10px}
+.heroSep{width:1px;background:currentColor;opacity:.12;margin:4px}
+.ind{flex:1;min-width:0;display:flex;gap:6px;text-align:left;padding:4px 2px;color:inherit;background:none}
+.ind .chico{white-space:nowrap;font-size:11px}
+.indIc{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;flex:none}
+.indIc svg{width:14px;height:14px}
+.heroPie{margin-top:12px;padding:9px 12px;border-radius:100px;background:color-mix(in srgb, currentColor 8%, transparent);font-size:12px;opacity:.85;display:flex;gap:8px;align-items:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -320,7 +329,39 @@ function tarjetaPago(p){
     <div class="peso"><div class="nom">${esc(p.nombre)}</div><div class="gris chico">${linea2(p)}</div></div>
     <div class="der">${p.monto ? `<span class="b">${dinero(num(p.monto))}</span>` : ''}${anillo(p)}</div></button>`;
 }
+const SIMB = {cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="9" cy="15" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l5 4.5 9-9.5"/></svg>',
+  reloj:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>'};
+function grupos(){
+  const hy = hoy(), mes = hy.getMonth(), anio = hy.getFullYear(), r = {1:[],2:[],3:[]};
+  D.pagos.forEach(p => { const f = fecha(p.vence), d = Math.round((f - hy)/DIA);
+    if(f.getMonth() === mes && f.getFullYear() === anio) r[p.pagado ? 1 : d <= 7 ? 3 : 2].push(p); else if(!p.pagado && f < hy) r[3].push(p); });
+  return r;
+}
+function heroNuevo(delMes, pag, tot){
+  const g = grupos(), hy = hoy();
+  const suma = l => dinero(Math.round(l.reduce((s,p) => s + num(p.monto), 0)));
+  let ult = -1, prox = null;
+  D.pagos.forEach(p => { (p.hist || []).forEach(h => { const f = typeof h === 'object' ? (h.f || h.fecha) : null; if(f) ult = Math.max(ult, new Date(f).getTime()); }); if(p.pagadoEl) ult = Math.max(ult, new Date(p.pagadoEl).getTime());
+    if(!p.pagado){ const f = fecha(p.vence); if(f >= hy && (!prox || f < prox)) prox = f; } });
+  const du = ult < 0 ? null : Math.round((hy - ult)/DIA), dp = prox ? Math.round((prox - hy)/DIA) : null;
+  const pie = (du == null ? 'Aún no registras pagos' : 'Último pago ' + (du <= 0 ? 'hoy' : du === 1 ? 'hace 1 día' : 'hace ' + du + ' días')) + ' · ' + (dp == null ? 'sin pagos próximos' : 'Próximo ' + (dp === 0 ? 'hoy' : dp === 1 ? 'mañana' : 'en ' + dp + ' días'));
+  const ind = (n, t, l, ic, col, lleno) => `<button class="ind" data-act="filtro" data-n="${n}"><span class="indIc" style="${lleno ? `background:${col};color:#fff` : `background:color-mix(in srgb, ${col} 18%, transparent);color:${col}`}">${SIMB[ic]}</span><span><span class="chico gris">${t}</span><b style="display:block;font-size:16px">${l.length}</b><span class="chico gris">${suma(l)}</span></span></button>`;
+  return `<div class="hero heroN" id="hero" style="${estiloHero()}">
+    <div class="fila" style="align-items:center"><span class="heroIc">${SIMB.cal}</span><div class="peso" style="padding-left:12px"><b style="font-size:16px">Por pagar este mes</b><div class="chico gris">${pag} de ${delMes.length} pagos</div></div><b style="font-size:26px">${dinero(tot)}</b></div>
+    <div class="heroLin"></div>
+    <div class="fila" style="align-items:stretch">${ind(1,'Pagados',g[1],'check','#1FA463',true)}<i class="heroSep"></i>${ind(2,'Pendientes',g[2],'reloj','currentColor',false)}<i class="heroSep"></i>${ind(3,'Vence pronto',g[3],'cal','#7C5CE6',false)}</div>
+    <div class="heroPie"><span style="width:16px;height:16px;display:inline-block">${SIMB.reloj}</span> ${pie}</div></div>`;
+}
+function listaFiltro(){
+  const t = ['','Pagados','Pendientes','Vence pronto'][filtroIni], sub = ['','Lo que ya pagaste este mes','Lo que falta pagar este mes (más de 7 días)','Vencen en 7 días o menos, o ya vencieron'][filtroIni];
+  const l = grupos()[filtroIni];
+  return `<div class="fila" style="align-items:center;margin-bottom:16px"><button class="pildora flechaCal" data-act="filtro" data-n="0" aria-label="Atrás">‹</button><div class="peso" style="padding-left:12px"><div class="b" style="font-size:22px">${t}</div><div class="gris chico">${sub}</div></div></div>`
+    + (l.length ? l.map(tarjetaPago).join('') : '<p class="gris">No hay pagos aquí por ahora.</p>');
+}
+let filtroIni = 0;
 function inicio(){
+  if(filtroIni) return listaFiltro();
   const mes = hoy().getMonth(), anio = hoy().getFullYear();
   const delMes = D.pagos.filter(p => { const f = fecha(p.vence); return f.getMonth() === mes && f.getFullYear() === anio; });
   const pend = delMes.filter(p => !p.pagado);
@@ -333,8 +374,7 @@ function inicio(){
     ${(D.invitaciones || []).map(x => `<button class="pago est-ama" style="display:block" data-act="invitacion" data-i="${x.id}"><b>✉ ${esc(x.de)} compartió ${esc(sinPrefijo(x.nombre))} contigo</b><div class="gris chico">Toca para aceptarlo o rechazarlo</div></button>`).join('')}
     ${D.pagos.filter(p => p.nubeSolVista && !p.creadoPor).map(p => `<button class="pago est-ama" style="display:block" data-act="solicitud" data-id="${p.id}"><b>✎ Piden un cambio en ${esc(sinPrefijo(p.nombre))}</b><div class="gris chico">Toca para revisarlo</div></button>`).join('')}
     ${(D.avisosNube || []).length ? `<button class="pago est-azu" style="display:block" data-act="avisoNubeOk">${D.avisosNube.map(esc).join('<br>')}<div class="gris chico">Toca para ocultar</div></button>` : ''}
-    <div class="hero" id="hero" style="${estiloHero()}"><div class="fila"><span class="peso">Por pagar este mes</span><span class="chico">${pag} de ${delMes.length} pagados</span></div>
-    <div class="monto">${dinero(tot)}</div><div class="barra" style="${estiloBarra()}"><i style="width:${delMes.length ? pag/delMes.length*100 : 0}%;${estiloRelleno()}"></i></div></div>`;
+    ${heroNuevo(delMes, pag, tot)}`;
   if(!D.pagos.length) return h + `<div class="vacio"><p>Agrega tu primer pago con el botón +.</p><button class="btn lleno" data-act="nuevo">Agregar pago</button></div>`;
   h += `<div class="sec"><h2>Próximos</h2><button class="pildora" data-act="tab" data-n="1">Ver todos ›</button></div><div class="prox">`;
   prox.forEach(p => { h += `<button class="pc" data-act="detalle" data-id="${p.id}"><div class="fila">${icono(p)}<div class="peso"><div class="b">${p.monto ? dinero(num(p.monto)) : ''}</div><div class="gris chico">${dias(p.vence) <= 0 ? 'hoy' : dias(p.vence) === 1 ? 'mañana' : 'en ' + dias(p.vence) + ' días'}</div></div>${anillo(p,36)}</div><div class="b" style="margin-top:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sinPrefijo(p.nombre))}</div><div class="gris chico">Vence ${corto(p.vence)}</div></button>`; });
@@ -956,6 +996,7 @@ document.addEventListener('click', (ev) => {
       const nube = D.nube; D = JSON.parse(t); D.nube = nube; guardar(); aplicarTema(); return 'Respaldo recuperado.'; }); break;
     case 'fondo': hojaFondo(); break;
     case 'colores': hojaColores(); break;
+    case 'filtro': filtroIni = +n; pintar(); window.scrollTo(0,0); break;
     case 'glassBlur': abrirHoja(`<h1>Desenfoque del fondo</h1>${['Normal','30 % más','50 % más','80 % más'].map((x,i) => `<button class="btn ${(D.glassBlur||0)===i?'lleno':'borde'}" style="margin-top:10px" data-act="glassBlurSel" data-n="${i}">${x}</button>`).join('')}<button class="btn borde" style="margin-top:16px" data-act="cerrar">Cerrar</button>`); break;
     case 'glassBlurSel': D.glassBlur = +n; guardar(); aplicarTema(); cerrarHoja(); pintar(); break;
     case 'fotoGuardar': if(window._rcGuardar) window._rcGuardar(); break;
