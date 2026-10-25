@@ -1,6 +1,6 @@
 {
-  "versionCode": 76,
-  "versionName": "9.0",
+  "versionCode": 77,
+  "versionName": "9.1",
   "apk": "MisPagos.apk",
-  "notas": "Número de tarjeta, vencimiento y CVV por separado. Datos compartidos con cifrado de extremo a extremo, como WhatsApp."
+  "notas": "Más rápida. Vibración al tocar cualquier botón. Los datos de tarjeta ya no van en el respaldo."
 }
