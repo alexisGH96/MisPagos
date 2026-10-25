@@ -1,6 +1,6 @@
 {
-  "versionCode": 70,
-  "versionName": "8.4",
+  "versionCode": 71,
+  "versionName": "8.5",
   "apk": "MisPagos.apk",
-  "notas": "Selectores con el estilo de la barra de navegación, botón Pagado con palomita verde y flechas del calendario centradas."
+  "notas": "Glass: elige cuánto desenfocar el fondo (normal, 30, 50 u 80 % más)."
 }
