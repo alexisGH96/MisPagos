@@ -1,6 +1,6 @@
 {
-  "versionCode": 69,
-  "versionName": "8.3",
+  "versionCode": 70,
+  "versionName": "8.4",
   "apk": "MisPagos.apk",
-  "notas": "Ventanas con márgenes parejos y líneas entre opciones. Cambio de apariencia con fundido suave. Barra de Por pagar en gris."
+  "notas": "Selectores con el estilo de la barra de navegación, botón Pagado con palomita verde y flechas del calendario centradas."
 }
