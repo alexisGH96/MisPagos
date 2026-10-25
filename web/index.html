@@ -388,8 +388,9 @@ function inicio(){
   h += `<div class="sec"><h2>Próximos</h2><button class="pildora" data-act="tab" data-n="1">Ver todos ›</button></div><div class="prox">`;
   prox.forEach(p => { h += `<button class="pc" data-act="detalle" data-id="${p.id}"><div class="fila">${icono(p)}<div class="peso"><div class="b">${p.monto ? dinero(num(p.monto)) : ''}</div><div class="gris chico">${dias(p.vence) <= 0 ? 'hoy' : dias(p.vence) === 1 ? 'mañana' : 'en ' + dias(p.vence) + ' días'}</div></div>${anillo(p,36)}</div><div class="b" style="margin-top:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sinPrefijo(p.nombre))}</div><div class="gris chico">Vence ${corto(p.vence)}</div></button>`; });
   const lt = ordenados().filter(p => filtroPagos === 1 ? !p.compartido : filtroPagos === 2 ? p.compartido : true);
+  const listaHtml = filtroPagos !== 2 ? lt.map(tarjetaPago).join('') : [['Te compartieron', lt.filter(p => p.creadoPor)], ['Tú compartiste', lt.filter(p => !p.creadoPor)]].filter(x => x[1].length).map(([t0, l0]) => `<div class="gris b chico" style="margin:6px 6px 8px">${t0}</div>` + l0.map(tarjetaPago).join('')).join('');
   h += `</div><h2>Registro de pagos</h2><div class="seg" id="segPagos">${['Todos','Propios','Compartidos'].map((x,i) => `<button class="${filtroPagos===i?'sel':''}" data-act="filtroPagos" data-n="${i}">${x}</button>`).join('')}</div><div id="listaPagos">`
-    + (lt.length ? lt.map(tarjetaPago).join('') : `<p class="gris">${filtroPagos === 2 ? 'No tienes pagos compartidos.' : 'Todos tus pagos son compartidos.'}</p>`) + `</div>`;
+    + (lt.length ? listaHtml : `<p class="gris">${filtroPagos === 2 ? 'No tienes pagos compartidos.' : 'Todos tus pagos son compartidos.'}</p>`) + `</div>`;
   return h;
 }
 function calendario(){
@@ -606,6 +607,7 @@ function detalle(id){
     const tel = per && per.tel ? per.tel.replace(/\D/g,'') : ''; const telI = tel.length === 10 ? '52' + tel : tel;
     h += `<h2>¿Quién paga?</h2><div class="caja"><div class="dato"><span>Tú · ${p.miParte||50} %</span><b>${dinero(Math.round(mi))}</b></div><div class="dato"><span>${esc(quien)} · ${100-(p.miParte||50)} %</span><b>${dinero(Math.round(otra))}</b></div>
       ${p.nubeId && D.nube && D.nube.verif ? `<button class="btn lleno" style="margin-top:12px" data-act="recordar" data-id="${p.id}" data-m="${esc(msg)}">Enviar recordatorio por Mis Pagos</button>` : ''}
+      ${p.nubeId && !p.creadoPor && D.nube && D.nube.verif ? `<button class="btn borde" style="margin-top:10px" data-act="enviarAct" data-id="${p.id}">Enviar actualización a ${esc(p.conQuien)}</button>` : ''}
       <a class="btn ${p.nubeId && D.nube && D.nube.verif ? 'borde' : 'lleno'}" style="margin-top:10px;text-decoration:none" href="https://wa.me/${telI}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">Enviar recordatorio por WhatsApp</a></div>`;
   }
   if((p.hist||[]).length){
@@ -1058,6 +1060,8 @@ document.addEventListener('click', (ev) => {
       if(navigator.vibrate) navigator.vibrate(20);
       document.getElementById('listaPagos').animate([{transform:'none', opacity:1},{transform:`translateX(${-d*20}%)`, opacity:0}], {duration:140, easing:'cubic-bezier(.4,0,1,1)', fill:'forwards'});
       setTimeout(() => { filtroPagos = +n; pintar(); window.scrollTo(0, y); const sp = document.getElementById('segPagos'); if(sp) window.scrollTo({top: sp.getBoundingClientRect().top + window.scrollY - 70, behavior:'smooth'}); const l2 = document.getElementById('listaPagos'); if(l2) l2.animate([{transform:`translateX(${d*20}%)`, opacity:0},{transform:'none', opacity:1}], {duration:280, easing:'cubic-bezier(.3,0,.15,1)'}); }, 140); break; }
+    case 'enviarAct': { const p = D.pagos.find(x => x.id === id); if(!p) break; p.nubeFirma = ''; p.e2eCambio = Date.now(); guardar();
+      tarea(async () => { await sincronizar(); return p.compartirDatos ? 'Listo: se enviaron los cambios y los datos para pagar.' : 'Listo: se enviaron los cambios. (Para enviar los datos de la tarjeta, activa "Permitir que vea y copie los datos para pagar" al editar.)'; }); break; }
     case 'calSeg': deslizar(b, () => { calSeg = +n; pintar(); }); break;
     case 'irTarjeta': { const el = document.getElementById('tj-' + b.dataset.id); if(el){ el.scrollIntoView({behavior:'smooth', block:'center'}); setTimeout(() => el.animate([{transform:'scale(1)'},{transform:'scale(1.03)'},{transform:'scale(1)'}], {duration:520, easing:'cubic-bezier(.3,0,.15,1)'}), 600); } break; }
     case 'filtro': filtroIni = +n; pintar(); window.scrollTo(0,0); break;
