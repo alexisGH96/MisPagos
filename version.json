@@ -1,6 +1,6 @@
 {
-  "versionCode": 87,
-  "versionName": "10.1",
+  "versionCode": 88,
+  "versionName": "10.2",
   "apk": "MisPagos.apk",
-  "notas": "La vibración ya no suena al desplazar: solo al tocar para entrar."
+  "notas": "Filtra Todos los pagos por propios o compartidos. Sombra de Próximos sin corte."
 }
