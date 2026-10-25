@@ -1,6 +1,6 @@
 {
-  "versionCode": 90,
-  "versionName": "10.4",
+  "versionCode": 91,
+  "versionName": "10.5",
   "apk": "MisPagos.apk",
-  "notas": "Nuevo calendario con el día en la tarjeta principal. Copia rápida solo de tarjeta, vencimiento y CVV. Registro de pagos."
+  "notas": "Sombra de Próximos completa, sin línea. Copiar fecha."
 }
