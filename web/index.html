@@ -73,7 +73,7 @@ h2{font-size:19px;margin:24px 4px 12px}
 .pago .nom{font-weight:700;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .der{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
 .est-nar{background:var(--t-nar)} .est-ama{background:var(--t-ama)} .est-ver{background:var(--t-ver)} .est-azu{background:var(--t-azu)} .est-roj{background:var(--t-roj)}
-.prox{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 8px;margin:0 -16px;padding-left:16px;scrollbar-width:none}
+.prox{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:12px 2px 36px;margin-top:-10px !important;margin-bottom:-22px !important;margin:0 -16px;padding-left:16px;scrollbar-width:none}
 .prox::-webkit-scrollbar{display:none}
 .pc{flex:0 0 190px;scroll-snap-align:start;background:var(--surf);border:1px solid var(--line);border-radius:22px;padding:14px;text-align:left}
 /* barra de navegación */
@@ -362,7 +362,7 @@ function listaFiltro(){
   return `<div class="fila" style="align-items:center;margin-bottom:16px"><button class="pildora flechaCal" data-act="filtro" data-n="0" aria-label="Atrás">‹</button><div class="peso" style="padding-left:12px"><div class="b" style="font-size:22px">${t}</div><div class="gris chico">${sub}</div></div></div>`
     + (l.length ? l.map(tarjetaPago).join('') : '<p class="gris">No hay pagos aquí por ahora.</p>');
 }
-let filtroIni = 0, calSeg = 0;
+let filtroIni = 0, calSeg = 0, filtroPagos = 0;
 function inicio(){
   if(filtroIni) return listaFiltro();
   const mes = hoy().getMonth(), anio = hoy().getFullYear();
@@ -381,7 +381,9 @@ function inicio(){
   if(!D.pagos.length) return h + `<div class="vacio"><p>Agrega tu primer pago con el botón +.</p><button class="btn lleno" data-act="nuevo">Agregar pago</button></div>`;
   h += `<div class="sec"><h2>Próximos</h2><button class="pildora" data-act="tab" data-n="1">Ver todos ›</button></div><div class="prox">`;
   prox.forEach(p => { h += `<button class="pc" data-act="detalle" data-id="${p.id}"><div class="fila">${icono(p)}<div class="peso"><div class="b">${p.monto ? dinero(num(p.monto)) : ''}</div><div class="gris chico">${dias(p.vence) <= 0 ? 'hoy' : dias(p.vence) === 1 ? 'mañana' : 'en ' + dias(p.vence) + ' días'}</div></div>${anillo(p,36)}</div><div class="b" style="margin-top:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sinPrefijo(p.nombre))}</div><div class="gris chico">Vence ${corto(p.vence)}</div></button>`; });
-  h += `</div><h2>Todos los pagos</h2>` + ordenados().map(tarjetaPago).join('');
+  const lt = ordenados().filter(p => filtroPagos === 1 ? !p.compartido : filtroPagos === 2 ? p.compartido : true);
+  h += `</div><h2>Todos los pagos</h2><div class="seg" id="segPagos">${['Todos','Propios','Compartidos'].map((x,i) => `<button class="${filtroPagos===i?'sel':''}" data-act="filtroPagos" data-n="${i}">${x}</button>`).join('')}</div><div id="listaPagos">`
+    + (lt.length ? lt.map(tarjetaPago).join('') : `<p class="gris">${filtroPagos === 2 ? 'No tienes pagos compartidos.' : 'Todos tus pagos son compartidos.'}</p>`) + `</div>`;
   return h;
 }
 function calendario(){
@@ -1039,6 +1041,12 @@ document.addEventListener('click', (ev) => {
       const nube = D.nube; D = JSON.parse(t); D.nube = nube; guardar(); aplicarTema(); return 'Respaldo recuperado.'; }); break;
     case 'fondo': hojaFondo(); break;
     case 'colores': hojaColores(); break;
+    case 'filtroPagos': { const sg = b.parentElement, act = sg.querySelector('.sel'); if(act === b) break;
+      const d = [...sg.children].indexOf(b) > [...sg.children].indexOf(act) ? 1 : -1, y = window.scrollY;
+      act.animate([{transform:'none'},{transform:`translateX(${b.offsetLeft - act.offsetLeft}px)`}], {duration:420, easing:'cubic-bezier(.3,0,.15,1)', fill:'forwards'}); b.style.color = 'var(--accTxt)'; b.style.position = 'relative'; b.style.zIndex = 1;
+      if(navigator.vibrate) navigator.vibrate(20);
+      document.getElementById('listaPagos').animate([{transform:'none', opacity:1},{transform:`translateX(${-d*20}%)`, opacity:0}], {duration:140, easing:'cubic-bezier(.4,0,1,1)', fill:'forwards'});
+      setTimeout(() => { filtroPagos = +n; pintar(); window.scrollTo(0, y); const l2 = document.getElementById('listaPagos'); if(l2) l2.animate([{transform:`translateX(${d*20}%)`, opacity:0},{transform:'none', opacity:1}], {duration:280, easing:'cubic-bezier(.3,0,.15,1)'}); }, 140); break; }
     case 'calSeg': deslizar(b, () => { calSeg = +n; pintar(); }); break;
     case 'irTarjeta': { const el = document.getElementById('tj-' + b.dataset.id); if(el){ el.scrollIntoView({behavior:'smooth', block:'center'}); setTimeout(() => el.animate([{transform:'scale(1)'},{transform:'scale(1.03)'},{transform:'scale(1)'}], {duration:520, easing:'cubic-bezier(.3,0,.15,1)'}), 600); } break; }
     case 'filtro': filtroIni = +n; pintar(); window.scrollTo(0,0); break;
