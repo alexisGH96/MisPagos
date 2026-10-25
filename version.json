@@ -1,6 +1,6 @@
 {
-  "versionCode": 75,
-  "versionName": "8.9",
+  "versionCode": 76,
+  "versionName": "9.0",
   "apk": "MisPagos.apk",
-  "notas": "Nueva tarjeta principal: pagados, pendientes y vence pronto (tócalos para ver solo esos), con tu último y próximo pago."
+  "notas": "Número de tarjeta, vencimiento y CVV por separado. Datos compartidos con cifrado de extremo a extremo, como WhatsApp."
 }
