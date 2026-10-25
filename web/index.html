@@ -554,7 +554,7 @@ function ajustes(){
     <div class="gris chico b" style="margin:22px 8px 8px">Apariencia</div><div class="caja">${[temas.slice(0,3), temas.slice(3)].map((fila,f) => `<div class="seg" style="margin:${f ? '8px' : '0'} 0 0">${fila.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div>`).join('')}<p class="gris chico" style="margin-bottom:0">Glass sigue al sistema (de noche es oscuro). Glass blanco es blanco con toques de color.</p></div>
     ${grupo('Fondo del modo Glass', [['Tu imagen de fondo', D.fondoGlass ? 'Tu foto' : 'Predeterminado', 'fondoGlass']])}
     ${document.documentElement.dataset.tema === 'glass' ? grupo('Glass', [['Desenfoque del fondo', ['Normal','30 % más','50 % más','80 % más'][D.glassBlur || 0], 'glassBlur']]) : ''}
-    ${grupo('Perfil y colores', [['Fondo del perfil', fondoSel() === -1 ? 'Foto' : fondoSel() === -2 ? 'Del tema' : fondoSel() === -3 ? 'Sin fondo' : FONDOS[fondoSel()][0], 'fondo'], ['Color de "Por pagar este mes"', listaHero()[selHero()][0], 'colores']])}
+    ${grupo('Colores', [['Color de "Por pagar este mes"', listaHero()[selHero()][0], 'colores']])}
     ${grupo('Tus datos', [['Respaldo en la nube', D.respaldoNube ? 'Guardado' : 'Guardar', 'respNube'], ['Guardar respaldo en archivo', 'archivo', 'exportar'], ['Cargar respaldo de archivo', 'archivo', 'importar']])}
     <input type="file" id="imp" accept="application/json" data-act="importar" hidden>
     <div class="gris chico b" style="margin:22px 8px 8px">Acerca de</div><div class="caja"><p class="chico" style="margin-top:0"><b>Ponla en tu iPhone como app:</b> en Safari toca Compartir y luego "Agregar a pantalla de inicio".</p><p class="gris chico" style="margin-bottom:0">Los avisos llegan cada mañana a las 9:00 (necesitas cuenta y activarlos en "Avisos"). El iPhone no permite que una web vibre por su cuenta. Tus pagos se guardan en este navegador; usa "Guardar respaldo" de vez en cuando.</p></div>`;
@@ -912,7 +912,7 @@ function estiloHero(){
 function estiloBarra(){ return claroHero() ? `background:${cr()[5]}` : ''; }
 function estiloRelleno(){ return claroHero() ? `background:${cr()[6]}` : `background:${matchMedia('(prefers-color-scheme: dark)').matches ? '#E8E8F0' : '#41454F'}`; }
 function grupoTema(){ const t = document.documentElement.dataset.tema; return t.startsWith('glass') ? 'glass' : t === 'oscuro' ? 'oscuro' : 'claro'; }
-function fondoSel(){ const v = (D.fondosPerfil || {})[grupoTema()]; return v != null ? v : -2; }
+function fondoSel(){ return -3; }   // perfil siempre sin fondo
 /* ajustar la foto dentro del círculo: arrastrar y acercar */
 function ajustarFoto(src){
   abrirHoja(`<h1>Ajusta tu foto</h1><p class="gris chico">Arrastra para moverla y usa la barra para acercar.</p>
