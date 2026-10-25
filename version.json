@@ -1,6 +1,6 @@
 {
-  "versionCode": 88,
-  "versionName": "10.2",
+  "versionCode": 89,
+  "versionName": "10.3",
   "apk": "MisPagos.apk",
-  "notas": "Filtra Todos los pagos por propios o compartidos. Sombra de Próximos sin corte."
+  "notas": "Ventanas con los colores de cada apariencia, contactos sin duplicar, avisos cuando te actualizan un pago compartido y más ajustes."
 }
