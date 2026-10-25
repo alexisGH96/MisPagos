@@ -101,7 +101,7 @@ nav button.sel{background:var(--pill);color:var(--icoSel)}
 /* hojas (detalle / editor) */
 .velo{position:fixed;inset:0;background:rgba(10,14,30,.35);opacity:0;transition:opacity .25s;z-index:20}
 .velo.ver{opacity:1}
-.hoja{position:fixed;left:0;right:0;bottom:0;max-height:92vh;overflow:auto;background:var(--bg);border-radius:28px 28px 0 0;padding:10px 16px calc(24px + env(safe-area-inset-bottom,0));transform:translateY(100%);transition:transform .32s cubic-bezier(.2,.8,.2,1);z-index:21;max-width:600px;margin:0 auto}
+.hoja{position:fixed;left:0;right:0;bottom:0;max-height:92vh;overflow:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:var(--bg);border-radius:28px 28px 0 0;padding:10px 16px calc(24px + env(safe-area-inset-bottom,0));transform:translateY(100%);transition:transform .32s cubic-bezier(.2,.8,.2,1);z-index:21;max-width:600px;margin:0 auto}
 .hoja.ver{transform:none}
 .asa{width:40px;height:5px;border-radius:5px;background:var(--line);margin:0 auto 10px}
 label{display:block;font-size:13px;color:var(--gr);margin:12px 4px 6px}
@@ -164,6 +164,8 @@ input,select{width:100%;font:inherit;color:var(--fg);background:var(--surf);bord
 #jalar.vuelve{transition:transform .26s cubic-bezier(.2,.8,.2,1),opacity .26s}
 @keyframes girar{to{transform:rotate(360deg)}}
 html,body{overscroll-behavior-y:contain}
+html.conHoja,html.conHoja body{overflow:hidden}
+.prox{overscroll-behavior-x:contain;touch-action:pan-x pan-y}
 /* tarjetas y botones flotando: sombra suave debajo */
 .caja,.pago,.pc,.hero{box-shadow:0 16px 36px -12px rgba(58,70,117,.34),0 3px 8px -3px rgba(58,70,117,.12)}
 .mas,.pildora{box-shadow:0 10px 24px -8px rgba(58,70,117,.38)}
@@ -564,7 +566,7 @@ function hojaFondo(){
 /* ===================== hojas: detalle y editor ===================== */
 let hojaT = null;
 function abrirHoja(html){
-  clearTimeout(hojaT);
+  clearTimeout(hojaT); document.documentElement.classList.add('conHoja');
   const capa = document.getElementById('capa');
   capa.innerHTML = `<div class="velo" data-act="cerrar"></div><div class="hoja" role="dialog" aria-modal="true"><div class="asa"></div>${html}</div>`;
   requestAnimationFrame(() => { capa.querySelector('.velo').classList.add('ver'); capa.querySelector('.hoja').classList.add('ver'); });
@@ -572,6 +574,7 @@ function abrirHoja(html){
 function cerrarHoja(){
   const capa = document.getElementById('capa'); const h = capa.querySelector('.hoja'); if(!h) return;
   h.classList.remove('ver'); capa.querySelector('.velo').classList.remove('ver');
+  document.documentElement.classList.remove('conHoja');
   hojaT = setTimeout(() => { capa.innerHTML = ''; }, 300);
 }
 function detalle(id){
@@ -626,7 +629,7 @@ function editor(id){
   document.getElementById('ed').onsubmit = (ev) => {
     ev.preventDefault(); const f = Object.fromEntries(new FormData(ev.target));
     const x = id ? D.pagos.find(z => z.id === id) : {id: Date.now(), pagado:false, hist:[]};
-    if(f.compartido && !(id && x.creadoPor)){
+    if(f.compartido && !(id && x.creadoPor) && !x.nubeId && (f.conQuien||'').trim() !== (x.conQuien||'')){
       const q = (f.conQuien || '').trim(), per = personas().find(z => z.nombre.toLowerCase() === q.toLowerCase());
       const ok = (q.includes('@') && q.includes('.')) || q.replace(/\D/g,'').length >= 10 || (per && (per.mail || (per.tel || '').replace(/\D/g,'').length >= 10));
       if(!ok){ alert('Escribe el correo o el número (10 dígitos) de la persona'); return; }
@@ -1119,15 +1122,19 @@ if(D.nube && D.nube.refresh && D.nube.verif) sincronizar().then(pintar).catch(()
 /* ---- jalar hacia abajo para sincronizar ---- */
 (() => {
   const bola = document.getElementById('jalar'), app = document.getElementById('app'), UMBRAL = 80, MAX = 120;
-  let y0 = null, d = 0, ocupado = false;
+  let y0 = null, x0 = 0, d = 0, ocupado = false, eje = null;
   const mover = (v, anim) => {
     bola.classList.toggle('vuelve', !!anim); app.style.transition = anim ? 'transform .26s cubic-bezier(.2,.8,.2,1)' : 'none';
     bola.style.transform = `translateY(${Math.min(v, MAX) - 60}px) rotate(${v * 2.2}deg)`; bola.style.opacity = Math.min(1, v / (UMBRAL * .6));
     app.style.transform = v ? `translateY(${Math.min(v, MAX) * .35}px)` : '';
   };
-  document.addEventListener('touchstart', e => { if(ocupado || window.scrollY > 0 || document.querySelector('.hoja')) { y0 = null; return; } y0 = e.touches[0].clientY; d = 0; }, {passive:true});
+  document.addEventListener('touchstart', e => {
+    if(ocupado || window.scrollY > 0 || document.querySelector('.hoja.abierta, .hoja') || e.target.closest('.prox, .hoja, input, textarea, select')) { y0 = null; return; }
+    y0 = e.touches[0].clientY; x0 = e.touches[0].clientX; d = 0; eje = null; }, {passive:true});
   document.addEventListener('touchmove', e => {
-    if(y0 === null) return; const dy = e.touches[0].clientY - y0;
+    if(y0 === null) return; const dy = e.touches[0].clientY - y0, dx = e.touches[0].clientX - x0;
+    if(!eje){ if(Math.abs(dx) < 8 && Math.abs(dy) < 8) return; eje = Math.abs(dy) > Math.abs(dx) * 1.5 ? 'y' : 'x'; }
+    if(eje === 'x'){ y0 = null; if(d){ d = 0; mover(0, true); } return; }   // gesto de lado: no es jalar
     if(dy <= 0 || window.scrollY > 0){ if(d){ d = 0; mover(0, true); } return; }
     e.preventDefault(); d = dy * .55; mover(d);
   }, {passive:false});
