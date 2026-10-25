@@ -1,6 +1,6 @@
 {
-  "versionCode": 78,
-  "versionName": "9.2",
+  "versionCode": 79,
+  "versionName": "9.3",
   "apk": "MisPagos.apk",
-  "notas": "Quincenas ahora en Calendario; la pestaña de cartera es solo Tarjetas. Vibración al tocar y lista de pagados corregida."
+  "notas": "Calendario y Quincenas con selector. Vibración y animación al tocar botones y tarjetas (ahora sí)."
 }
