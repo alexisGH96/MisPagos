@@ -1,6 +1,6 @@
 {
-  "versionCode": 71,
-  "versionName": "8.5",
+  "versionCode": 72,
+  "versionName": "8.6",
   "apk": "MisPagos.apk",
-  "notas": "Glass: elige cuánto desenfocar el fondo (normal, 30, 50 u 80 % más)."
+  "notas": "Ningún botón negro: lo elegido se ve como en la barra de navegación y los símbolos son grises. Flechas del calendario más chicas."
 }
