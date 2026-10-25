@@ -1,6 +1,6 @@
 {
-  "versionCode": 68,
-  "versionName": "8.2",
+  "versionCode": 69,
+  "versionName": "8.3",
   "apk": "MisPagos.apk",
-  "notas": "Animaciones más suaves, barra de Android transparente, fondo de perfil del tema o sin fondo y ventanas que se cierran con animación."
+  "notas": "Ventanas con márgenes parejos y líneas entre opciones. Cambio de apariencia con fundido suave. Barra de Por pagar en gris."
 }
