@@ -1,6 +1,6 @@
 {
-  "versionCode": 73,
-  "versionName": "8.7",
+  "versionCode": 74,
+  "versionName": "8.8",
   "apk": "MisPagos.apk",
-  "notas": "Compartir solo por correo o número. Botones sin contornos de color, como tarjetas. Tarjetas compartidas con el texto en dos renglones."
+  "notas": "Datos de tus tarjetas cifrados y protegidos con huella o PIN. Copia rápida desde Tarjetas y datos compartidos solo con tu permiso."
 }
