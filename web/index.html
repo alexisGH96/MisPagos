@@ -410,8 +410,8 @@ function quincenaActual(){
   return [new Date(y, m, q+1), new Date(y, m, fin)];
 }
 function carteraV(){
-  let h = `<div class="seg"><button class="${cartera===0?'sel':''}" data-act="cartera" data-n="0">Quincenas</button><button class="${cartera===1?'sel':''}" data-act="cartera" data-n="1">Tarjetas</button></div>`;
-  if(cartera === 1){
+  let h = `<h1>Tarjetas</h1>`;
+  {
     const cs = D.pagos.filter(p => p.credito);
     const corteDe = (dia, desde) => { let d = new Date(desde.getFullYear(), desde.getMonth(), 1); for(let k = 0; k < 3; k++){ const m = new Date(d.getFullYear(), d.getMonth() + k, 1); const f = new Date(m.getFullYear(), m.getMonth(), Math.min(dia, new Date(m.getFullYear(), m.getMonth()+1, 0).getDate())); if(f >= desde) return f; } };
     const h0 = hoy(), conC = cs.filter(p => p.diaCorte > 0).map(p => { const sig = corteDe(p.diaCorte, new Date(h0.getTime() + DIA)); return {p, faltan: Math.round((sig - h0)/DIA), sig}; }).sort((a,b) => b.faltan - a.faltan);
@@ -421,14 +421,16 @@ function carteraV(){
       <div class="dos" style="margin-top:12px"><div><div class="gris chico">Corte</div><div class="b">${p.diaCorte ? 'día ' + p.diaCorte : '—'}</div></div><div><div class="gris chico">Límite de pago</div><div class="b">${corto(p.vence)}</div></div>
       <div><div class="gris chico">Sin intereses</div><div class="b">${p.monto ? dinero(num(p.monto)) : '—'}</div></div><div><div class="gris chico">Mínimo</div><div class="b">${p.minimo ? dinero(num(p.minimo)) : '—'}</div></div></div></button>`).join('');
   }
+}
+function quincenasV(){
   const [a, b] = quincenaActual();
   const sigA = new Date(b.getTime() + DIA), sigB = sigA.getDate() === 1 ? new Date(sigA.getFullYear(), sigA.getMonth(), D.quincena||15) : new Date(sigA.getFullYear(), sigA.getMonth()+1, 0);
   const bloque = (t, x, y, act) => {
     const ps = ordenados().filter(p => { const f = fecha(p.vence); return f >= x && f <= y; });
     const pend = ps.filter(p => !p.pagado).reduce((s,p) => s + num(p.monto), 0);
-    return `<div class="caja${act ? ' est-azu' : ''}" style="margin-bottom:14px"><div class="gris chico b">${t} · ${x.getDate()} – ${y.getDate()} ${MESES[y.getMonth()]}</div><div style="font-size:32px;font-weight:800;margin:6px 0 2px">${dinero(pend)}</div><div class="gris chico">por pagar · ${ps.filter(p=>!p.pagado).length} pagos</div><div style="margin-top:12px">${ps.map(tarjetaPago).join('') || '<span class="gris chico">Sin pagos en esta quincena.</span>'}</div></div>`;
+    return `<div class="caja" style="margin-bottom:14px"><div class="gris chico b">${t} · ${x.getDate()} – ${y.getDate()} ${MESES[y.getMonth()]}</div><div style="font-size:32px;font-weight:800;margin:6px 0 2px">${dinero(pend)}</div><div class="gris chico">por pagar · ${ps.filter(p=>!p.pagado).length} pagos</div><div style="margin-top:12px">${ps.map(tarjetaPago).join('') || '<span class="gris chico">Sin pagos en esta quincena.</span>'}</div></div>`;
   };
-  return h + `<h1 style="margin-top:0">Quincenas</h1><p class="gris" style="text-align:center;margin-top:-10px">Cuánto apartar de cada pago de nómina</p>` + bloque('Quincena actual', a, b, true) + bloque('Siguiente', sigA, sigB, false);
+  return `<h2>Quincenas</h2><p class="gris chico" style="margin:-4px 4px 10px">Cuánto apartar de cada pago de nómina</p>` + bloque('Quincena actual', a, b, true) + bloque('Siguiente', sigA, sigB, false);
 }
 /* ---- gráfica de pastel: sectores separados, esquinas redondeadas, líneas guía con punto ---- */
 function pastel(vals, cols, total, centro, sub){
@@ -1097,7 +1099,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { ap
 function pintar(anim){
   avanzar();
   const app = document.getElementById('app');
-  app.innerHTML = [inicio, calendario, carteraV, estadisticas, ajustes][tab]();
+  app.innerHTML = [inicio, () => calendario() + quincenasV(), carteraV, estadisticas, ajustes][tab]();
   if(anim && !matchMedia('(prefers-reduced-motion: reduce)').matches) app.animate([{opacity:0, transform:'translateY(8px)'}, {opacity:1, transform:'none'}], {duration:260, easing:'cubic-bezier(.2,.8,.2,1)'});
   // las gráficas se animan cuando aparecen en pantalla
   const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ e.target.classList.add('ver'); obs.unobserve(e.target); } }), {threshold:.35});
