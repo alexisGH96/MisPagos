@@ -176,7 +176,7 @@ html.conHoja,html.conHoja body{overflow:hidden}
 :root[data-tema="glassb"] nav button.sel{background:radial-gradient(120% 100% at 50% 58%, rgba(255,255,255,.75) 0, rgba(255,255,255,.8) 62%, rgba(255,255,255,.95) 100%), linear-gradient(to bottom, transparent 55%, rgba(255,255,255,.35));
   border:1px solid rgba(255,255,255,.85);border-bottom-color:rgba(40,48,80,.12);box-shadow:inset 10px 6px 10px -6px rgba(255,255,255,1);color:#963C1E}
 :root[data-tema="claro1"] .pildora{background:#fff;color:#121A35;border-color:#E2E6EE}
-:root[data-tema="claro1"] .pildora.flechaCal{background:#1C326E;color:#fff}
+:root[data-tema="claro1"] .pildora.flechaCal{background:#fff;color:#626A7C;border-color:#E2E6EE}
 button,.pago,.pc,a.btn{transition:transform .38s cubic-bezier(.3,0,.15,1)}
 button:active,.pago:active,.pc:active,a.btn:active{transform:scale(.97);transition-duration:.16s}
 ::view-transition-old(root),::view-transition-new(root){animation-duration:.5s;animation-timing-function:cubic-bezier(.3,0,.15,1)}
@@ -584,7 +584,7 @@ function detalle(id){
   let h = `<div class="pago est-${estado(p)}" style="display:block"><div class="fila">${icono(p)}<div class="peso"><div class="nom">${esc(p.nombre)}</div><div class="gris chico">${p.monto ? dinero(num(p.monto)) + ' · ' : ''}${FRECS[p.frec]}</div></div>${anillo(p,44)}</div>
     ${p.creadoPor ? `<div class="gris chico b" style="margin-top:10px">☁ Creado por ${esc(p.creadoPor)}</div>` : ''}
     <div class="b" style="margin:14px 0">Vence ${corto(p.vence)} · ${p.pagado ? 'pagado ✓' : d < 0 ? 'venció hace ' + (-d) + ' días' : d === 0 ? 'vence hoy' : d === 1 ? 'vence mañana' : 'faltan ' + d + ' días'}</div>
-    <button class="btn ${p.pagado || document.documentElement.dataset.tema.startsWith('glass') ? 'borde' : 'lleno'}" data-act="pagar" data-id="${p.id}">${p.pagado ? 'Pagado <span class="verde">✓</span>' : 'Ya pagué ✓'}</button></div>`;
+    <button class="btn borde" data-act="pagar" data-id="${p.id}">${p.pagado ? 'Pagado <span class="verde">✓</span>' : 'Confirmar pago'}</button></div>`;
   if(p.tieneDatos){
     h += `<h2>Datos para pagar</h2><div class="caja">` + [['Tarjeta',p.tarjetaUlt,'numTarjeta'],['Vence',p.tarjetaUlt ? '••/••' : '','expira'],['CVV',p.tarjetaUlt ? '•••' : '','cvv'],['Cuenta',p.cuentaUlt,'cuenta'],['Referencia',p.refUlt,'referencia'],['Titular',p.titularVis,'']].filter(x => x[1]).map(([a,b,k]) => `<div class="dato"><span class="gris">${a}</span><span class="fila"><b id="dv-${k}">${esc(b)}</b>${k ? `<button class="pildora" data-act="verDato" data-id="${p.id}" data-k="${k}">Ver</button><button class="pildora" data-act="copiarDato" data-id="${p.id}" data-k="${k}">Copiar</button>` : ''}</span></div>`).join('') + `</div>`;
   }
@@ -999,6 +999,8 @@ document.addEventListener('click', (ev) => {
     case 'borrar': if(confirm('¿Eliminar este pago?')){ const bp = D.pagos.find(p => p.id === id); if(bp) borrarNube(bp); D.pagos = D.pagos.filter(p => p.id !== id); guardar(); cerrarHoja(); pintar(); aviso('Pago eliminado'); } break;
     case 'pagar': {
       const p = D.pagos.find(x => x.id === id);
+      if(!b.dataset.ok){ if(!p.pagado) b.innerHTML = 'Pagado <span class="verde">✓</span>'; if(navigator.vibrate) navigator.vibrate(25);
+        b.dataset.ok = 1; b.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}], {duration:380, easing:'cubic-bezier(.3,0,.15,1)'}).onfinish = () => b.click(); break; }
       if(!p.pagado){ p.pagado = true; (p.hist = p.hist||[]).push({f:iso(hoy()), v:p.vence, m:p.monto}); aviso('✓ Marcado como pagado'); }
       else { p.pagado = false; if(p.hist && p.hist.length && p.hist[p.hist.length-1].v === p.vence) p.hist.pop(); aviso('Marcado como pendiente'); }
       guardar(); pintar(); detalle(id); break; }
