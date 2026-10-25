@@ -605,9 +605,9 @@ function detalle(id){
     const per = personas().find(x => x.nombre.toLowerCase() === quien.toLowerCase());
     const msg = `Hola, el pago de ${sinPrefijo(p.nombre)} vence el ${corto(p.vence)}. Te toca ${dinero(Math.round(otra))}.`;
     const tel = per && per.tel ? per.tel.replace(/\D/g,'') : ''; const telI = tel.length === 10 ? '52' + tel : tel;
-    h += `<h2>¿Quién paga?</h2><div class="caja"><div class="dato"><span>Tú · ${p.miParte||50} %</span><b>${dinero(Math.round(mi))}</b></div><div class="dato"><span>${esc(quien)} · ${100-(p.miParte||50)} %</span><b>${dinero(Math.round(otra))}</b></div>
+    h += `<h2>¿Quién paga?</h2><div class="caja"><div class="dato"><span>Tú · ${p.miParte||50} %</span><b>${dinero(Math.round(mi))}</b></div><div class="dato"><span>${esc(nombreVisible(quien))} · ${100-(p.miParte||50)} %</span><b>${dinero(Math.round(otra))}</b></div>
       ${p.nubeId && D.nube && D.nube.verif ? `<button class="btn lleno" style="margin-top:12px" data-act="recordar" data-id="${p.id}" data-m="${esc(msg)}">Enviar recordatorio por Mis Pagos</button>` : ''}
-      ${p.nubeId && !p.creadoPor && D.nube && D.nube.verif ? `<button class="btn borde" style="margin-top:10px" data-act="enviarAct" data-id="${p.id}">Enviar actualización a ${esc(p.conQuien)}</button>` : ''}
+      ${p.nubeId && !p.creadoPor && D.nube && D.nube.verif ? `<button class="btn borde" style="margin-top:10px" data-act="enviarAct" data-id="${p.id}">Enviar actualización a ${esc(nombreVisible(p.conQuien))} por Mis Pagos</button>` : ''}
       <a class="btn ${p.nubeId && D.nube && D.nube.verif ? 'borde' : 'lleno'}" style="margin-top:10px;text-decoration:none" href="https://wa.me/${telI}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">Enviar recordatorio por WhatsApp</a></div>`;
   }
   if((p.hist||[]).length){
@@ -660,6 +660,7 @@ function editor(id){
     if(!id) D.pagos.push(x);
     if(x.conQuien && !personas().some(z => z.nombre.toLowerCase() === x.conQuien.toLowerCase())) D.personas.push({nombre:x.conQuien, tel:'', mail:''});
     guardar(); cerrarHoja(); pintar(); aviso('✓ Guardado');
+    if(id && x.compartido && !x.creadoPor) setTimeout(() => detalle(x.id), 340);   // vuelve al detalle para enviar la actualización
     if(x.compartido && !x.creadoPor && D.nube && D.nube.verif) sincronizar().then(pintar).catch(() => {});
   };
 }
@@ -733,6 +734,7 @@ async function sincronizar(){
   if(!D.nube.verif && !(await revisarVerif())) throw new Error('Primero verifica tu correo con el enlace que te enviamos.');
   const yo = D.nube.correo, uid = D.nube.uid; let sub = 0, nue = 0, cam = 0, qui = 0;
   await publicarPerfil();
+  for(const p of D.pagos){ const q = (p.conQuien || '').trim(); if(q.includes('@') && !(D.nomCorreo || {})[q.toLowerCase()]) await nombreDeCorreo(q); }
   for(const p of D.pagos){
     if(p.creadoPor || !p.compartido || !p.conQuien) continue;
     const per = personas().find(z => z.nombre.toLowerCase() === p.conQuien.toLowerCase());
@@ -819,6 +821,19 @@ function nomCreador(f){
   const em = ((f.participantes && f.participantes.arrayValue && f.participantes.arrayValue.values) || []).map(v => v.stringValue).find(e => e && e.toLowerCase() !== (D.nube.correo||'').toLowerCase()) || '';
   const per = personas().find(z => z.mail && z.mail.toLowerCase() === em.toLowerCase());
   return per ? per.nombre : gs(f,'creadorNombre');
+}
+function nombreVisible(q){
+  q = (q || '').trim(); if(!q.includes('@')) return q;
+  const per = personas().find(z => z.mail && z.mail.toLowerCase() === q.toLowerCase() && !z.nombre.includes('@'));
+  if(per) return per.nombre;
+  const n = (D.nomCorreo || {})[q.toLowerCase()]; if(n) return n;
+  const base = q.split('@')[0].replace(/[0-9._-]+/g, ' ').trim().split(' ')[0] || q;
+  return base.charAt(0).toUpperCase() + base.slice(1);
+}
+async function nombreDeCorreo(correo){
+  try{ const r = await pedir('POST', DOCS + ':runQuery', {structuredQuery:{from:[{collectionId:'usuarios'}], where:{fieldFilter:{field:{fieldPath:'correo'}, op:'EQUAL', value:sv(correo.toLowerCase())}}, limit:1}}, await token());
+    const d = (Array.isArray(r) ? r : []).find(x => x.document); const n = d ? gs(d.document.fields, 'nombre').trim().split(/\s+/)[0] : '';
+    if(n){ (D.nomCorreo = D.nomCorreo || {})[correo.toLowerCase()] = n; guardar(); } return n; }catch(e){ return ''; }
 }
 async function pubDeCorreo(correo){
   try{ const r = await pedir('POST', DOCS + ':runQuery', {structuredQuery:{from:[{collectionId:'usuarios'}], where:{fieldFilter:{field:{fieldPath:'correo'}, op:'EQUAL', value:sv(correo.toLowerCase())}}, limit:1}}, await token());
