@@ -175,8 +175,8 @@ html,body{overscroll-behavior-y:contain}
   border:1px solid rgba(255,255,255,.85);border-bottom-color:rgba(40,48,80,.12);box-shadow:inset 10px 6px 10px -6px rgba(255,255,255,1);color:#963C1E}
 :root[data-tema="claro1"] .pildora{background:#fff;color:#121A35;border-color:transparent}
 :root[data-tema="claro1"] .pildora.flechaCal{background:#1C326E;color:#fff}
-button,.pago,.pc,a.btn{transition:transform .22s cubic-bezier(.34,1.8,.64,1)}
-button:active,.pago:active,.pc:active,a.btn:active{transform:scale(.95);transition-duration:.09s}
+button,.pago,.pc,a.btn{transition:transform .38s cubic-bezier(.3,0,.15,1)}
+button:active,.pago:active,.pc:active,a.btn:active{transform:scale(.97);transition-duration:.16s}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -461,6 +461,8 @@ function ahorros(){
 const FONDOS = ['Atardecer','Noche','Aurora','Bokeh','Geométrico','Cristal'].map((n,i) => [n, `url(perfil_${i}.jpg) center/cover`]);
 function portadaCSS(){
   const g = grupoTema(), pf = fondoSel(), foto = (D.fondoFotos || {})[g] || D.fondoFoto;
+  if(pf === -3) return 'transparent';
+  if(pf === -2) return g === 'glass' ? 'rgba(255,255,255,.28)' : g === 'oscuro' ? 'linear-gradient(135deg,#2E2B52,#5A4FC4)' : document.documentElement.dataset.tema === 'claro1' ? 'linear-gradient(135deg,#1C326E,#4A74D0)' : 'linear-gradient(135deg,#FFD9C7,#F4A58C)';
   if(foto && pf === -1) return `url(${foto}) center/cover`;
   return FONDOS[Math.max(0, Math.min(FONDOS.length - 1, pf))][1];
 }
@@ -484,7 +486,7 @@ function ajustes(){
     ${grupo('Cuenta y personas', [['Cuenta y pagos compartidos', correo ? (D.nube.verif ? 'Conectada' : 'Sin verificar') : 'Sin cuenta', 'cuenta'], ['Personas con las que pagas', personas().length + ' personas', 'personas']])}
     <div class="gris chico b" style="margin:22px 8px 8px">Apariencia</div><div class="caja">${[temas.slice(0,3), temas.slice(3)].map((fila,f) => `<div class="seg" style="margin:${f ? '8px' : '0'} 0 0">${fila.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div>`).join('')}<p class="gris chico" style="margin-bottom:0">Glass sigue al sistema (de noche es oscuro). Glass blanco es blanco con toques de color.</p></div>
     ${grupo('Fondo del modo Glass', [['Tu imagen de fondo', D.fondoGlass ? 'Tu foto' : 'Predeterminado', 'fondoGlass']])}
-    ${grupo('Perfil y colores', [['Fondo del perfil', fondoSel() === -1 ? 'Foto' : FONDOS[fondoSel()][0], 'fondo'], ['Color de "Por pagar este mes"', listaHero()[selHero()][0], 'colores']])}
+    ${grupo('Perfil y colores', [['Fondo del perfil', fondoSel() === -1 ? 'Foto' : fondoSel() === -2 ? 'Del tema' : fondoSel() === -3 ? 'Sin fondo' : FONDOS[fondoSel()][0], 'fondo'], ['Color de "Por pagar este mes"', listaHero()[selHero()][0], 'colores']])}
     ${grupo('Tus datos', [['Respaldo en la nube', D.respaldoNube ? 'Guardado' : 'Guardar', 'respNube'], ['Guardar respaldo en archivo', 'archivo', 'exportar'], ['Cargar respaldo de archivo', 'archivo', 'importar']])}
     <input type="file" id="imp" accept="application/json" data-act="importar" hidden>
     <div class="gris chico b" style="margin:22px 8px 8px">Acerca de</div><div class="caja"><p class="chico" style="margin-top:0"><b>Ponla en tu iPhone como app:</b> en Safari toca Compartir y luego "Agregar a pantalla de inicio".</p><p class="gris chico" style="margin-bottom:0">Los avisos llegan cada mañana a las 9:00 (necesitas cuenta y activarlos en "Avisos"). El iPhone no permite que una web vibre por su cuenta. Tus pagos se guardan en este navegador; usa "Guardar respaldo" de vez en cuando.</p></div>`;
@@ -501,7 +503,7 @@ function reducir(archivo, max, recorte){
 }
 function elegirImagen(fn){ const i = document.createElement('input'); i.type = 'file'; i.accept = 'image/*'; i.onchange = () => i.files[0] && fn(i.files[0]); i.click(); }
 function hojaFondo(){
-  abrirHoja(`<h1>Fondo del perfil</h1><div class="dos">${FONDOS.map(([n,g],i) => `<button data-act="fondoSel" data-n="${i}" style="height:80px;border-radius:18px;background:${g};color:#fff;font-weight:700;text-shadow:0 1px 6px rgba(0,0,0,.5);${fondoSel() === i ? 'box-shadow:0 0 0 3px var(--fg)' : ''}">${n}</button>`).join('')}<button data-act="fondoFoto" class="btn borde" style="height:80px;border-radius:18px">Foto de tu galería</button></div><button class="btn borde" style="margin-top:16px" data-act="cerrar">Cerrar</button>`);
+  abrirHoja(`<h1>Fondo del perfil</h1><div class="dos"><button data-act="fondoSel" data-n="-2" class="btn borde" style="height:80px;border-radius:18px;${fondoSel() === -2 ? 'box-shadow:0 0 0 3px var(--fg)' : ''}">Del tema</button><button data-act="fondoSel" data-n="-3" class="btn borde" style="height:80px;border-radius:18px;${fondoSel() === -3 ? 'box-shadow:0 0 0 3px var(--fg)' : ''}">Sin fondo</button>${FONDOS.map(([n,g],i) => `<button data-act="fondoSel" data-n="${i}" style="height:80px;border-radius:18px;background:${g};color:#fff;font-weight:700;text-shadow:0 1px 6px rgba(0,0,0,.5);${fondoSel() === i ? 'box-shadow:0 0 0 3px var(--fg)' : ''}">${n}</button>`).join('')}<button data-act="fondoFoto" class="btn borde" style="height:80px;border-radius:18px">Foto de tu galería</button></div><button class="btn borde" style="margin-top:16px" data-act="cerrar">Cerrar</button>`);
 }
 /* ===================== hojas: detalle y editor ===================== */
 let hojaT = null;
@@ -803,9 +805,9 @@ function estiloHero(){
   const c = cr(); return `background:linear-gradient(120deg,${c[1]},${c[2]});color:${c[3]};${grupoHero() === 'claro' && selHero() === 0 ? 'border:1px solid #E2E6EE;' : ''}`;
 }
 function estiloBarra(){ return claroHero() ? `background:${cr()[5]}` : ''; }
-function estiloRelleno(){ return claroHero() ? `background:${cr()[6]}` : ''; }
+function estiloRelleno(){ return claroHero() ? `background:${cr()[6]}` : 'background:#963C1E'; }
 function grupoTema(){ const t = document.documentElement.dataset.tema; return t.startsWith('glass') ? 'glass' : t === 'oscuro' ? 'oscuro' : 'claro'; }
-function fondoSel(){ const v = (D.fondosPerfil || {})[grupoTema()]; return v != null ? v : (D.perfilFondo == null ? 1 : D.perfilFondo); }
+function fondoSel(){ const v = (D.fondosPerfil || {})[grupoTema()]; return v != null ? v : -2; }
 /* ajustar la foto dentro del círculo: arrastrar y acercar */
 function ajustarFoto(src){
   abrirHoja(`<h1>Ajusta tu foto</h1><p class="gris chico">Arrastra para moverla y usa la barra para acercar.</p>
@@ -832,7 +834,7 @@ function deslizar(b, fin){
   if(!act || act === b){ fin(); return; }
   const dx = b.offsetLeft - act.offsetLeft;
   act.style.color = 'var(--fg)';
-  const p = act.animate([{transform:'translateX(0) scaleX(1)'},{transform:`translateX(${dx*0.5}px) scaleX(1.12)`},{transform:`translateX(${dx}px) scaleX(1)`}], {duration:280, easing:'cubic-bezier(.3,1.3,.5,1)', fill:'forwards'});
+  const p = act.animate([{transform:'translateX(0)'},{transform:`translateX(${dx}px)`}], {duration:420, easing:'cubic-bezier(.3,0,.15,1)', fill:'forwards'});
   b.style.color = 'var(--accTxt)'; b.style.position = 'relative'; b.style.zIndex = 1; act.style.zIndex = 0;
   p.onfinish = fin;
 }
@@ -858,7 +860,7 @@ document.addEventListener('click', (ev) => {
   switch(a){
     case 'tab': tab = +n; pintar(true); window.scrollTo({top:0}); break;
     case 'detalle': detalle(id); break;
-    case 'nuevo': b.animate([{transform:'rotate(0) scale(1)'},{transform:'rotate(90deg) scale(1.12)'},{transform:'rotate(90deg) scale(1)'}], {duration:260, easing:'cubic-bezier(.3,1.6,.5,1)'}); setTimeout(() => editor(null), 200); break;
+    case 'nuevo': b.animate([{transform:'rotate(0)'},{transform:'rotate(90deg)'}], {duration:380, easing:'cubic-bezier(.3,0,.15,1)'}); setTimeout(() => editor(null), 220); break;
     case 'editar': cerrarHoja(); setTimeout(() => editor(id), 320); break;
     case 'cerrar': cerrarHoja(); break;
     case 'borrar': if(confirm('¿Eliminar este pago?')){ const bp = D.pagos.find(p => p.id === id); if(bp) borrarNube(bp); D.pagos = D.pagos.filter(p => p.id !== id); guardar(); cerrarHoja(); pintar(); aviso('Pago eliminado'); } break;
@@ -870,9 +872,9 @@ document.addEventListener('click', (ev) => {
     case 'copiar': navigator.clipboard && navigator.clipboard.writeText(b.dataset.t).then(() => aviso('✓ Copiado')); break;
     case 'mes': { const d = +n, cal = document.querySelector('.cal');
       const ir = () => { calMes = new Date(calMes.getFullYear(), calMes.getMonth() + d, 1); pintar();
-        const c2 = document.querySelector('.cal'); if(c2) c2.animate([{transform:`translateX(${d*35}%)`, opacity:0},{transform:'none', opacity:1}], {duration:260, easing:'cubic-bezier(.2,.8,.2,1)'}); };
+        const c2 = document.querySelector('.cal'); if(c2) c2.animate([{transform:`translateX(${d*25}%)`, opacity:0},{transform:'none', opacity:1}], {duration:420, easing:'cubic-bezier(.3,0,.15,1)'}); };
       if(!cal) { ir(); break; }
-      cal.animate([{transform:'none', opacity:1},{transform:`translateX(${-d*35}%)`, opacity:0}], {duration:150, easing:'ease-in'}).onfinish = ir; break; }
+      cal.animate([{transform:'none', opacity:1},{transform:`translateX(${-d*25}%)`, opacity:0}], {duration:200, easing:'cubic-bezier(.4,0,1,1)'}).onfinish = ir; break; }
     case 'dia': calSel = b.dataset.d; pintar(); break;
     case 'cartera': deslizar(b, () => { cartera = +n; pintar(); }); break;
     case 'estad': deslizar(b, () => { estad = +n; pintar(); }); break;
