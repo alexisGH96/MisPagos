@@ -1,6 +1,6 @@
 {
-  "versionCode": 94,
-  "versionName": "10.8",
+  "versionCode": 95,
+  "versionName": "10.9",
   "apk": "MisPagos.apk",
-  "notas": "Compartidos divididos en 'Te compartieron' y 'Tú compartiste'. Contactos con el nombre de su cuenta."
+  "notas": "Pagados muestra la fecha en que pagaste. Perfil sin fondo."
 }
