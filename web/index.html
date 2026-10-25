@@ -539,8 +539,8 @@ function detalle(id){
     ${p.creadoPor ? `<div class="gris chico b" style="margin-top:10px">☁ Creado por ${esc(p.creadoPor)}</div>` : ''}
     <div class="b" style="margin:14px 0">Vence ${corto(p.vence)} · ${p.pagado ? 'pagado ✓' : d < 0 ? 'venció hace ' + (-d) + ' días' : d === 0 ? 'vence hoy' : d === 1 ? 'vence mañana' : 'faltan ' + d + ' días'}</div>
     <button class="btn ${p.pagado || document.documentElement.dataset.tema.startsWith('glass') ? 'borde' : 'lleno'}" data-act="pagar" data-id="${p.id}">${p.pagado ? 'Pagado <span class="verde">✓</span>' : 'Ya pagué ✓'}</button></div>`;
-  if(p.cuenta || p.referencia || p.titular){
-    h += `<h2>Datos para pagar</h2><div class="caja">` + [['Cuenta',p.cuenta],['Referencia',p.referencia],['Titular',p.titular]].filter(x => x[1]).map(([a,b]) => `<div class="dato"><span class="gris">${a}</span><span class="fila"><b>${esc(b)}</b><button class="pildora" data-act="copiar" data-t="${esc(b)}">Copiar</button></span></div>`).join('') + `</div>`;
+  if(p.tieneDatos){
+    h += `<h2>Datos para pagar</h2><div class="caja">` + [['Cuenta',p.cuentaUlt,'cuenta'],['Referencia',p.refUlt,'referencia'],['Titular',p.titularVis,'']].filter(x => x[1]).map(([a,b,k]) => `<div class="dato"><span class="gris">${a}</span><span class="fila"><b id="dv-${k}">${esc(b)}</b>${k ? `<button class="pildora" data-act="verDato" data-id="${p.id}" data-k="${k}">Ver</button><button class="pildora" data-act="copiarDato" data-id="${p.id}" data-k="${k}">Copiar</button>` : ''}</span></div>`).join('') + `</div>`;
   }
   if(p.credito){
     h += `<h2>${p.tipoCred==='departamental'?'Crédito departamental':'Tarjeta de crédito'}</h2><div class="caja"><div class="dato"><span class="gris">Corte</span><b>${p.diaCorte ? 'día ' + p.diaCorte : '—'}</b></div><div class="dato"><span class="gris">Límite de pago</span><b>${corto(p.vence)}</b></div><div class="dato"><span class="gris">Sin intereses</span><b>${p.monto ? dinero(num(p.monto)) : '—'}</b></div><div class="dato"><span class="gris">Pago mínimo</span><b>${p.minimo ? dinero(num(p.minimo)) : '—'}</b></div><p class="gris chico">El día de corte cierra tu periodo y se calcula cuánto debes; al día siguiente actualiza aquí el monto a pagar.</p></div>`;
@@ -571,10 +571,11 @@ function editor(id){
     <div class="dos"><div><label>Se repite</label><select name="frec">${op(FRECS, p.frec)}</select></div><div><label>Categoría</label><select name="cat"><option value="">Automática</option>${op(cats, p.cat)}</select></div></div>
     <label>¿Es un crédito?</label><select name="credito"><option value="no">No es crédito</option><option value="tarjeta" ${p.credito && p.tipoCred!=='departamental'?'selected':''}>Tarjeta de crédito</option><option value="departamental" ${p.credito && p.tipoCred==='departamental'?'selected':''}>Crédito departamental</option></select>
     <div class="dos"><div><label>Día de corte</label><input name="diaCorte" inputmode="numeric" value="${p.diaCorte||''}"></div><div><label>Pago mínimo</label><input name="minimo" inputmode="decimal" value="${esc(p.minimo||'')}"></div></div>
-    <label>Datos para pagar</label><input name="cuenta" value="${esc(p.cuenta||'')}" placeholder="Número de cuenta o tarjeta"><input name="referencia" style="margin-top:8px" value="${esc(p.referencia||'')}" placeholder="Referencia"><input name="titular" style="margin-top:8px" value="${esc(p.titular||'')}" placeholder="Titular">
+    <label>Datos para pagar</label><input name="cuenta" id="edCuenta" value="" placeholder="${p.tieneDatos ? 'Cuenta: ' + esc(p.cuentaUlt||'') + ' (escribe para cambiar)' : 'Número de cuenta o tarjeta'}"><input name="referencia" style="margin-top:8px" value="" placeholder="${p.tieneDatos && p.refUlt ? 'Referencia: ' + esc(p.refUlt) : 'Referencia'}"><input name="titular" style="margin-top:8px" value="${esc(p.titularVis||'')}" placeholder="Titular">
     <label><input type="checkbox" name="compartido" style="width:auto;margin-right:8px" ${p.compartido?'checked':''}>Lo pago con alguien más</label>
     <input name="conQuien" list="per" type="text" value="${esc(p.conQuien||'')}" placeholder="Correo o número" style="width:100%"><datalist id="per">${per}</datalist>
     <input name="miParte" inputmode="numeric" value="${p.miParte||50}" placeholder="Mi parte %" style="width:100%;margin-top:10px">
+    ${p.creadoPor ? '' : `<label class="fila" style="gap:8px;margin-top:8px"><input type="checkbox" name="compartirDatos" ${p.compartirDatos ? 'checked' : ''}> Permitir que vea y copie los datos para pagar</label>`}
     <button class="btn lleno" style="margin-top:20px" type="submit">Guardar</button>
     <div class="dos" style="margin-top:10px"><button class="btn borde" type="button" data-act="cerrar">Cancelar</button>${id ? `<button class="btn borde" type="button" style="color:var(--r-roj)" data-act="borrar" data-id="${id}">Eliminar</button>` : '<span></span>'}</div>
   </form>`);
@@ -591,7 +592,11 @@ function editor(id){
       if(Object.keys(cam).length){ enviarSolicitud(x, cam).then(() => aviso('Solicitud enviada a ' + x.creadoPor)).catch(e => alert(e.message)); }
     } else { x.nombre = f.nombre.trim(); x.monto = f.monto.trim(); if(x.vence !== f.vence){ x.vence = f.vence; x.ancla = fecha(f.vence).getDate(); } }
     x.frec = f.frec; x.cat = f.cat || adivinarCat(x.nombre); x.credito = f.credito !== 'no'; x.tipoCred = f.credito === 'departamental' ? 'departamental' : 'tarjeta';
-    x.diaCorte = parseInt(f.diaCorte)||0; x.minimo = f.minimo.trim(); x.cuenta = f.cuenta.trim(); x.referencia = f.referencia.trim(); x.titular = f.titular.trim();
+    x.diaCorte = parseInt(f.diaCorte)||0; x.minimo = f.minimo.trim(); x.compartirDatos = !!f.compartido && !!f.compartirDatos && !x.creadoPor;
+    { const nuevoD = {cuenta:f.cuenta.trim(), referencia:f.referencia.trim(), titular:f.titular.trim()};
+      if(nuevoD.cuenta || nuevoD.referencia || nuevoD.titular !== (x.titularVis||'')){
+        Boveda.leer(x.id).then(o => { const d = {cuenta:nuevoD.cuenta || o.cuenta, referencia:nuevoD.referencia || o.referencia, titular:nuevoD.titular};
+          return Boveda.guardar(x.id, d).then(() => { x.cuentaUlt = ocultar(d.cuenta); x.refUlt = ocultar(d.referencia); x.titularVis = d.titular; x.tieneDatos = !!(d.cuenta || d.referencia || d.titular); guardar(); pintar(); }); }); } }
     x.compartido = !!f.compartido; x.conQuien = f.conQuien.trim(); x.miParte = Math.max(0, Math.min(100, parseInt(f.miParte)||50));
     if(!x.ancla) x.ancla = fecha(x.vence).getDate();
     if(!id) D.pagos.push(x);
@@ -678,10 +683,11 @@ async function sincronizar(){
     const tel = ((per && per.tel) || p.conQuien).replace(/\D/g, '');
     if(!otro && tel.length >= 10) otro = await correoDeTelefono(tel.slice(-10));
     if(!otro.includes('@') || otro === yo) continue;
-    const firma = [p.nombre, p.monto, p.vence, p.frec, p.miParte, p.conQuien, otro, p.credito ? p.tipoCred || 'tarjeta' : '', p.diaCorte || 0, p.minimo || ''].join('|');
+    const firma = [p.nombre, p.monto, p.vence, p.frec, p.miParte, p.conQuien, otro, p.credito ? p.tipoCred || 'tarjeta' : '', p.diaCorte || 0, p.minimo || '', p.compartirDatos ? (p.cuentaUlt||'') + (p.titularVis||'') : ''].join('|');
     if(p.nubeId && firma === p.nubeFirma) continue;
     const fields = {nombre:sv(p.nombre), monto:sv(p.monto), vence:sv(p.vence), frec:sv(p.frec), cat:sv(p.cat), parteCreador:iv(p.miParte||50),
       credito:sv(p.credito ? p.tipoCred || 'tarjeta' : ''), diaCorte:iv(p.diaCorte || 0), minimo:sv(p.minimo || ''),
+      datos:sv(p.compartirDatos ? JSON.stringify(await Boveda.leer(p.id).then(o => ({c:o.cuenta, r:o.referencia, t:o.titular}))) : ''),
       creadoPor:sv(uid), creadorNombre:sv(D.nombre || yo), creadorCorreo:sv(yo), otroNombre:sv(p.conQuien), otroCorreo:sv(otro),
       participantes:{arrayValue:{values:[sv(yo), sv(otro)]}}, actualizado:iv(Date.now())};
     if(!p.nubeId){ fields.estado = sv('pendiente'); fields.solicitud = sv(''); const r = await pedir('POST', DOCS + '/compartidos', {fields}, await token()); p.nubeId = r.name.split('/').pop(); p.nubeEstado = 'pendiente'; }
@@ -718,12 +724,16 @@ async function sincronizar(){
     }
     const nuevo = !p;
     if(nuevo) p = {id: Date.now() + Math.floor(Math.random()*1000), nubeId:id, pagado:false, hist:[]};
-    const firma = [gs(f,'nombre'), gs(f,'monto'), gs(f,'vence'), gs(f,'frec'), gi(f,'parteCreador',50), gs(f,'credito'), gi(f,'diaCorte',0), gs(f,'minimo')].join('|');
+    const firma = [gs(f,'nombre'), gs(f,'monto'), gs(f,'vence'), gs(f,'frec'), gi(f,'parteCreador',50), gs(f,'credito'), gi(f,'diaCorte',0), gs(f,'minimo'), gs(f,'datos')].join('|');
     if(!nuevo && firma === p.nubeFirma) return;
     if(!nuevo && p.vence !== gs(f,'vence')) p.pagado = false;
     Object.assign(p, {nombre:gs(f,'nombre'), monto:gs(f,'monto'), vence:gs(f,'vence'), frec:gs(f,'frec') || 'M1', cat:gs(f,'cat') || adivinarCat(gs(f,'nombre')),
       compartido:true, miParte:100 - gi(f,'parteCreador',50), conQuien:gs(f,'creadorNombre'), creadoPor:gs(f,'creadorNombre'), nubeFirma:firma,
       credito:!!gs(f,'credito'), tipoCred:gs(f,'credito') || 'tarjeta', diaCorte:gi(f,'diaCorte',0), minimo:gs(f,'minimo')});
+    { const pp = D.pagos.find(z => z.nubeId === id); let dd = null; try{ dd = gs(f,'datos') ? JSON.parse(gs(f,'datos')) : null; }catch(e){}
+      if(pp){ const o = dd ? {cuenta:dd.c||'', referencia:dd.r||'', titular:dd.t||''} : {cuenta:'', referencia:'', titular:''};
+        pp.cuentaUlt = ocultar(o.cuenta); pp.refUlt = ocultar(o.referencia); pp.titularVis = o.titular; pp.tieneDatos = !!(o.cuenta || o.referencia || o.titular);
+        Boveda.guardar(pp.id, o).catch(() => {}); } }
     p.ancla = fecha(p.vence).getDate();
     if(nuevo){ D.pagos.push(p); nue++; } else cam++;
   });
@@ -858,6 +868,29 @@ function deslizar(b, fin){
   b.style.color = 'var(--accTxt)'; b.style.position = 'relative'; b.style.zIndex = 1; act.style.zIndex = 0;
   p.onfinish = fin;
 }
+/* ===== Bóveda: los datos para pagar se guardan cifrados (AES-256-GCM) con una llave que el navegador
+   genera y marca como NO extraíble; ni la propia página puede leer la llave, solo usarla. ===== */
+const Boveda = (() => {
+  const abrir = () => new Promise((ok, mal) => { const r = indexedDB.open('mispagos-boveda', 1); r.onupgradeneeded = () => { r.result.createObjectStore('llave'); r.result.createObjectStore('datos'); }; r.onsuccess = () => ok(r.result); r.onerror = mal; });
+  const op = async (tienda, modo, f) => { const db = await abrir(); return new Promise((ok, mal) => { const tx = db.transaction(tienda, modo); const req = f(tx.objectStore(tienda)); tx.oncomplete = () => ok(req && req.result); tx.onerror = mal; }); };
+  let llaveP = null;
+  const llave = () => llaveP || (llaveP = (async () => {
+    let k = await op('llave', 'readonly', s => s.get('k'));
+    if(!k){ k = await crypto.subtle.generateKey({name:'AES-GCM', length:256}, false, ['encrypt','decrypt']); await op('llave', 'readwrite', s => s.put(k, 'k')); }
+    return k; })());
+  return {
+    async guardar(id, obj){ const iv = crypto.getRandomValues(new Uint8Array(12)); const ct = await crypto.subtle.encrypt({name:'AES-GCM', iv}, await llave(), new TextEncoder().encode(JSON.stringify(obj))); await op('datos', 'readwrite', s => s.put({iv, ct}, String(id))); },
+    async leer(id){ const r = await op('datos', 'readonly', s => s.get(String(id))); if(!r) return {cuenta:'', referencia:'', titular:''}; return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM', iv:r.iv}, await llave(), r.ct))); }
+  };
+})();
+const ocultar = v => { const d = (v || '').replace(/\s/g,''); return d.length <= 4 ? (d ? '••••' : '') : '•••• ' + d.slice(-4); };
+/* pasar a la bóveda los datos que estaban sin cifrar */
+async function migrarBoveda(){
+  let cambio = false;
+  for(const p of D.pagos){ if(p.cuenta || p.referencia || p.titular){ await Boveda.guardar(p.id, {cuenta:p.cuenta||'', referencia:p.referencia||'', titular:p.titular||''}); p.cuentaUlt = ocultar(p.cuenta); p.refUlt = ocultar(p.referencia); p.titularVis = p.titular || ''; p.tieneDatos = true; delete p.cuenta; delete p.referencia; delete p.titular; cambio = true; } }
+  if(cambio){ guardar(); pintar(); }
+}
+setTimeout(() => migrarBoveda().catch(() => {}), 500);
 function hojaColores(){
   const L = listaHero(), gl = grupoHero() === 'glass';
   abrirHoja(`<h1>Color de "Por pagar este mes"</h1>${L.map((c,i) => {
@@ -890,6 +923,11 @@ document.addEventListener('click', (ev) => {
       else { p.pagado = false; if(p.hist && p.hist.length && p.hist[p.hist.length-1].v === p.vence) p.hist.pop(); aviso('Marcado como pendiente'); }
       guardar(); pintar(); detalle(id); break; }
     case 'copiar': navigator.clipboard && navigator.clipboard.writeText(b.dataset.t).then(() => aviso('✓ Copiado')); break;
+    case 'verDato': case 'copiarDato': {
+      if(!confirm(act === 'verDato' ? '¿Mostrar el dato completo?' : '¿Copiar el dato completo?')) break;
+      Boveda.leer(+b.dataset.id).then(o => { const v = o[b.dataset.k] || '';
+        if(act === 'verDato'){ const el = document.getElementById('dv-' + b.dataset.k); if(el){ el.textContent = v; setTimeout(() => { el.textContent = ocultar(v); }, 30000); } }
+        else navigator.clipboard.writeText(v.replace(/\s/g,'')).then(() => { aviso('✓ Copiado (se borra en 1 min)'); setTimeout(() => navigator.clipboard.writeText('').catch(() => {}), 60000); }); }); break; }
     case 'mes': { const d = +n, cal = document.querySelector('.cal');
       const ir = () => { calMes = new Date(calMes.getFullYear(), calMes.getMonth() + d, 1); pintar();
         const c2 = document.querySelector('.cal'); if(c2) c2.animate([{transform:`translateX(${d*25}%)`, opacity:0},{transform:'none', opacity:1}], {duration:420, easing:'cubic-bezier(.3,0,.15,1)'}); };
