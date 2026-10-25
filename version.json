@@ -1,6 +1,6 @@
 {
-  "versionCode": 82,
-  "versionName": "9.6",
+  "versionCode": 83,
+  "versionName": "9.7",
   "apk": "MisPagos.apk",
-  "notas": "Calendario/Quincenas y Estadísticas/Ahorros cambian deslizándose."
+  "notas": "Se puede volver a editar pagos que ya compartías por nombre."
 }
