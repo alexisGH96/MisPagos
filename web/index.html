@@ -359,7 +359,7 @@ function listaFiltro(){
   return `<div class="fila" style="align-items:center;margin-bottom:16px"><button class="pildora flechaCal" data-act="filtro" data-n="0" aria-label="Atrás">‹</button><div class="peso" style="padding-left:12px"><div class="b" style="font-size:22px">${t}</div><div class="gris chico">${sub}</div></div></div>`
     + (l.length ? l.map(tarjetaPago).join('') : '<p class="gris">No hay pagos aquí por ahora.</p>');
 }
-let filtroIni = 0;
+let filtroIni = 0, calSeg = 0;
 function inicio(){
   if(filtroIni) return listaFiltro();
   const mes = hoy().getMonth(), anio = hoy().getFullYear();
@@ -385,7 +385,7 @@ function calendario(){
   const h0 = hoy(); if(!calMes) calMes = new Date(h0.getFullYear(), h0.getMonth(), 1); if(!calSel) calSel = iso(h0);
   const y = calMes.getFullYear(), m = calMes.getMonth();
   const primero = (new Date(y, m, 1).getDay() + 6) % 7, ndias = new Date(y, m+1, 0).getDate();
-  let h = `<h1>Calendario</h1><div class="caja"><div class="fila" style="margin-bottom:8px"><button class="pildora flechaCal" data-act="mes" data-n="-1" aria-label="Mes anterior">‹</button><div class="peso b" style="text-align:center;font-size:19px">${MESESL[m][0].toUpperCase()+MESESL[m].slice(1)} ${y}</div><button class="pildora flechaCal" data-act="mes" data-n="1" aria-label="Mes siguiente">›</button></div><div class="cal">`;
+  let h = `<div class="caja"><div class="fila" style="margin-bottom:8px"><button class="pildora flechaCal" data-act="mes" data-n="-1" aria-label="Mes anterior">‹</button><div class="peso b" style="text-align:center;font-size:19px">${MESESL[m][0].toUpperCase()+MESESL[m].slice(1)} ${y}</div><button class="pildora flechaCal" data-act="mes" data-n="1" aria-label="Mes siguiente">›</button></div><div class="cal">`;
   ['L','M','M','J','V','S','D'].forEach(d => h += `<div class="dn">${d}</div>`);
   for(let i = 0; i < primero; i++) h += '<div></div>';
   for(let d = 1; d <= ndias; d++){
@@ -430,7 +430,7 @@ function quincenasV(){
     const pend = ps.filter(p => !p.pagado).reduce((s,p) => s + num(p.monto), 0);
     return `<div class="caja" style="margin-bottom:14px"><div class="gris chico b">${t} · ${x.getDate()} – ${y.getDate()} ${MESES[y.getMonth()]}</div><div style="font-size:32px;font-weight:800;margin:6px 0 2px">${dinero(pend)}</div><div class="gris chico">por pagar · ${ps.filter(p=>!p.pagado).length} pagos</div><div style="margin-top:12px">${ps.map(tarjetaPago).join('') || '<span class="gris chico">Sin pagos en esta quincena.</span>'}</div></div>`;
   };
-  return `<h2>Quincenas</h2><p class="gris chico" style="margin:-4px 4px 10px">Cuánto apartar de cada pago de nómina</p>` + bloque('Quincena actual', a, b, true) + bloque('Siguiente', sigA, sigB, false);
+  return `<p class="gris chico" style="margin:0 4px 10px">Cuánto apartar de cada pago de nómina</p>` + bloque('Quincena actual', a, b, true) + bloque('Siguiente', sigA, sigB, false);
 }
 /* ---- gráfica de pastel: sectores separados, esquinas redondeadas, líneas guía con punto ---- */
 function pastel(vals, cols, total, centro, sub){
@@ -1029,6 +1029,7 @@ document.addEventListener('click', (ev) => {
       const nube = D.nube; D = JSON.parse(t); D.nube = nube; guardar(); aplicarTema(); return 'Respaldo recuperado.'; }); break;
     case 'fondo': hojaFondo(); break;
     case 'colores': hojaColores(); break;
+    case 'calSeg': deslizar(b, () => { calSeg = +n; pintar(); }); break;
     case 'filtro': filtroIni = +n; pintar(); window.scrollTo(0,0); break;
     case 'glassBlur': abrirHoja(`<h1>Desenfoque del fondo</h1>${['Normal','30 % más','50 % más','80 % más'].map((x,i) => `<button class="btn ${(D.glassBlur||0)===i?'lleno':'borde'}" style="margin-top:10px" data-act="glassBlurSel" data-n="${i}">${x}</button>`).join('')}<button class="btn borde" style="margin-top:16px" data-act="cerrar">Cerrar</button>`); break;
     case 'glassBlurSel': D.glassBlur = +n; guardar(); aplicarTema(); cerrarHoja(); pintar(); break;
@@ -1099,7 +1100,7 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { ap
 function pintar(anim){
   avanzar();
   const app = document.getElementById('app');
-  app.innerHTML = [inicio, () => calendario() + quincenasV(), carteraV, estadisticas, ajustes][tab]();
+  app.innerHTML = [inicio, () => `<div class="seg"><button class="${calSeg===0?'sel':''}" data-act="calSeg" data-n="0">Calendario</button><button class="${calSeg===1?'sel':''}" data-act="calSeg" data-n="1">Quincenas</button></div>` + (calSeg ? quincenasV() : calendario()), carteraV, estadisticas, ajustes][tab]();
   if(anim && !matchMedia('(prefers-reduced-motion: reduce)').matches) app.animate([{opacity:0, transform:'translateY(8px)'}, {opacity:1, transform:'none'}], {duration:260, easing:'cubic-bezier(.2,.8,.2,1)'});
   // las gráficas se animan cuando aparecen en pantalla
   const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ e.target.classList.add('ver'); obs.unobserve(e.target); } }), {threshold:.35});
