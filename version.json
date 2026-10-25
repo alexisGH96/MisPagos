@@ -1,6 +1,6 @@
 {
-  "versionCode": 91,
-  "versionName": "10.5",
+  "versionCode": 92,
+  "versionName": "10.6",
   "apk": "MisPagos.apk",
-  "notas": "Sombra de Próximos completa, sin línea. Copiar fecha."
+  "notas": "Ventanas sin líneas, con Cancelar y vibración en sus botones."
 }
