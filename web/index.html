@@ -51,15 +51,15 @@ h2{font-size:19px;margin:24px 4px 12px}
 .b{font-weight:700}
 .sec{display:flex;align-items:center;justify-content:space-between;margin:24px 4px 12px}
 .sec h2{margin:0}
-.pildora{border:1.5px solid var(--acc);color:var(--acc);border-radius:100px;padding:7px 14px;font-size:14px}
+.pildora{border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:100px;padding:7px 14px;font-size:14px}
 .btn{display:block;width:100%;border-radius:100px;padding:13px 16px;font-weight:700;text-align:center}
 .btn.lleno{background:var(--acc);color:var(--accTxt)}
-.btn.borde{border:1.5px solid currentColor}
+.btn.borde{border:1px solid var(--line);background:var(--card);color:var(--fg)}
 .caja{background:var(--surf);border:1px solid var(--line);border-radius:22px;padding:16px}
 /* encabezado */
 .hola{display:flex;align-items:center;gap:14px;margin-bottom:16px}
 .ava{width:48px;height:48px;border-radius:50%;background:var(--acc);color:var(--accTxt);display:grid;place-items:center;font-weight:700;font-size:20px}
-.mas{width:48px;height:48px;border-radius:50%;background:var(--acc);color:var(--accTxt);font-size:28px;line-height:1}
+.mas{width:48px;height:48px;border-radius:50%;background:var(--card);border:1px solid var(--line);color:#46464F;font-size:28px;line-height:1}
 .hero{background:linear-gradient(120deg,var(--hero1),var(--hero2));color:var(--heroTxt);border-radius:26px;padding:20px;box-shadow:var(--sombra)}
 .hero .monto{font-size:44px;font-weight:800;letter-spacing:-1px;margin:6px 0 14px}
 .barra{height:7px;border-radius:9px;background:rgba(255,255,255,.3);overflow:hidden}
@@ -173,7 +173,7 @@ html,body{overscroll-behavior-y:contain}
 .pastel.tarde.ver path[fill=none],.pastel.tarde.ver circle,.pastel.tarde.ver text{animation-delay:1.2s}
 :root[data-tema="glassb"] nav button.sel{background:radial-gradient(120% 100% at 50% 58%, rgba(255,255,255,.75) 0, rgba(255,255,255,.8) 62%, rgba(255,255,255,.95) 100%), linear-gradient(to bottom, transparent 55%, rgba(255,255,255,.35));
   border:1px solid rgba(255,255,255,.85);border-bottom-color:rgba(40,48,80,.12);box-shadow:inset 10px 6px 10px -6px rgba(255,255,255,1);color:#963C1E}
-:root[data-tema="claro1"] .pildora{background:#fff;color:#121A35;border-color:transparent}
+:root[data-tema="claro1"] .pildora{background:#fff;color:#121A35;border-color:#E2E6EE}
 :root[data-tema="claro1"] .pildora.flechaCal{background:#1C326E;color:#fff}
 button,.pago,.pc,a.btn{transition:transform .38s cubic-bezier(.3,0,.15,1)}
 button:active,.pago:active,.pc:active,a.btn:active{transform:scale(.97);transition-duration:.16s}
@@ -377,7 +377,7 @@ function carteraV(){
     const h0 = hoy(), conC = cs.filter(p => p.diaCorte > 0).map(p => { const sig = corteDe(p.diaCorte, new Date(h0.getTime() + DIA)); return {p, faltan: Math.round((sig - h0)/DIA), sig}; }).sort((a,b) => b.faltan - a.faltan);
     if(conC.length) h += `<div class="caja est-ver" style="margin-bottom:16px"><div class="b" style="font-size:17px">¿Con cuál comprar hoy?</div><div class="gris chico" style="margin:4px 0 8px">Usa la que ya hizo corte: lo que compres entra hasta el siguiente estado de cuenta y tienes más días para pagar sin intereses.</div>${conC.map((z,i) => `<div class="fila" style="padding:8px 0"><span class="punto" style="width:24px;height:24px;display:grid;place-items:center;color:#fff;font-weight:800;background:${z.faltan >= 15 ? 'var(--r-ver)' : z.faltan <= 5 ? 'var(--r-roj)' : 'var(--r-ama)'}">${z.faltan >= 15 ? '✓' : z.faltan <= 5 ? '!' : '•'}</span><div class="peso"><div class="b">${esc(sinPrefijo(z.p.nombre))}${i === 0 ? ' · la mejor hoy' : ''}</div><div class="gris chico">${z.faltan >= 15 ? 'Ya hizo corte. Corta otra vez el ' + z.sig.getDate() + ' ' + MESES[z.sig.getMonth()] + '.' : 'Corta en ' + z.faltan + (z.faltan === 1 ? ' día' : ' días') + ': mejor espera o usa otra.'}</div></div></div>`).join('')}</div>`;
     if(!cs.length) return h + `<div class="vacio">Aquí aparecen tus tarjetas de crédito y créditos departamentales. Para agregar uno, abre un pago, toca editar y elige el tipo de crédito.</div>`;
-    return h + cs.map(p => `<button class="pago est-${estado(p)}" style="display:block" data-act="detalle" data-id="${p.id}"><div class="fila">${icono(p)}<div class="peso"><div class="nom">${esc(sinPrefijo(p.nombre))}</div><div class="gris chico">${p.tipoCred==='departamental'?'Crédito departamental':'Tarjeta de crédito'}${p.creadoPor ? ' · <b>compartida de ' + esc(p.creadoPor) + '</b>' : ''}</div></div></div>
+    return h + cs.map(p => `<button class="pago est-${estado(p)}" style="display:block" data-act="detalle" data-id="${p.id}"><div class="fila">${icono(p)}<div class="peso"><div class="nom">${esc(sinPrefijo(p.nombre))}</div><div class="gris chico" style="text-align:right">${p.tipoCred==='departamental'?'Crédito departamental':'Tarjeta de crédito'}${p.creadoPor ? '<br>Compartida por ' + esc(p.creadoPor) : ''}</div></div></div>
       <div class="dos" style="margin-top:12px"><div><div class="gris chico">Corte</div><div class="b">${p.diaCorte ? 'día ' + p.diaCorte : '—'}</div></div><div><div class="gris chico">Límite de pago</div><div class="b">${corto(p.vence)}</div></div>
       <div><div class="gris chico">Sin intereses</div><div class="b">${p.monto ? dinero(num(p.monto)) : '—'}</div></div><div><div class="gris chico">Mínimo</div><div class="b">${p.minimo ? dinero(num(p.minimo)) : '—'}</div></div></div></button>`).join('');
   }
@@ -573,13 +573,19 @@ function editor(id){
     <div class="dos"><div><label>Día de corte</label><input name="diaCorte" inputmode="numeric" value="${p.diaCorte||''}"></div><div><label>Pago mínimo</label><input name="minimo" inputmode="decimal" value="${esc(p.minimo||'')}"></div></div>
     <label>Datos para pagar</label><input name="cuenta" value="${esc(p.cuenta||'')}" placeholder="Número de cuenta o tarjeta"><input name="referencia" style="margin-top:8px" value="${esc(p.referencia||'')}" placeholder="Referencia"><input name="titular" style="margin-top:8px" value="${esc(p.titular||'')}" placeholder="Titular">
     <label><input type="checkbox" name="compartido" style="width:auto;margin-right:8px" ${p.compartido?'checked':''}>Lo pago con alguien más</label>
-    <div class="dos"><div><input name="conQuien" list="per" value="${esc(p.conQuien||'')}" placeholder="¿Con quién? Nombre, correo o número"><datalist id="per">${per}</datalist></div><div><input name="miParte" inputmode="numeric" value="${p.miParte||50}" placeholder="Mi parte %"></div></div>
+    <input name="conQuien" list="per" type="text" value="${esc(p.conQuien||'')}" placeholder="Correo o número" style="width:100%"><datalist id="per">${per}</datalist>
+    <input name="miParte" inputmode="numeric" value="${p.miParte||50}" placeholder="Mi parte %" style="width:100%;margin-top:10px">
     <button class="btn lleno" style="margin-top:20px" type="submit">Guardar</button>
     <div class="dos" style="margin-top:10px"><button class="btn borde" type="button" data-act="cerrar">Cancelar</button>${id ? `<button class="btn borde" type="button" style="color:var(--r-roj)" data-act="borrar" data-id="${id}">Eliminar</button>` : '<span></span>'}</div>
   </form>`);
   document.getElementById('ed').onsubmit = (ev) => {
     ev.preventDefault(); const f = Object.fromEntries(new FormData(ev.target));
     const x = id ? D.pagos.find(z => z.id === id) : {id: Date.now(), pagado:false, hist:[]};
+    if(f.compartido && !(id && x.creadoPor)){
+      const q = (f.conQuien || '').trim(), per = personas().find(z => z.nombre.toLowerCase() === q.toLowerCase());
+      const ok = (q.includes('@') && q.includes('.')) || q.replace(/\D/g,'').length >= 10 || (per && (per.mail || (per.tel || '').replace(/\D/g,'').length >= 10));
+      if(!ok){ alert('Escribe el correo o el número (10 dígitos) de la persona'); return; }
+    }
     if(id && x.creadoPor){
       const cam = {}; if(f.nombre.trim() !== x.nombre) cam.nombre = f.nombre.trim(); if(f.monto.trim() !== x.monto) cam.monto = f.monto.trim(); if(f.vence !== x.vence) cam.vence = f.vence;
       if(Object.keys(cam).length){ enviarSolicitud(x, cam).then(() => aviso('Solicitud enviada a ' + x.creadoPor)).catch(e => alert(e.message)); }
