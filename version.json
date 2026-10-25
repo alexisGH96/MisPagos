@@ -1,6 +1,6 @@
 {
-  "versionCode": 86,
-  "versionName": "10.0",
+  "versionCode": 87,
+  "versionName": "10.1",
   "apk": "MisPagos.apk",
-  "notas": "Botón Confirmar pago con animación. Vibración solo al tocar (no al desplazar). Flechas del calendario sin relleno."
+  "notas": "La vibración ya no suena al desplazar: solo al tocar para entrar."
 }
