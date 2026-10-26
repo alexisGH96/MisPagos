@@ -1,6 +1,6 @@
 {
-  "versionCode": 98,
-  "versionName": "11.2",
+  "versionCode": 99,
+  "versionName": "11.3",
   "apk": "MisPagos.apk",
-  "notas": "Los avisos de pagos compartidos llegan más rápido aunque no abras la app."
+  "notas": "Elige con qué tarjeta de crédito pagas cada servicio: ya no se suma doble."
 }
