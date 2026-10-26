@@ -1,6 +1,6 @@
 {
-  "versionCode": 103,
-  "versionName": "11.7",
+  "versionCode": 104,
+  "versionName": "11.8",
   "apk": "MisPagos.apk",
-  "notas": "Corrige el cierre al abrir y Pendientes en la tarjeta principal."
+  "notas": "Corrige el cierre al abrir la app."
 }
