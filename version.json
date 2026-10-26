@@ -1,6 +1,6 @@
 {
-  "versionCode": 99,
-  "versionName": "11.3",
+  "versionCode": 100,
+  "versionName": "11.4",
   "apk": "MisPagos.apk",
-  "notas": "Elige con qué tarjeta de crédito pagas cada servicio: ya no se suma doble."
+  "notas": "Elige con quién compartes desde tus contactos. Campos sin rayita también al editar pagos."
 }
