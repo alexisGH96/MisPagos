@@ -263,8 +263,9 @@ function estado(p){
   const d = dias(p.vence);
   if(d <= 0) return 'roj'; if(d <= 3) return 'nar'; if(d <= 7) return 'ama'; return 'azu';
 }
-const miMonto = p => num(p.monto) * (p.compartido ? (p.miParte || 50) / 100 : 1);   // solo tu parte si es compartido
+const miMonto = p => (p.pagoCon && !p.credito) ? 0 : num(p.monto) * (p.compartido ? (p.miParte || 50) / 100 : 1);   // solo tu parte; con tarjeta va incluido en ella
 function mensual(p){
+  if(p.pagoCon && !p.credito) return 0;   // va incluido en la tarjeta con que se paga
   let m = num(p.monto);
   m = {M2:m/2, M3:m/3, M12:m/12, D15:m*2, D7:m*4.33, U:0}[p.frec] ?? m;
   if(p.compartido) m = m * (p.miParte||50) / 100;
@@ -332,7 +333,7 @@ function ordenados(){ return [...D.pagos].sort((a,b) => (a.pagado - b.pagado) ||
 function tarjetaPago(p){
   return `<button class="pago est-${estado(p)}" data-act="detalle" data-id="${p.id}">
     ${icono(p)}
-    <div class="peso"><div class="nom">${esc(p.nombre)}</div><div class="gris chico">${linea2(p)}</div></div>
+    <div class="peso"><div class="nom">${esc(p.nombre)}</div><div class="gris chico">${linea2(p)}${(() => { const q = p.pagoCon && !p.credito && D.pagos.find(z => z.id === p.pagoCon); return q ? '<br>💳 Con ' + esc(sinPrefijo(q.nombre)) : ''; })()}</div></div>
     <div class="der">${p.monto ? `<span class="b">${dinero(num(p.monto))}</span>` : ''}${anillo(p)}</div></button>`;
 }
 const SIMB = {cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="9" cy="15" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/></svg>',
@@ -627,6 +628,8 @@ function editor(id){
     <div class="dos"><div><label>Se repite</label><select name="frec">${op(FRECS, p.frec)}</select></div><div><label>Categoría</label><select name="cat"><option value="">Automática</option>${op(cats, p.cat)}</select></div></div>
     <label>¿Es un crédito?</label><select name="credito"><option value="no">No es crédito</option><option value="tarjeta" ${p.credito && p.tipoCred!=='departamental'?'selected':''}>Tarjeta de crédito</option><option value="departamental" ${p.credito && p.tipoCred==='departamental'?'selected':''}>Crédito departamental</option></select>
     <div class="dos"><div><label>Día de corte</label><input name="diaCorte" inputmode="numeric" value="${p.diaCorte||''}"></div><div><label>Pago mínimo</label><input name="minimo" inputmode="decimal" value="${esc(p.minimo||'')}"></div></div>
+    ${(() => { const tj = D.pagos.filter(q => q.credito && q.id !== p.id); if(!tj.length) return '';
+      return `<label>¿Con qué lo pagas?</label><select name="pagoCon"><option value="0">Efectivo, débito o transferencia</option>${tj.map(q => `<option value="${q.id}" ${p.pagoCon === q.id ? 'selected' : ''}>Tarjeta de crédito: ${esc(sinPrefijo(q.nombre))}${q.creadoPor ? ' (de ' + esc(q.creadoPor) + ')' : ''}</option>`).join('')}</select><p class="gris chico" style="margin:4px 4px 0">Si lo pagas con una tarjeta de crédito, no se suma aparte en tus totales: ya va dentro del pago de esa tarjeta.</p>`; })()}
     <label>Datos para pagar</label><input name="numTarjeta" inputmode="numeric" value="" placeholder="${p.tarjetaUlt ? 'Tarjeta: ' + esc(p.tarjetaUlt) + ' (escribe para cambiar)' : 'Número de tarjeta (16 dígitos)'}">
     <div class="dos" style="margin-top:8px;grid-template-columns:1.6fr 1fr"><input name="expira" maxlength="5" inputmode="numeric" value="" placeholder="${p.tarjetaUlt ? 'Vencimiento: ••/••' : 'Vencimiento MM/AA'}" oninput="const d=this.value.replace(/\D/g,'').slice(0,4); const esc=(this._a||0) < this.value.length; this.value = d.length > 2 ? d.slice(0,2)+'/'+d.slice(2) : (d.length===2 && esc ? d+'/' : d); this._a=this.value.length"><input name="cvv" type="password" inputmode="numeric" maxlength="4" value="" placeholder="${p.tarjetaUlt ? 'CVV: •••' : 'CVV'}"></div>
     <input name="cuenta" id="edCuenta" style="margin-top:8px" value="" placeholder="${p.tieneDatos ? 'Cuenta: ' + esc(p.cuentaUlt||'') + ' (escribe para cambiar)' : 'Número de cuenta o CLABE'}"><input name="referencia" style="margin-top:8px" value="" placeholder="${p.tieneDatos && p.refUlt ? 'Referencia: ' + esc(p.refUlt) : 'Referencia'}"><input name="titular" style="margin-top:8px" value="${esc(p.titularVis||'')}" placeholder="Titular">
@@ -650,6 +653,7 @@ function editor(id){
       if(Object.keys(cam).length){ enviarSolicitud(x, cam).then(() => aviso('Solicitud enviada a ' + x.creadoPor)).catch(e => alert(e.message)); }
     } else { x.nombre = f.nombre.trim(); x.monto = f.monto.trim(); if(x.vence !== f.vence){ x.vence = f.vence; x.ancla = fecha(f.vence).getDate(); } }
     x.frec = f.frec; x.cat = f.cat || adivinarCat(x.nombre); x.credito = f.credito !== 'no'; x.tipoCred = f.credito === 'departamental' ? 'departamental' : 'tarjeta';
+    x.pagoCon = x.credito ? 0 : (+f.pagoCon || 0);
     x.diaCorte = parseInt(f.diaCorte)||0; x.minimo = f.minimo.trim(); x.compartirDatos = !!f.compartido && !!f.compartirDatos && !x.creadoPor;
     { const nuevoD = {cuenta:f.cuenta.trim(), referencia:f.referencia.trim(), titular:f.titular.trim(), numTarjeta:(f.numTarjeta||'').replace(/\D/g,''), expira:(f.expira||'').trim(), cvv:(f.cvv||'').replace(/\D/g,'')};
       if(nuevoD.cuenta || nuevoD.referencia || nuevoD.numTarjeta || nuevoD.expira || nuevoD.cvv || nuevoD.titular !== (x.titularVis||'')){
