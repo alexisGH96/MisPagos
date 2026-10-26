@@ -1,6 +1,6 @@
 {
-  "versionCode": 102,
-  "versionName": "11.6",
+  "versionCode": 103,
+  "versionName": "11.7",
   "apk": "MisPagos.apk",
-  "notas": "Nueva campanita con el historial de avisos. Pendientes ahora cuenta todo lo que te falta pagar."
+  "notas": "Corrige el cierre al abrir y Pendientes en la tarjeta principal."
 }
