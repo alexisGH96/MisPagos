@@ -1,6 +1,6 @@
 {
-  "versionCode": 101,
-  "versionName": "11.5",
+  "versionCode": 102,
+  "versionName": "11.6",
   "apk": "MisPagos.apk",
-  "notas": "Pagos compartidos por montos exactos además de porcentaje."
+  "notas": "Nueva campanita con el historial de avisos. Pendientes ahora cuenta todo lo que te falta pagar."
 }
