@@ -343,7 +343,7 @@ const SIMB = {cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 function grupos(){
   const hy = hoy(), mes = hy.getMonth(), anio = hy.getFullYear(), r = {1:[],2:[],3:[]};
   D.pagos.forEach(p => { const f = fecha(p.vence), d = Math.round((f - hy)/DIA);
-    if(f.getMonth() === mes && f.getFullYear() === anio) r[p.pagado ? 1 : d <= 7 ? 3 : 2].push(p); else if(!p.pagado && f < hy) r[3].push(p); });
+    if(f.getMonth() === mes && f.getFullYear() === anio){ if(p.pagado) r[1].push(p); else { r[2].push(p); if(d <= 7) r[3].push(p); } } else if(!p.pagado && f < hy){ r[3].push(p); r[2].push(p); } });
   return r;
 }
 function calDia(d){
@@ -365,13 +365,25 @@ function heroNuevo(delMes, pag, tot){
     <div class="heroPie"><span style="width:16px;height:16px;display:inline-block">${SIMB.reloj}</span> ${pie}</div></div>`;
 }
 function listaFiltro(){
-  const t = ['','Pagados','Pendientes','Vence pronto'][filtroIni], sub = ['','Lo que ya pagaste este mes','Lo que falta pagar este mes (más de 7 días)','Vencen en 7 días o menos, o ya vencieron'][filtroIni];
+  const t = ['','Pagados','Pendientes','Vence pronto'][filtroIni], sub = ['','Lo que ya pagaste este mes','Todo lo que te falta pagar este mes','Vencen en 7 días o menos, o ya vencieron'][filtroIni];
   const l = grupos()[filtroIni];
   return `<div class="fila" style="align-items:center;margin-bottom:16px"><button class="pildora flechaCal" data-act="filtro" data-n="0" aria-label="Atrás">‹</button><div class="peso" style="padding-left:12px"><div class="b" style="font-size:22px">${t}</div><div class="gris chico">${sub}</div></div></div>`
     + (l.length ? l.map(tarjetaPago).join('') : '<p class="gris">No hay pagos aquí por ahora.</p>');
 }
-let filtroIni = 0, calSeg = 0, filtroPagos = 0;
+let filtroIni = 0, calSeg = 0, filtroPagos = 0, verAvisos = false;
+function avisoNube(txt){ (D.avisosNube = D.avisosNube || []).push(txt); (D.historial = D.historial || []).push({t:Date.now(), tx:txt, leido:false}); if(D.historial.length > 100) D.historial = D.historial.slice(-100); }
+const CAMPANA = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 17v-6a6 6 0 0 1 12 0v6l1.5 1.5h-15z"/><path d="M12 3.2V5M10 18.5a2 2 0 0 0 4 0"/></svg>';
+function pantallaAvisos(){
+  const l = (D.historial || []).slice().reverse();
+  const hace = t => { const m = Math.floor((Date.now()-t)/60000); return m < 1 ? 'ahora' : m < 60 ? 'hace ' + m + ' min' : m < 1440 ? 'hace ' + Math.floor(m/60) + ' h' : 'hace ' + Math.floor(m/1440) + ' días'; };
+  const h = `<div class="fila" style="align-items:center;margin-bottom:16px"><button class="pildora flechaCal" data-act="avisos" data-n="0" aria-label="Atrás">‹</button><div class="peso" style="padding-left:12px"><div class="b" style="font-size:22px">Avisos</div><div class="gris chico">Cambios, solicitudes, recordatorios y alertas</div></div></div>`
+    + (l.length ? l.map(a => `<div class="caja" style="margin-bottom:10px;display:flex;gap:12px;align-items:flex-start"><span style="width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb, currentColor 8%, transparent);flex:none">${CAMPANA.replace('width="22" height="22"','width="18" height="18"')}</span><div class="peso"><div>${esc(a.tx)}${a.leido ? '' : ' <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#E5484D"></span>'}</div><div class="gris chico">${hace(a.t)}</div></div></div>`).join('')
+      + `<button class="btn borde" style="margin-top:6px" data-act="borrarAvisos">Borrar avisos</button>` : '<p class="gris">Aún no tienes avisos. Aquí verás cuando alguien cambie un pago compartido o te mande un recordatorio.</p>');
+  (D.historial || []).forEach(a => a.leido = true); guardar();
+  return h;
+}
 function inicio(){
+  if(verAvisos) return pantallaAvisos();
   if(filtroIni) return listaFiltro();
   const mes = hoy().getMonth(), anio = hoy().getFullYear();
   const delMes = D.pagos.filter(p => { const f = fecha(p.vence); return f.getMonth() === mes && f.getFullYear() === anio; });
@@ -381,7 +393,7 @@ function inicio(){
   const prox = ordenados().filter(p => !p.pagado).slice(0, 8);
   let h = `<div class="hola"><span class="ava">${esc((D.nombre||'?')[0].toUpperCase())}</span>
     <div class="peso"><div class="b" style="font-size:22px">Hola${D.nombre ? ', ' + esc(D.nombre) : ''}</div><div class="gris chico">Bienvenido de nuevo</div></div>
-    <button class="mas" data-act="nuevo" aria-label="Agregar pago">+</button></div>
+    <button class="mas" data-act="avisos" data-n="1" aria-label="Avisos" style="margin-right:10px;position:relative;display:grid;place-items:center">${CAMPANA}${(D.historial||[]).some(a => !a.leido) ? `<span style="position:absolute;top:-2px;right:-2px;min-width:18px;height:18px;border-radius:9px;background:#E5484D;color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center">${Math.min(9,(D.historial||[]).filter(a => !a.leido).length)}</span>` : ''}</button><button class="mas" data-act="nuevo" aria-label="Agregar pago">+</button></div>
     ${(D.invitaciones || []).map(x => `<button class="pago est-ama" style="display:block" data-act="invitacion" data-i="${x.id}"><b>✉ ${esc(x.de)} compartió ${esc(sinPrefijo(x.nombre))} contigo</b><div class="gris chico">Toca para aceptarlo o rechazarlo</div></button>`).join('')}
     ${D.pagos.filter(p => p.nubeSolVista && !p.creadoPor).map(p => `<button class="pago est-ama" style="display:block" data-act="solicitud" data-id="${p.id}"><b>✎ Piden un cambio en ${esc(sinPrefijo(p.nombre))}</b><div class="gris chico">Toca para revisarlo</div></button>`).join('')}
     ${(D.avisosNube || []).length ? `<button class="pago est-azu" style="display:block" data-act="avisoNubeOk">${D.avisosNube.map(esc).join('<br>')}<div class="gris chico">Toca para ocultar</div></button>` : ''}
@@ -769,15 +781,15 @@ async function sincronizar(){
   (Array.isArray(res) ? res : []).forEach(x => {
     const d = x.document; if(!d) return; const id = d.name.split('/').pop(), f = d.fields; vistos.add(id);
     try{ const ro = JSON.parse(gs(f,'recordatorio') || 'null'); D.recVisto = D.recVisto || {};
-      if(ro && ro.deCorreo !== yo && ro.t > (D.recVisto[id] || 0)){ D.recVisto[id] = ro.t; (D.avisosNube = D.avisosNube || []).push(`🔔 ${ro.de} te recuerda: ${ro.msg}`); } }catch(e){}
+      if(ro && ro.deCorreo !== yo && ro.t > (D.recVisto[id] || 0)){ D.recVisto[id] = ro.t; avisoNube(`🔔 ${ro.de} te recuerda: ${ro.msg}`); } }catch(e){}
     const estado = gs(f,'estado') || 'aceptado', sol = gs(f,'solicitud');
     let p = D.pagos.find(z => z.nubeId === id);
     D.avisosNube = D.avisosNube || [];
     if(gs(f,'creadoPor') === uid){
       if(!p) return; const otroN = gs(f,'otroNombre') || gs(f,'otroCorreo');
       if(estado !== (p.nubeEstado || '')){
-        if(estado === 'aceptado' && p.nubeEstado === 'pendiente') D.avisosNube.push(`✓ ${otroN} aceptó el pago compartido ${sinPrefijo(p.nombre)}.`);
-        if(estado === 'rechazado') D.avisosNube.push(`✕ ${otroN} rechazó el pago compartido ${sinPrefijo(p.nombre)}. Revísalo.`);
+        if(estado === 'aceptado' && p.nubeEstado === 'pendiente') avisoNube(`✓ ${otroN} aceptó el pago compartido ${sinPrefijo(p.nombre)}.`);
+        if(estado === 'rechazado') avisoNube(`✕ ${otroN} rechazó el pago compartido ${sinPrefijo(p.nombre)}. Revísalo.`);
         p.nubeEstado = estado;
       }
       if(sol && sol !== p.nubeSolVista) p.nubeSolVista = sol;
@@ -790,7 +802,7 @@ async function sincronizar(){
     }
     if(p && p.solicitudEnviada && !sol){
       let ok = false; try{ const q = JSON.parse(p.solicitudEnviada); ok = (q.monto == null || q.monto === gs(f,'monto')) && (q.vence == null || q.vence === gs(f,'vence')); }catch(e){}
-      D.avisosNube.push(`${gs(f,'creadorNombre')} ${ok ? 'aprobó' : 'no aprobó'} tu cambio en ${sinPrefijo(p.nombre)}.`); p.solicitudEnviada = '';
+      avisoNube(`${gs(f,'creadorNombre')} ${ok ? 'aprobó' : 'no aprobó'} tu cambio en ${sinPrefijo(p.nombre)}.`); p.solicitudEnviada = '';
     }
     const nuevo = !p;
     if(nuevo) p = {id: Date.now() + Math.floor(Math.random()*1000), nubeId:id, pagado:false, hist:[]};
@@ -1088,6 +1100,10 @@ document.addEventListener('click', (ev) => {
       tarea(async () => { await sincronizar(); return p.compartirDatos ? 'Listo: se enviaron los cambios y los datos para pagar.' : 'Listo: se enviaron los cambios. (Para enviar los datos de la tarjeta, activa "Permitir que vea y copie los datos para pagar" al editar.)'; }); break; }
     case 'calSeg': deslizar(b, () => { calSeg = +n; pintar(); }); break;
     case 'irTarjeta': { const el = document.getElementById('tj-' + b.dataset.id); if(el){ el.scrollIntoView({behavior:'smooth', block:'center'}); setTimeout(() => el.animate([{transform:'scale(1)'},{transform:'scale(1.03)'},{transform:'scale(1)'}], {duration:520, easing:'cubic-bezier(.3,0,.15,1)'}), 600); } break; }
+    case 'avisos': { const d = +n ? 1 : -1;
+      if(+n){ b.animate([{transform:'rotate(0)'},{transform:'rotate(-14deg)'},{transform:'rotate(10deg)'},{transform:'rotate(0)'}], {duration:340}); if(navigator.vibrate) navigator.vibrate(20); }
+      setTimeout(() => { verAvisos = !!+n; pintar(); window.scrollTo(0,0); const ap = document.getElementById('app'); if(ap) ap.animate([{transform:`translateX(${d*25}%)`, opacity:0},{transform:'none', opacity:1}], {duration:420, easing:'cubic-bezier(.3,0,.15,1)'}); }, +n ? 180 : 0); break; }
+    case 'borrarAvisos': if(confirm('¿Borrar todos los avisos?')){ D.historial = []; guardar(); pintar(); } break;
     case 'filtro': filtroIni = +n; pintar(); window.scrollTo(0,0); break;
     case 'glassBlur': abrirHoja(`<h1>Desenfoque del fondo</h1>${['Normal','30 % más','50 % más','80 % más'].map((x,i) => `<button class="btn ${(D.glassBlur||0)===i?'lleno':'borde'}" style="margin-top:10px" data-act="glassBlurSel" data-n="${i}">${x}</button>`).join('')}<button class="btn borde" style="margin-top:16px" data-act="cerrar">Cerrar</button>`); break;
     case 'glassBlurSel': D.glassBlur = +n; guardar(); aplicarTema(); cerrarHoja(); pintar(); break;
