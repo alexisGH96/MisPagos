@@ -1,6 +1,6 @@
 {
-  "versionCode": 100,
-  "versionName": "11.4",
+  "versionCode": 101,
+  "versionName": "11.5",
   "apk": "MisPagos.apk",
-  "notas": "Elige con quién compartes desde tus contactos. Campos sin rayita también al editar pagos."
+  "notas": "Pagos compartidos por montos exactos además de porcentaje."
 }
