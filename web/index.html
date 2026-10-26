@@ -263,12 +263,13 @@ function estado(p){
   const d = dias(p.vence);
   if(d <= 0) return 'roj'; if(d <= 3) return 'nar'; if(d <= 7) return 'ama'; return 'azu';
 }
-const miMonto = p => (p.pagoCon && !p.credito) ? 0 : num(p.monto) * (p.compartido ? (p.miParte || 50) / 100 : 1);   // solo tu parte; con tarjeta va incluido en ella
+const miParteMonto = p => p.miFijo ? Math.min(num(p.monto), num(p.miFijo)) : num(p.monto) * (p.miParte || 50) / 100;
+const miMonto = p => (p.pagoCon && !p.credito) ? 0 : (p.compartido ? miParteMonto(p) : num(p.monto));   // solo tu parte; con tarjeta va incluido en ella
 function mensual(p){
   if(p.pagoCon && !p.credito) return 0;   // va incluido en la tarjeta con que se paga
   let m = num(p.monto);
   m = {M2:m/2, M3:m/3, M12:m/12, D15:m*2, D7:m*4.33, U:0}[p.frec] ?? m;
-  if(p.compartido) m = m * (p.miParte||50) / 100;
+  if(p.compartido) m = p.miFijo ? m * miParteMonto(p) / Math.max(1, num(p.monto)) : m * (p.miParte||50) / 100;
   return m;
 }
 function tipo(p){
@@ -602,7 +603,7 @@ function detalle(id){
     h += `<h2>${p.tipoCred==='departamental'?'Crédito departamental':'Tarjeta de crédito'}</h2><div class="caja"><div class="dato"><span class="gris">Corte</span><b>${p.diaCorte ? 'día ' + p.diaCorte : '—'}</b></div><div class="dato"><span class="gris">Límite de pago</span><b>${corto(p.vence)}</b></div><div class="dato"><span class="gris">Sin intereses</span><b>${p.monto ? dinero(num(p.monto)) : '—'}</b></div><div class="dato"><span class="gris">Pago mínimo</span><b>${p.minimo ? dinero(num(p.minimo)) : '—'}</b></div><p class="gris chico">El día de corte cierra tu periodo y se calcula cuánto debes; al día siguiente actualiza aquí el monto a pagar.</p></div>`;
   }
   if(p.compartido){
-    const mi = num(p.monto) * (p.miParte||50)/100, otra = num(p.monto) - mi, quien = p.conQuien || 'La otra persona';
+    const mi = miParteMonto(p), otra = num(p.monto) - mi, quien = p.conQuien || 'La otra persona';
     const per = personas().find(x => x.nombre.toLowerCase() === quien.toLowerCase());
     const msg = `Hola, el pago de ${sinPrefijo(p.nombre)} vence el ${corto(p.vence)}. Te toca ${dinero(Math.round(otra))}.`;
     const tel = per && per.tel ? per.tel.replace(/\D/g,'') : ''; const telI = tel.length === 10 ? '52' + tel : tel;
@@ -631,11 +632,14 @@ function editor(id){
     ${(() => { const tj = D.pagos.filter(q => q.credito && q.id !== p.id); if(!tj.length) return '';
       return `<label>¿Con qué lo pagas?</label><select name="pagoCon"><option value="0">Efectivo, débito o transferencia</option>${tj.map(q => `<option value="${q.id}" ${p.pagoCon === q.id ? 'selected' : ''}>Tarjeta de crédito: ${esc(sinPrefijo(q.nombre))}${q.creadoPor ? ' (de ' + esc(q.creadoPor) + ')' : ''}</option>`).join('')}</select><p class="gris chico" style="margin:4px 4px 0">Si lo pagas con una tarjeta de crédito, no se suma aparte en tus totales: ya va dentro del pago de esa tarjeta.</p>`; })()}
     <label>Datos para pagar</label><input name="numTarjeta" inputmode="numeric" value="" placeholder="${p.tarjetaUlt ? 'Tarjeta: ' + esc(p.tarjetaUlt) + ' (escribe para cambiar)' : 'Número de tarjeta (16 dígitos)'}">
-    <div class="dos" style="margin-top:8px;grid-template-columns:1.6fr 1fr"><input name="expira" maxlength="5" inputmode="numeric" value="" placeholder="${p.tarjetaUlt ? 'Vencimiento: ••/••' : 'Vencimiento MM/AA'}" oninput="const d=this.value.replace(/\D/g,'').slice(0,4); const esc=(this._a||0) < this.value.length; this.value = d.length > 2 ? d.slice(0,2)+'/'+d.slice(2) : (d.length===2 && esc ? d+'/' : d); this._a=this.value.length"><input name="cvv" type="password" inputmode="numeric" maxlength="4" value="" placeholder="${p.tarjetaUlt ? 'CVV: •••' : 'CVV'}"></div>
+    <div class="dos" style="margin-top:8px;grid-template-columns:1.6fr 1fr"><input name="expira" maxlength="5" inputmode="numeric" value="" placeholder="${p.tarjetaUlt ? 'Vencimiento: ••/••' : 'Vencimiento MM/AA'}" oninput="const d=this.value.replace(/[^0-9]/g,'').slice(0,4); const sube=(this._a||0) < this.value.length; this.value = d.length > 2 ? d.slice(0,2)+'/'+d.slice(2) : (d.length===2 && sube ? d+'/' : d); this._a=this.value.length"><input name="cvv" type="password" inputmode="numeric" maxlength="4" value="" placeholder="${p.tarjetaUlt ? 'CVV: •••' : 'CVV'}"></div>
     <input name="cuenta" id="edCuenta" style="margin-top:8px" value="" placeholder="${p.tieneDatos ? 'Cuenta: ' + esc(p.cuentaUlt||'') + ' (escribe para cambiar)' : 'Número de cuenta o CLABE'}"><input name="referencia" style="margin-top:8px" value="" placeholder="${p.tieneDatos && p.refUlt ? 'Referencia: ' + esc(p.refUlt) : 'Referencia'}"><input name="titular" style="margin-top:8px" value="${esc(p.titularVis||'')}" placeholder="Titular">
     <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" name="compartido" style="width:auto;flex:none;margin:0" ${p.compartido?'checked':''}><span style="flex:1">Lo pago con alguien más</span></label>
     <input name="conQuien" list="per" type="text" value="${esc(p.conQuien||'')}" placeholder="Correo o número" style="width:100%"><datalist id="per">${per}</datalist>
-    <input name="miParte" inputmode="numeric" value="${p.miParte||50}" placeholder="Mi parte %" style="width:100%;margin-top:10px">
+    <select name="modoParte" style="margin-top:10px" onchange="const e=this.value==='monto'; this.form.miParte.style.display=e?'none':''; this.form.miFijo.style.display=e?'':'none'; document.getElementById('elOtro').style.display=e?'':'none'"><option value="pct">Dividir por porcentaje (%)</option><option value="monto" ${p.miFijo ? 'selected' : ''}>Dividir por montos exactos ($)</option></select>
+    <input name="miParte" inputmode="numeric" value="${p.miParte||50}" placeholder="Mi parte %" style="width:100%;margin-top:8px;${p.miFijo ? 'display:none' : ''}">
+    <input name="miFijo" inputmode="decimal" value="${esc(p.miFijo||'')}" placeholder="Lo que pagas tú ($)" style="width:100%;margin-top:8px;${p.miFijo ? '' : 'display:none'}" oninput="const t=num(this.form.monto.value), y=num(this.value); document.getElementById('elOtro').textContent = t ? 'La otra persona paga ' + dinero(Math.max(0, Math.round((t-y)*100)/100)) + ' (de ' + dinero(t) + ')' : ''">
+    <p class="gris chico" id="elOtro" style="margin:4px 4px 0;${p.miFijo ? '' : 'display:none'}"></p>
     ${p.creadoPor ? '' : `<label style="display:flex;align-items:center;gap:10px;margin-top:10px"><input type="checkbox" name="compartirDatos" style="width:auto;flex:none;margin:0" ${p.compartirDatos ? 'checked' : ''}><span style="flex:1">Permitir que vea y copie los datos para pagar</span></label>`}
     <button class="btn lleno" style="margin-top:20px" type="submit">Guardar</button>
     <div class="dos" style="margin-top:10px"><button class="btn borde" type="button" data-act="cerrar">Cancelar</button>${id ? `<button class="btn borde" type="button" style="color:var(--r-roj)" data-act="borrar" data-id="${id}">Eliminar</button>` : '<span></span>'}</div>
@@ -660,6 +664,7 @@ function editor(id){
         Boveda.leer(x.id).then(o => { const d = {cuenta:nuevoD.cuenta || o.cuenta, referencia:nuevoD.referencia || o.referencia, titular:nuevoD.titular, numTarjeta:nuevoD.numTarjeta || o.numTarjeta || '', expira:nuevoD.expira || o.expira || '', cvv:nuevoD.cvv || o.cvv || ''};
           return Boveda.guardar(x.id, d).then(() => { x.cuentaUlt = ocultar(d.cuenta); x.refUlt = ocultar(d.referencia); x.titularVis = d.titular; x.tarjetaUlt = ocultar(d.numTarjeta); x.tieneDatos = !!(d.cuenta || d.referencia || d.titular || d.numTarjeta); x.e2eCambio = Date.now(); guardar(); pintar(); }); }); } }
     x.compartido = !!f.compartido; x.conQuien = f.conQuien.trim(); x.miParte = Math.max(0, Math.min(100, parseInt(f.miParte)||50));
+    if(f.modoParte === 'monto' && (f.miFijo||'').trim()){ x.miFijo = f.miFijo.trim(); const t0 = num(x.monto); x.miParte = t0 ? Math.round(Math.min(t0, num(x.miFijo)) / t0 * 100) : 50; } else x.miFijo = '';
     if(!x.ancla) x.ancla = fecha(x.vence).getDate();
     if(!id) D.pagos.push(x);
     if(x.conQuien && !personas().some(z => z.nombre.toLowerCase() === x.conQuien.toLowerCase())) D.personas.push({nombre:x.conQuien, tel:'', mail:''});
@@ -747,9 +752,9 @@ async function sincronizar(){
     const tel = ((per && per.tel) || p.conQuien).replace(/\D/g, '');
     if(!otro && tel.length >= 10) otro = await correoDeTelefono(tel.slice(-10));
     if(!otro.includes('@') || otro === yo) continue;
-    const firma = [p.nombre, p.monto, p.vence, p.frec, p.miParte, p.conQuien, otro, p.credito ? p.tipoCred || 'tarjeta' : '', p.diaCorte || 0, p.minimo || '', p.compartirDatos ? (p.cuentaUlt||'') + (p.titularVis||'') + (p.tarjetaUlt||'') + (p.e2eCambio||'') : '', p._faltaPub ? Date.now() : ''].join('|');
+    const firma = [p.nombre, p.monto, p.vence, p.frec, p.miParte, p.miFijo||'', p.conQuien, otro, p.credito ? p.tipoCred || 'tarjeta' : '', p.diaCorte || 0, p.minimo || '', p.compartirDatos ? (p.cuentaUlt||'') + (p.titularVis||'') + (p.tarjetaUlt||'') + (p.e2eCambio||'') : '', p._faltaPub ? Date.now() : ''].join('|');
     if(p.nubeId && firma === p.nubeFirma) continue;
-    const fields = {nombre:sv(p.nombre), monto:sv(p.monto), vence:sv(p.vence), frec:sv(p.frec), cat:sv(p.cat), parteCreador:iv(p.miParte||50),
+    const fields = {nombre:sv(p.nombre), monto:sv(p.monto), vence:sv(p.vence), frec:sv(p.frec), cat:sv(p.cat), parteCreador:iv(p.miParte||50), fijoCreador:sv(p.miFijo||''),
       credito:sv(p.credito ? p.tipoCred || 'tarjeta' : ''), diaCorte:iv(p.diaCorte || 0), minimo:sv(p.minimo || ''),
       datos:sv(p.compartirDatos ? await (async () => { const pubO = await pubDeCorreo(otro); if(!pubO){ p._faltaPub = true; return ''; }
         const o = await Boveda.leer(p.id); return Boveda.e2eCifrar(pubO, JSON.stringify({c:o.cuenta, r:o.referencia, t:o.titular, n:o.numTarjeta||'', e:o.expira||'', v:o.cvv||''})); })() : ''),
@@ -789,11 +794,11 @@ async function sincronizar(){
     }
     const nuevo = !p;
     if(nuevo) p = {id: Date.now() + Math.floor(Math.random()*1000), nubeId:id, pagado:false, hist:[]};
-    const firma = [gs(f,'nombre'), gs(f,'monto'), gs(f,'vence'), gs(f,'frec'), gi(f,'parteCreador',50), gs(f,'credito'), gi(f,'diaCorte',0), gs(f,'minimo'), gs(f,'datos')].join('|');
+    const firma = [gs(f,'nombre'), gs(f,'monto'), gs(f,'vence'), gs(f,'frec'), gi(f,'parteCreador',50), gs(f,'fijoCreador'), gs(f,'credito'), gi(f,'diaCorte',0), gs(f,'minimo'), gs(f,'datos')].join('|');
     if(!nuevo && firma === p.nubeFirma) return;
     if(!nuevo && p.vence !== gs(f,'vence')) p.pagado = false;
     Object.assign(p, {nombre:gs(f,'nombre'), monto:gs(f,'monto'), vence:gs(f,'vence'), frec:gs(f,'frec') || 'M1', cat:gs(f,'cat') || adivinarCat(gs(f,'nombre')),
-      compartido:true, miParte:100 - gi(f,'parteCreador',50), conQuien:nomCreador(f), creadoPor:nomCreador(f), nubeFirma:firma,
+      compartido:true, miParte:100 - gi(f,'parteCreador',50), miFijo: gs(f,'fijoCreador') ? String(Math.max(0, num(gs(f,'monto')) - num(gs(f,'fijoCreador'))).toFixed(2)) : '', conQuien:nomCreador(f), creadoPor:nomCreador(f), nubeFirma:firma,
       credito:!!gs(f,'credito'), tipoCred:gs(f,'credito') || 'tarjeta', diaCorte:gi(f,'diaCorte',0), minimo:gs(f,'minimo')});
     { const pp = D.pagos.find(z => z.nubeId === id); const crudo = gs(f,'datos');
       const creador = ((f.participantes && f.participantes.arrayValue && f.participantes.arrayValue.values) || []).map(v => v.stringValue).find(e => e && e.toLowerCase() !== yo.toLowerCase()) || '';
