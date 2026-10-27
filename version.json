@@ -1,6 +1,6 @@
 {
-  "versionCode": 110,
-  "versionName": "12.4",
+  "versionCode": 111,
+  "versionName": "12.5",
   "apk": "MisPagos.apk",
-  "notas": "Al guardar un pago compartido te lleva a Enviar actualización. Actualizar monto del recibo."
+  "notas": "Nuevo diseño de ¿Con cuál comprar hoy? en Tarjetas."
 }
