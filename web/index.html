@@ -428,7 +428,7 @@ function listaRegistro(){
 function historialHtml(){
   const MESL = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const meses = [...new Set(D.pagos.flatMap(p => (p.hist||[]).filter(o => o.f).map(o => o.f.slice(0,7))))].sort().reverse();
-  return `<h2>Historial de pagos</h2><input id="bh" placeholder="Buscar: luz, octubre 2026…" value="${esc(window._bh||'')}" oninput="window._bh=this.value; document.getElementById('listaH').innerHTML = listaHist()" style="margin-bottom:10px">
+  return `<div class="fila" style="justify-content:space-between;align-items:center"><h2>Historial de pagos</h2><button class="mas lupa" data-act="lupa" data-n="bh" aria-label="Buscar">${LUPA}</button></div><input id="bh" placeholder="Buscar: luz, octubre 2026…" value="${esc(window._bh||'')}" oninput="window._bh=this.value; document.getElementById('listaH').innerHTML = listaHist()" style="font-size:19px;margin-bottom:10px;${window._bhA ? '' : 'display:none'}">
     <select id="mh" onchange="window._mh=this.value; document.getElementById('listaH').innerHTML = listaHist()" style="margin-bottom:12px"><option value="">Todos los meses</option>${meses.map(m => { const [y, mm] = m.split('-'); const t0 = MESL[+mm-1]; return `<option value="${m}" ${window._mh === m ? 'selected' : ''}>${t0.charAt(0).toUpperCase() + t0.slice(1)} ${y}</option>`; }).join('')}</select>
     <div id="listaH">${listaHist()}</div>`;
 }
@@ -485,7 +485,7 @@ function inicio(){
   prox.forEach(p => { h += `<button class="pc" data-act="detalle" data-id="${p.id}"><div class="fila">${icono(p)}<div class="peso"><div class="b">${p.monto ? dinero(num(p.monto)) : ''}</div><div class="gris chico">${dias(p.vence) <= 0 ? 'hoy' : dias(p.vence) === 1 ? 'mañana' : 'en ' + dias(p.vence) + ' días'}</div></div>${anillo(p,36)}</div><div class="b" style="margin-top:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sinPrefijo(p.nombre))}</div><div class="gris chico">Vence ${corto(p.vence)}</div></button>`; });
   const lt = ordenados().filter(p => filtroPagos === 1 ? !p.compartido : filtroPagos === 2 ? p.compartido : true);
   const listaHtml = listaRegistro();
-  h += `</div><div class="fila" style="justify-content:space-between;align-items:center"><h2>Registro de pagos</h2><button class="mas lupa" data-act="lupa" data-n="bn" aria-label="Buscar">${LUPA}</button></div><input id="bn" class="buscar" placeholder="Buscar por nombre…" value="${esc(window._bn||'')}" oninput="window._bn=this.value; document.getElementById('listaPagos').innerHTML = listaRegistro()" style="margin-bottom:12px;${window._bnA ? '' : 'display:none'}"><div class="seg" id="segPagos">${['Todos','Propios','Compartidos'].map((x,i) => `<button class="${filtroPagos===i?'sel':''}" data-act="filtroPagos" data-n="${i}">${x}</button>`).join('')}</div><div id="listaPagos">`
+  h += `</div><div class="fila" style="justify-content:space-between;align-items:center"><h2>Registro de pagos</h2><button class="mas lupa" data-act="lupa" data-n="bn" aria-label="Buscar">${LUPA}</button></div><input id="bn" class="buscar" placeholder="Buscar por nombre…" style="font-size:19px" value="${esc(window._bn||'')}" oninput="window._bn=this.value; document.getElementById('listaPagos').innerHTML = listaRegistro()" style="font-size:19px;margin-bottom:12px;${window._bnA ? '' : 'display:none'}"><div class="seg" id="segPagos">${['Todos','Propios','Compartidos'].map((x,i) => `<button class="${filtroPagos===i?'sel':''}" data-act="filtroPagos" data-n="${i}">${x}</button>`).join('')}</div><div id="listaPagos">`
     + (lt.length || window._bn ? listaHtml : `<p class="gris">${filtroPagos === 2 ? 'No tienes pagos compartidos.' : 'Todos tus pagos son compartidos.'}</p>`) + `</div>`;
   return h;
 }
@@ -518,7 +518,7 @@ function quincenaActual(){
   return [new Date(y, m, q+1), new Date(y, m, fin)];
 }
 function carteraV(){
-  let h = `<div class="fila" style="justify-content:space-between;align-items:center"><h1 style="margin:0">Tarjetas</h1><button class="mas lupa" data-act="lupa" data-n="bt" aria-label="Buscar">${LUPA}</button></div><input id="bt" class="buscar" placeholder="Buscar por nombre…" value="${esc(window._bt||'')}" oninput="window._bt=this.value; document.getElementById('listaTj').innerHTML = tarjetasLista()" style="margin:12px 0;${window._btA ? '' : 'display:none'}"><div id="listaTj">`;
+  let h = `<div class="fila" style="justify-content:space-between;align-items:center"><h1 style="margin:0">Tarjetas</h1><button class="mas lupa" data-act="lupa" data-n="bt" aria-label="Buscar">${LUPA}</button></div><input id="bt" class="buscar" placeholder="Buscar por nombre…" style="font-size:22px" value="${esc(window._bt||'')}" oninput="window._bt=this.value; document.getElementById('listaTj').innerHTML = tarjetasLista()" style="font-size:22px;margin:12px 0;${window._btA ? '' : 'display:none'}"><div id="listaTj">`;
   return h + tarjetasLista() + '</div>';
 }
 function tarjetasLista(){
@@ -655,6 +655,7 @@ function ajustes(){
     <div class="gris chico b" style="margin:22px 8px 8px">Apariencia</div><div class="caja">${[temas.slice(0,3), temas.slice(3)].map((fila,f) => `<div class="seg" style="margin:${f ? '8px' : '0'} 0 0">${fila.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div>`).join('')}<p class="gris chico" style="margin-bottom:0">Glass sigue al sistema (de noche es oscuro). Glass blanco es blanco con toques de color.</p></div>
     ${grupo('Fondo del modo Glass', [['Tu imagen de fondo', D.fondoGlass ? 'Tu foto' : 'Predeterminado', 'fondoGlass']])}
     ${document.documentElement.dataset.tema === 'glass' ? grupo('Glass', [['Desenfoque del fondo', ['Normal','30 % más','50 % más','80 % más'][D.glassBlur || 0], 'glassBlur']]) : ''}
+    ${grupo('Ayuda', [['Ver tutorial', '', 'tutorial']])}
     ${grupo('Colores', [['Color de "Por pagar este mes"', listaHero()[selHero()][0], 'colores']])}
     ${grupo('Tus datos', [['Respaldo en la nube', D.respaldoNube ? 'Guardado' : 'Guardar', 'respNube'], ['Guardar respaldo en archivo', 'archivo', 'exportar'], ['Cargar respaldo de archivo', 'archivo', 'importar']])}
     <input type="file" id="imp" accept="application/json" data-act="importar" hidden>
@@ -1184,6 +1185,7 @@ document.addEventListener('click', (ev) => {
       const nube = D.nube; D = JSON.parse(t); D.nube = nube; guardar(); aplicarTema(); return 'Respaldo recuperado.'; }); break;
     case 'fondo': hojaFondo(); break;
     case 'colores': hojaColores(); break;
+    case 'tutorial': { const p = D.pagos.find(x => !x.pagado); if(p) recorridoWeb(p.id); else bvAbrir(); break; }
     case 'filtroPagos': { const sg = b.parentElement, act = sg.querySelector('.sel'); if(act === b) break;
       const d = [...sg.children].indexOf(b) > [...sg.children].indexOf(act) ? 1 : -1, y = window.scrollY;
       act.animate([{transform:'none'},{transform:`translateX(${b.offsetLeft - act.offsetLeft}px)`}], {duration:420, easing:'cubic-bezier(.3,0,.15,1)', fill:'forwards'}); b.style.color = 'var(--accTxt)'; b.style.position = 'relative'; b.style.zIndex = 1;
@@ -1197,7 +1199,7 @@ document.addEventListener('click', (ev) => {
     case 'lupa': { const inp = document.getElementById(n); if(!inp) break; if(navigator.vibrate) navigator.vibrate(20);
       b.animate([{transform:'scale(1)'},{transform:'scale(.86)'},{transform:'scale(1)'}], {duration:280});
       const abrir = inp.style.display === 'none';
-      if(n === 'bn') window._bnA = abrir; else window._btA = abrir;
+      if(n === 'bn') window._bnA = abrir; else if(n === 'bh') window._bhA = abrir; else window._btA = abrir;
       if(abrir){ inp.style.display = ''; inp.animate([{opacity:0, transform:'translateY(-12px)'},{opacity:1, transform:'none'}], {duration:260, easing:'cubic-bezier(.3,0,.15,1)'}); inp.focus();
         document.getElementById('app').style.paddingBottom = '70vh';   // aire para subir la búsqueda arriba del teclado
         setTimeout(() => window.scrollTo({top: b.getBoundingClientRect().top + window.scrollY - 70, behavior:'smooth'}), 120); }
@@ -1290,6 +1292,7 @@ function pintar(anim){
 aplicarTema();
 if(!D.nombre && !D.pagos.length){ setTimeout(() => { const v = prompt('¡Bienvenido a Mis Pagos! ¿Cómo te llamas?'); if(v){ D.nombre = v.trim(); guardar(); pintar(); } }, 400); }
 pintar();
+setTimeout(() => { if(D.bienvenida) return; if(D.pagos.length){ D.bienvenida = true; guardar(); return; } bvAbrir(); }, 400);   // primera vez: bienvenida y primer pago
 if(D.nube && D.nube.refresh && D.nube.verif) sincronizar().then(pintar).catch(() => {});
 /* ---- jalar hacia abajo para sincronizar ---- */
 (() => {
@@ -1324,6 +1327,152 @@ if(D.nube && D.nube.refresh && D.nube.verif) sincronizar().then(pintar).catch(()
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').then(r => r.update()).catch(() => {});
 // si llega una versión nueva de la web, recargar una vez para usarla
 if('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('controllerchange', () => { if(!sessionStorage.recargado){ sessionStorage.recargado = 1; location.reload(); } });
+
+/* ================= Bienvenida, primer pago guiado y recorrido ================= */
+const AVS = ['🐶','🐱','🐼','🦊','🐰','🐻','🐨','🐯','🦁','🐸','🐧','🦄','🐵','🐹','🦉'];
+const AVC = ['#FFE3D3','#E3ECFF','#E6F6EC','#FFF3C9','#F3E5FF','#FFE0EA'];
+const EJ = {internet:['Internet','599'], streaming:['Netflix','299'], luz:['Luz CFE','650'], telefono:['Plan de celular','349'], renta:['Renta','6500'], tarjeta:['Tarjeta de crédito','2500'], tienda:['Liverpool','800'], grupo:['Tanda','1000'], otro:['Gimnasio','450']};
+function avatarURL(e, c){ const cv = document.createElement('canvas'); cv.width = cv.height = 256; const x = cv.getContext('2d');
+  x.fillStyle = c; x.beginPath(); x.arc(128,128,128,0,7); x.fill(); x.font = '150px serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(e, 128, 140); return cv.toDataURL('image/png'); }
+let BV = null;
+function bvAbrir(){
+  BV = {paso:'perfil', v:{cat:'internet', nombre:'', monto:'', dia:'', frec:'M1'}, av:null};
+  const d = document.createElement('div'); d.id = 'bv';
+  d.style.cssText = 'position:fixed;inset:0;z-index:99;background:#F6F7FB;color:#121A35;overflow:auto;padding:max(28px,env(safe-area-inset-top)) 18px 28px';
+  document.body.appendChild(d); bvPintar(1);
+}
+function bvCerrar(){ const d = document.getElementById('bv'); D.bienvenida = true; guardar();
+  if(d) d.animate([{opacity:1},{opacity:0}], {duration:260}).onfinish = () => { d.remove(); pintar(); if(BV && BV.creado) setTimeout(() => recorridoWeb(BV.creado), 450); }; }
+function bvPintar(dir){
+  const d = document.getElementById('bv'); if(!d) return; const v = BV.v;
+  const card = (h) => `<div style="background:#fff;border:1px solid #E2E6EE;border-radius:28px;padding:24px 22px;box-shadow:0 10px 30px -12px rgba(20,30,60,.18)">${h}</div>`;
+  const campo = (n, ph, val, extra='') => `<input name="${n}" placeholder="${ph}" value="${esc(val||'')}" ${extra} style="width:100%;background:#F1F3F8;border:0;border-radius:14px;padding:14px 16px;font-size:16px;color:#121A35;margin-bottom:12px">`;
+  const btn = (t, act, lleno=true, extra='') => `<button data-bv="${act}" ${extra} style="flex:${lleno?2:1};height:54px;border-radius:100px;font-weight:800;font-size:16px;${lleno?'background:#1C326E;color:#fff':'background:#fff;color:#121A35;border:1px solid #E2E6EE'}">${t}</button>`;
+  const barra = (k) => `<div style="display:flex;gap:4px;margin-bottom:10px">${[0,1,2,3].map(i => `<span style="flex:1;height:6px;border-radius:3px;background:${i<=k?'#1C326E':'#DDE2EC'}"></span>`).join('')}</div><div style="color:#6B7280;font-size:13px;font-weight:700;margin:0 2px 14px">Tu primer pago · paso ${k+1} de 4</div>`;
+  const despues = `<button data-bv="despues" style="display:block;margin:14px auto 0;color:#6B7280;font-size:14px">Lo haré después</button>`;
+  let h = '';
+  if(BV.paso === 'perfil'){
+    const av = BV.av || D.foto;
+    h = card(`<div style="text-align:center"><img src="icon-192.png" alt="" style="width:72px;height:72px;border-radius:50%"><h1 style="margin:14px 0 4px;font-size:26px">Bienvenido a Mis Pagos</h1><p style="color:#6B7280;margin:0 0 18px">Configuremos tu perfil.</p></div>
+      <div class="b" style="margin:0 2px 8px">Idioma</div><select name="idioma" style="width:100%;background:#F1F3F8;border:0;border-radius:14px;padding:12px;margin-bottom:14px" onchange="if(this.value==='en'){ this.value='es'; aviso('El inglés llegará en una próxima versión'); }"><option value="es">Español</option><option value="en">English (próximamente)</option></select>
+      <div class="b" style="margin:0 2px 8px">Foto de perfil</div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:8px">${av ? `<img src="${av}" style="width:72px;height:72px;border-radius:50%;object-fit:cover">` : `<span style="width:72px;height:72px;border-radius:50%;background:#E3ECFF;display:grid;place-items:center;font-size:40px">🙂</span>`}
+        <label style="flex:1;height:46px;border-radius:100px;border:1px solid #E2E6EE;display:grid;place-items:center;font-weight:800;font-size:14px">🖼️ Usar una foto mía<input type="file" accept="image/*" style="display:none" onchange="const f=this.files[0]; if(!f) return; const r=new FileReader(); r.onload=()=>{ BV.av=r.result; bvGuardaForm(); bvPintar(0); }; r.readAsDataURL(f)"></label></div>
+      <div style="color:#6B7280;font-size:13px;margin:6px 2px">o elige uno:</div>
+      <div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px">${AVS.map((e,i) => `<button data-bv="av" data-e="${e}" data-c="${AVC[i%AVC.length]}" style="flex:none;width:54px;height:54px;border-radius:50%;background:${AVC[i%AVC.length]};font-size:30px">${e}</button>`).join('')}</div>
+      <div class="b" style="margin:0 2px 8px">Tu nombre</div>${campo('nombre','¿Cómo te llamas?', BV.nom ?? D.nombre)}
+      <div class="b" style="margin:0 2px 8px">Teléfono</div>${campo('tel','10 dígitos', BV.tel ?? D.miTel, 'inputmode="tel"')}
+      <div class="b" style="margin:0 2px 8px">Correo</div>${campo('cor','tu@correo.com', BV.cor ?? D.miCorreo, 'type="email"')}
+      <div style="display:flex;margin-top:8px">${btn('Continuar','perfilOk')}</div>`);
+  } else {
+    const k = BV.paso; let cuerpo = '', pie = '';
+    if(k === 0){
+      cuerpo = `<h2 style="margin:0 0 6px;font-size:22px">¿Qué pagas cada mes?</h2><p style="color:#6B7280;margin:0 0 16px">Agreguemos tu primer pago juntos. Por ejemplo, tu Internet. Toca el tipo:</p>` +
+        Object.entries(CATS).map(([c, x]) => `<button data-bv="tipo" data-c="${c}" style="display:block;width:100%;text-align:left;padding:14px 16px;border-radius:16px;margin-bottom:8px;font-size:16px;${c===v.cat?'background:#E3ECFF;border:2px solid #1C326E;font-weight:800':'background:#F1F3F8'}">${x[0]}&nbsp;&nbsp; ${x[1]}</button>`).join('');
+    } else if(k === 1){
+      if(!v.nombre){ v.nombre = EJ[v.cat][0]; v.monto = EJ[v.cat][1]; }
+      cuerpo = `<h2 style="margin:0 0 6px;font-size:22px">${CATS[v.cat][0]} ¿Cómo se llama y cuánto pagas?</h2><p style="color:#6B7280;margin:0 0 16px">Te dejamos un ejemplo; cámbialo por el tuyo.</p><div class="b" style="margin:0 2px 8px">Nombre</div>${campo('pn', EJ[v.cat][0], v.nombre)}<div class="b" style="margin:0 2px 8px">Monto</div>${campo('pm', '$'+EJ[v.cat][1], v.monto, 'inputmode="decimal"')}`;
+      pie = btn('Atrás','atras',false) + btn('Continuar','sig');
+    } else if(k === 2){
+      if(!v.dia){ const f = hoy(); f.setDate(f.getDate()+5); v.dia = String(f.getDate()); }
+      const fs = frecsDe(v.cat); if(!fs.includes(v.frec)) v.frec = fs.includes('M1') ? 'M1' : fs[0];
+      cuerpo = `<h2 style="margin:0 0 6px;font-size:22px">📅 ¿Qué día vence?</h2><p style="color:#6B7280;margin:0 0 16px">Elige el día del mes en que lo pagas.</p>
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:16px">${Array.from({length:31},(_,i)=>i+1).map(i => `<button data-bv="dia" data-d="${i}" style="aspect-ratio:1;border-radius:12px;font-size:15px;${String(i)===v.dia?'background:#1C326E;color:#fff;font-weight:800':'background:#F1F3F8'}">${i}</button>`).join('')}</div>
+        <div class="b" style="margin:0 2px 8px">Se repite</div>${fs.map(f => `<button data-bv="frec" data-f="${f}" style="display:block;width:100%;padding:10px;border-radius:100px;margin-bottom:6px;font-weight:800;${f===v.frec?'background:#1C326E;color:#fff':'background:#F1F3F8'}">${FRECS[f].charAt(0).toUpperCase()+FRECS[f].slice(1)}</button>`).join('')}`;
+      pie = btn('Atrás','atras',false) + btn('Continuar','sig');
+    } else {
+      cuerpo = `<h2 style="margin:0 0 6px;font-size:22px">✨ Así se verá</h2><p style="color:#6B7280;margin:0 0 16px">Revisa tu primer pago. Lo puedes cambiar cuando quieras.</p>
+        <div id="bvPrev" style="display:flex;align-items:center;gap:14px;background:#E3ECFF;border-radius:20px;padding:16px"><span style="font-size:30px">${CATS[v.cat][0]}</span><div style="flex:1"><div class="b" style="font-size:17px">${esc(v.nombre)}</div><div style="color:#6B7280;font-size:13px">Vence el día ${v.dia} · ${FRECS[v.frec]}</div></div><div class="b" style="font-size:17px">${v.monto ? dinero(num(v.monto)) : ''}</div></div>
+        <p style="color:#6B7280;margin:16px 0 0">Después te llevamos por la app para que veas dónde aparece.</p>`;
+      pie = btn('Atrás','atras',false) + btn('Guardar mi primer pago','guardar');
+    }
+    h = barra(k) + card(cuerpo) + (pie ? `<div style="display:flex;gap:12px;margin-top:14px">${pie}</div>` : '') + despues;
+  }
+  d.innerHTML = `<form onsubmit="return false" style="max-width:560px;margin:0 auto">${h}</form>`;
+  if(dir) d.firstChild.animate([{transform:`translateX(${dir*30}%)`, opacity:0},{transform:'none', opacity:1}], {duration:380, easing:'cubic-bezier(.3,0,.15,1)'});
+  const pv = document.getElementById('bvPrev'); if(pv) pv.animate([{transform:'scale(.9)', opacity:0},{transform:'scale(1.03)', opacity:1, offset:.7},{transform:'none'}], {duration:500, delay:150, fill:'backwards'});
+}
+function bvGuardaForm(){ const f = document.querySelector('#bv form'); if(!f) return; if(f.nombre) BV.nom = f.nombre.value; if(f.tel) BV.tel = f.tel.value; if(f.cor) BV.cor = f.cor.value; if(f.pn){ BV.v.nombre = f.pn.value; BV.v.monto = f.pm.value; } }
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-bv]'); if(!b || !BV) return; const a = b.dataset.bv, v = BV.v;
+  if(navigator.vibrate) navigator.vibrate(20); bvGuardaForm();
+  if(a === 'av'){ BV.av = avatarURL(b.dataset.e, b.dataset.c); bvPintar(0); return; }
+  if(a === 'perfilOk'){ if(!(BV.nom||'').trim()){ aviso('Escribe tu nombre'); return; }
+    D.nombre = BV.nom.trim(); D.miTel = (BV.tel||'').replace(/[^0-9+]/g,''); D.miCorreo = (BV.cor||'').trim().toLowerCase(); if(BV.av) D.foto = BV.av; guardar(); BV.paso = 0; bvPintar(1); return; }
+  if(a === 'tipo'){ v.cat = b.dataset.c; v.nombre = EJ[v.cat][0]; v.monto = EJ[v.cat][1]; BV.paso = 1; bvPintar(1); return; }
+  if(a === 'dia'){ v.dia = b.dataset.d; bvPintar(0); return; }
+  if(a === 'frec'){ v.frec = b.dataset.f; bvPintar(0); return; }
+  if(a === 'sig'){ if(BV.paso === 1 && !v.nombre.trim()){ aviso('Ponle un nombre'); return; } BV.paso++; bvPintar(1); return; }
+  if(a === 'atras'){ BV.paso--; bvPintar(-1); return; }
+  if(a === 'despues'){ BV.creado = null; bvCerrar(); return; }
+  if(a === 'guardar'){
+    const h = hoy(), dd = +v.dia; let f = new Date(h.getFullYear(), h.getMonth(), Math.min(dd, new Date(h.getFullYear(), h.getMonth()+1, 0).getDate()));
+    if(f < h) f = new Date(h.getFullYear(), h.getMonth()+1, Math.min(dd, new Date(h.getFullYear(), h.getMonth()+2, 0).getDate()));
+    const p = {id:Date.now(), nombre:v.nombre.trim(), monto:v.monto, vence:iso(f), frec:v.frec, cat:v.cat, credito:esCredito(v.cat), tipoCred:v.cat==='tienda'?'departamental':'tarjeta', compartido:false, miParte:50, pagado:false, hist:[]};
+    D.pagos.push(p); guardar(); BV.creado = p.id; bvCerrar(); return; }
+});
+
+/* ---------- recorrido con foco sobre la pantalla real ---------- */
+function recorridoWeb(id){
+  const p = D.pagos.find(x => x.id === id) || D.pagos.find(x => !x.pagado); if(!p) return;
+  const nom = sinPrefijo(p.nombre), f = new Date(p.vence + 'T12:00');
+  const dia = f.getDate() + ' de ' + ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'][f.getMonth()];
+  const ir = (t, extra) => () => { if(extra) extra(); if(tab !== t){ tab = t; pintar(true); } else pintar(); window.scrollTo({top:0}); };
+  const aIni = ir(0), aCal = ir(1, () => { calSeg = 0; }), aQui = ir(1, () => { calSeg = 1; }), aTar = ir(2), aEst = ir(3);
+  const navB = i => () => document.querySelector(`#nav [data-n="${i}"]`);
+  const pasos = [
+    ['Resumen de tus obligaciones del mes', `En esta tarjeta principal puedes consultar el resumen de los pagos correspondientes al mes en curso, incluidos los de ${nom}. Asimismo, al seleccionar las categorías Pagados, Pendientes o Vence pronto, podrás visualizar el detalle de cada una de ellas.`, () => document.querySelector('.heroN'), null, aIni],
+    ['Tu primer pago registrado', `El pago de ${nom} se muestra en la sección Próximos, junto con los días restantes para su vencimiento. Al seleccionarlo, accederás a su información detallada y, una vez realizado el pago, podrás registrarlo como pagado desde ese mismo apartado.`, () => document.querySelector(`.prox [data-id="${p.id}"]`), null, aIni],
+    ['Centro de notificaciones', 'El ícono de la campana concentra el historial de tu actividad. Allí encontrarás los pagos que has confirmado, los recordatorios programados y las modificaciones realizadas en los pagos compartidos.', () => document.querySelector('[data-act=avisos][data-n="1"]'), null, aIni],
+    ['Accede al calendario', 'Para continuar, selecciona el ícono del calendario ubicado en la barra de navegación inferior. De esta manera, podrás consultar la distribución de tus pagos por fecha.', navB(1), aCal, aIni],
+    ['Visualización de tus pagos en el calendario', `El pago de ${nom} vence el ${dia}. Cada día que contiene pagos se identifica con un color según su estado: verde indica que el pago ya fue realizado, mientras que amarillo señala un vencimiento dentro de los próximos 7 días. Además, la fecha actual aparece resaltada con un contorno.`, () => document.querySelector('.cal'), null, aCal],
+    ['Planeación por quincena', 'En esta sección se muestra el monto que debes reservar de cada pago de nómina para cubrir tus compromisos. En el caso de los pagos compartidos, únicamente se considera tu parte proporcional. Cabe mencionar que los días de pago pueden modificarse en Mi perfil.', () => document.querySelector('#app .caja'), null, aQui],
+    ['Accede a tus tarjetas', 'A continuación, selecciona el ícono de la cartera ubicado en la barra de navegación inferior. Allí podrás consultar y administrar tus tarjetas de crédito.', navB(2), aTar, aQui],
+    ['Administración de tus tarjetas', 'En esta sección se concentran tus tarjetas de crédito y departamentales. Para cada una podrás consultar su día de corte, la fecha límite de pago y el mejor día para realizar compras. Asimismo, la opción «¿Con cuál comprar hoy?» te sugiere la tarjeta más conveniente, y podrás copiar el número, la fecha de vencimiento o el CVV de forma segura. Con la lupa puedes localizar cualquier tarjeta por su nombre.', () => document.querySelector('#listaTj > *'), null, aTar],
+    ['Consulta tus estadísticas', 'A continuación, selecciona el ícono de barras ubicado en la barra de navegación inferior. Allí podrás analizar de manera detallada el comportamiento de tus pagos.', navB(3), aEst, aTar],
+    ['Recorrido completado', 'En esta sección podrás visualizar la distribución de tus gastos, el estado de tus ahorros y tu historial de pagos. Cabe señalar que puedes repetir este recorrido en cualquier momento desde Mi perfil, en la opción Ayuda.', () => null, null, aEst],
+  ];
+  let i = 0;
+  const capa = document.createElement('div'); capa.id = 'guia';
+  capa.style.cssText = 'position:fixed;inset:0;z-index:98';
+  capa.innerHTML = '<div id="gHueco" style="position:fixed;border-radius:22px;box-shadow:0 0 0 9999px rgba(11,16,32,.84);pointer-events:none;transition:all .35s cubic-bezier(.3,0,.15,1);outline:2.5px solid #fff;outline-offset:4px"></div><div id="gGlobo" style="position:fixed;left:16px;right:16px;background:#fff;color:#121A35;border-radius:22px;padding:16px 18px 14px;box-shadow:0 20px 40px -10px rgba(0,0,0,.4);max-width:560px;margin:0 auto"></div>';
+  document.body.appendChild(capa);
+  const hueco = capa.querySelector('#gHueco'), globo = capa.querySelector('#gGlobo');
+  const fin = () => { capa.animate([{opacity:1},{opacity:0}], {duration:220}).onfinish = () => { capa.remove(); tab = 0; calSeg = 0; pintar(true); }; };
+  const mostrar = () => {
+    const [ti, tx, obj, toca] = pasos[i]; const el = obj();
+    if(el){ el.scrollIntoView({block:'center'}); }
+    setTimeout(() => {
+      const r = el ? el.getBoundingClientRect() : null;
+      if(r){ Object.assign(hueco.style, {display:'block', left:(r.left-8)+'px', top:(r.top-8)+'px', width:(r.width+16)+'px', height:(r.height+16)+'px'}); }
+      else Object.assign(hueco.style, {display:'block', left:'50%', top:'50%', width:'0px', height:'0px'});
+      globo.innerHTML = `<div style="display:flex;gap:3px">${pasos.map((_,k) => `<span style="flex:1;height:5px;border-radius:3px;background:${k<=i?'#1C326E':'#DDE2EC'}"></span>`).join('')}</div>
+        <div style="color:#6B7280;font-size:12px;margin:8px 0 2px">${i+1} de ${pasos.length}</div><div style="font-size:18px;font-weight:800">${ti}</div><div style="font-size:14px;color:#3C4256;line-height:1.45;margin:6px 0 12px">${tx}</div>
+        <div style="display:flex;align-items:center;gap:8px">${i ? '<button data-g="atras" aria-label="Atrás" style="width:40px;height:40px;border-radius:50%;background:#F1F3F8;font-size:24px;line-height:1">‹</button>' : ''}<button data-g="omitir" style="color:#6B7280;padding:8px 6px">Omitir</button><span style="flex:1"></span><button data-g="sig" style="background:#1C326E;color:#fff;font-weight:800;border-radius:100px;padding:10px 18px">${i === pasos.length-1 ? 'Finalizar' : toca ? 'Selecciónalo o continúa' : 'Continuar'}</button></div>`;
+      const h = window.innerHeight;
+      if(!r){ globo.style.top = '50%'; globo.style.bottom = ''; globo.style.transform = 'translateY(-50%)'; }
+      else if(r.bottom + 260 < h){ globo.style.top = (r.bottom + 18) + 'px'; globo.style.bottom = ''; globo.style.transform = ''; }
+      else { globo.style.top = ''; globo.style.bottom = Math.max(20, h - r.top + 18) + 'px'; globo.style.transform = ''; }
+      globo.animate([{opacity:0, transform:(globo.style.transform||'') + ' translateY(12px)'},{opacity:1, transform:globo.style.transform || 'none'}], {duration:300, easing:'cubic-bezier(.3,0,.15,1)'});
+    }, el ? 260 : 0);
+  };
+  const irA = (ant) => { const p = pasos[i]; if(p[4] !== ant[4]){ hueco.style.display = 'none'; globo.innerHTML = ''; p[4](); setTimeout(mostrar, 500); } else mostrar(); };
+  capa.addEventListener('click', e => {
+    const g = e.target.closest('[data-g]');
+    if(navigator.vibrate) navigator.vibrate(20);
+    if(g){ const ant = pasos[i];
+      if(g.dataset.g === 'omitir') return fin();
+      if(g.dataset.g === 'atras'){ if(i){ i--; irA(ant); } return; }
+      if(i === pasos.length - 1) return fin();
+      i++; irA(ant); return; }
+    const r = hueco.getBoundingClientRect();
+    if(hueco.style.display !== 'none' && e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom){   // tocó lo resaltado
+      const ant = pasos[i]; if(ant[3]){ ant[3](); i++; hueco.style.display = 'none'; globo.innerHTML = ''; setTimeout(mostrar, 500); } else if(i < pasos.length - 1){ i++; irA(ant); } else fin();
+    }
+  });
+  aIni(); setTimeout(mostrar, 300);
+}
+
 </script>
 </body>
 </html>
