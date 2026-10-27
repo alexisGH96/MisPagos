@@ -1,6 +1,6 @@
 {
-  "versionCode": 105,
-  "versionName": "11.9",
+  "versionCode": 106,
+  "versionName": "12.0",
   "apk": "MisPagos.apk",
-  "notas": "Servicios con número de servicio y periodo facturado. Nuevo historial de pagos por mes con buscador."
+  "notas": "Lupitas para buscar pagos y tarjetas, historial en Estadísticas, avisos de pagos confirmados y avisos con los colores de la app."
 }
