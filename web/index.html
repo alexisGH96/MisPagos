@@ -709,7 +709,7 @@ function detalle(id){
     const tel = per && per.tel ? per.tel.replace(/\D/g,'') : ''; const telI = tel.length === 10 ? '52' + tel : tel;
     h += `<h2>¿Quién paga?</h2><div class="caja"><div class="dato"><span>Tú · ${p.miParte||50} %</span><b>${dinero(Math.round(mi))}</b></div><div class="dato"><span>${esc(nombreVisible(quien))} · ${100-(p.miParte||50)} %</span><b>${dinero(Math.round(otra))}</b></div>
       ${p.nubeId && D.nube && D.nube.verif ? `<button class="btn lleno" style="margin-top:12px" data-act="recordar" data-id="${p.id}" data-m="${esc(msg)}">Enviar recordatorio por Mis Pagos</button>` : ''}
-      ${p.nubeId && !p.creadoPor && D.nube && D.nube.verif ? `<button class="btn borde" style="margin-top:10px" data-act="enviarAct" data-id="${p.id}">Enviar actualización a ${esc(nombreVisible(p.conQuien))} por Mis Pagos</button>` : ''}
+      ${!p.creadoPor && D.nube && D.nube.verif ? `<button class="btn borde" style="margin-top:10px" data-act="enviarAct" data-id="${p.id}">Enviar actualización a ${esc(nombreVisible(p.conQuien))} por Mis Pagos</button>` : ''}
       <a class="btn ${p.nubeId && D.nube && D.nube.verif ? 'borde' : 'lleno'}" style="margin-top:10px;text-decoration:none" href="https://wa.me/${telI}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">Enviar recordatorio por WhatsApp</a></div>`;
   }
   if((p.hist||[]).length){
@@ -773,7 +773,7 @@ function editor(id){
     if(!id) D.pagos.push(x);
     if(x.conQuien && !personas().some(z => z.nombre.toLowerCase() === x.conQuien.toLowerCase())) D.personas.push({nombre:x.conQuien, tel:'', mail:''});
     guardar(); cerrarHoja(); pintar(); aviso('✓ Guardado');
-    if(id && x.compartido && !x.creadoPor) setTimeout(() => detalle(x.id), 340);   // vuelve al detalle para enviar la actualización
+    if(x.compartido && !x.creadoPor) setTimeout(() => { detalle(x.id); setTimeout(() => guiarActualizar(x), 450); }, 340);   // vuelve al detalle para enviar la actualización
     if(x.compartido && !x.creadoPor && D.nube && D.nube.verif) sincronizar().then(pintar).catch(() => {});
   };
 }
@@ -936,7 +936,9 @@ function nomCreador(f){
   return per ? per.nombre : gs(f,'creadorNombre');
 }
 function nombreVisible(q){
-  q = (q || '').trim(); if(!q.includes('@')) return q;
+  q = (q || '').trim();
+  const d = q.replace(/\D/g,'').slice(-10);
+  if(!q.includes('@')){ if(d.length === 10 && /^[0-9 +()-]+$/.test(q)){ const pt = personas().find(z => (z.tel||'').replace(/\D/g,'').slice(-10) === d && !/^[0-9 +()-]+$/.test(z.nombre)); if(pt) return pt.nombre; } return q; }
   const per = personas().find(z => z.mail && z.mail.toLowerCase() === q.toLowerCase() && !z.nombre.includes('@'));
   if(per) return per.nombre;
   const n = (D.nomCorreo || {})[q.toLowerCase()]; if(n) return n;
@@ -1413,6 +1415,22 @@ document.addEventListener('click', e => {
 });
 
 /* ---------- recorrido con foco sobre la pantalla real ---------- */
+function guiarActualizar(p){
+  const b = document.querySelector('.hoja [data-act=enviarAct]'); if(!b) return;
+  b.scrollIntoView({behavior:'smooth', block:'center'});
+  setTimeout(() => {
+    const r = b.getBoundingClientRect();
+    const capa = document.createElement('div'); capa.style.cssText = 'position:fixed;inset:0;z-index:98';
+    capa.innerHTML = `<div style="position:fixed;left:${r.left-8}px;top:${r.top-8}px;width:${r.width+16}px;height:${r.height+16}px;border-radius:100px;box-shadow:0 0 0 9999px rgba(11,16,32,.84);outline:2.5px solid #fff;outline-offset:4px;pointer-events:none"></div>
+      <div style="position:fixed;left:16px;right:16px;${r.top > 300 ? 'bottom:' + (window.innerHeight - r.top + 22) + 'px' : 'top:' + (r.bottom + 22) + 'px'};background:#fff;color:#121A35;border-radius:22px;padding:16px 18px;box-shadow:0 20px 40px -10px rgba(0,0,0,.4)">
+      <div style="font-size:18px;font-weight:800">Envía la actualización</div><div style="font-size:14px;color:#3C4256;line-height:1.45;margin:6px 0 12px">Guardaste cambios en este pago compartido. Toca el botón iluminado para que a ${esc(nombreVisible(p.conQuien))} le lleguen al momento por Mis Pagos, con una notificación.</div>
+      <div style="display:flex;justify-content:flex-end"><button data-g="omitir" style="color:#6B7280;padding:8px 6px">Ahora no</button></div></div>`;
+    document.body.appendChild(capa);
+    capa.addEventListener('click', e => { if(navigator.vibrate) navigator.vibrate(20);
+      const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
+      capa.remove(); if(inside) b.click(); });
+  }, 500);
+}
 function recorridoWeb(id){
   const p = D.pagos.find(x => x.id === id) || D.pagos.find(x => !x.pagado); if(!p) return;
   const nom = sinPrefijo(p.nombre), f = new Date(p.vence + 'T12:00');
