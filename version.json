@@ -1,6 +1,6 @@
 {
-  "versionCode": 107,
-  "versionName": "12.1",
+  "versionCode": 108,
+  "versionName": "12.2",
   "apk": "MisPagos.apk",
-  "notas": "Elige el tipo al agregar un pago, frecuencias por tipo, bienvenida y tutorial."
+  "notas": "Guía para agregar tu primer pago y recorrido por la app. La búsqueda sube arriba del teclado."
 }
