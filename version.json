@@ -1,6 +1,6 @@
 {
-  "versionCode": 109,
-  "versionName": "12.3",
+  "versionCode": 110,
+  "versionName": "12.4",
   "apk": "MisPagos.apk",
-  "notas": "Recorrido con textos formales, Quincenas y Tarjetas, flecha para regresar; lupita en el historial."
+  "notas": "Al guardar un pago compartido te lleva a Enviar actualización. Actualizar monto del recibo."
 }
