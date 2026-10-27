@@ -238,7 +238,14 @@ function num(v){ return parseFloat(String(v||'').replace(/[^0-9.]/g,''))||0; }
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function sinPrefijo(n){ return n.replace(/^Pagar |^Pago /,''); }
 
-const FRECS = {M1:'mensual', M2:'cada 2 meses', M3:'cada 3 meses', M12:'anual', D15:'quincenal', D7:'semanal', U:'una vez'};
+const FRECS = {M1:'mensual', M2:'bimestral', M3:'trimestral', M6:'semestral', M12:'anual', D15:'quincenal', D7:'semanal', U:'una sola vez'};
+const CATS = {tarjeta:['💳','Tarjeta de crédito'], tienda:['🛍️','Crédito departamental'], renta:['🏠','Renta / vivienda'], streaming:['🎬','Suscripciones y membresías'], internet:['📡','Internet'], luz:['💡','Luz, agua o gas'], telefono:['📱','Teléfono'], grupo:['👥','Tanda o grupo'], otro:['📌','Otro']};
+const esCredito = c => c === 'tarjeta' || c === 'tienda';
+function frecsDe(c){
+  if(esCredito(c)) return ['M1','U','M12']; if(c === 'streaming') return ['U','M1','M6','M12']; if(c === 'renta') return ['U','M1','M2','M6','M12'];
+  if(c === 'telefono' || c === 'internet') return ['M1','M6','M12']; if(c === 'grupo') return ['D7','D15','M1']; if(c === 'luz') return ['M1','M2','M3'];
+  return ['M1','M2','M3','M6','M12','D15','D7','U'];
+}
 function sumarMes(s, n, ancla){
   const d = fecha(s); const y = d.getFullYear(), m = d.getMonth() + n;
   const max = new Date(y, m + 1, 0).getDate();
@@ -255,15 +262,18 @@ function siguiente(p){
 /* los pagados avanzan solos al siguiente periodo cuando pasa su fecha */
 const MESC = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 const esServicio = c => ['luz','internet','telefono','streaming'].includes(c);
-const mesesPer = f => f === 'M2' ? 2 : f === 'M3' ? 3 : 1;
-const casillasPer = f => f === 'M2' || f === 'M3' ? 2 : 1;
-function perTexto(per){ if(!per) return ''; const m = per.split(',').map(x => x.split('-').map(Number)); const a = m[0], z = m[m.length-1];
+const mesesPer = f => ({M2:2, M3:3, M6:6, M12:12})[f] || 1;
+const casillasPer = f => f === 'M2' || f === 'M3' || f === 'M6' ? 2 : f === 'U' || f.startsWith('D') ? 0 : 1;
+function perTexto(per){ if(!per) return ''; if(!per.includes('-')) return 'año ' + per; const m = per.split(',').map(x => x.split('-').map(Number)); const a = m[0], z = m[m.length-1];
   const fa = (a[2] ? a[2] + ' ' : '') + MESC[a[1]-1], fz = (z[2] ? z[2] + ' ' : '') + MESC[z[1]-1] + ' ' + z[0];
   return m.length === 1 ? fz : fa + (a[0] !== z[0] ? ' ' + a[0] : '') + ' – ' + fz; }
-function correrPer(per, n){ if(!per) return ''; return per.split(',').map(x => { const [y, m, d] = x.split('-').map(Number); const t = y*12 + m-1 + n; return Math.floor(t/12) + '-' + String(t%12+1).padStart(2,'0') + (d ? '-' + String(d).padStart(2,'0') : ''); }).join(','); }
+function correrPer(per, n){ if(!per) return ''; if(!per.includes('-')) return String(+per + Math.floor(n/12)); return per.split(',').map(x => { const [y, m, d] = x.split('-').map(Number); const t = y*12 + m-1 + n; return Math.floor(t/12) + '-' + String(t%12+1).padStart(2,'0') + (d ? '-' + String(d).padStart(2,'0') : ''); }).join(','); }
 function perHtml(p, frec, cat){
   if(!esServicio(cat)) return '';
   const n = casillasPer(frec), meses = mesesPer(frec), h = hoy(), base = h.getFullYear()*12 + h.getMonth() - 12;
+  if(!n) return '';
+  if(frec === 'M12'){ const y0 = h.getFullYear(), act = p.periodo && !p.periodo.includes('-') ? p.periodo : String(new Date(p.vence + 'T12:00').getFullYear());
+    return `<label>Periodo facturado (año)</label><select name="perAnio">${[y0-1, y0, y0+1, y0+2].map(y => `<option ${String(y) === act ? 'selected' : ''}>${y}</option>`).join('')}</select>`; }
   const ops = Array.from({length:18}, (_, i) => { const t = base + i; return [Math.floor(t/12) + '-' + String(t%12+1).padStart(2,'0'), MESC[t%12] + ' ' + Math.floor(t/12)]; });
   const ya = p.periodo ? p.periodo.split(',') : []; const v = new Date(p.vence + 'T12:00'); const tv = v.getFullYear()*12 + v.getMonth();
   let filas = '';
@@ -273,6 +283,9 @@ function perHtml(p, frec, cat){
     filas += `<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">${n === 2 ? `<span class="gris chico" style="width:46px">${k ? 'Hasta' : 'Desde'}</span>` : ''}<input name="dia${k}" inputmode="numeric" maxlength="2" placeholder="Día" value="${pa && pa[2] ? +pa[2] : ''}" style="width:70px;flex:none"><select name="per${k}" style="flex:1">${ops.map(o => `<option value="${o[0]}" ${o[0] === quiero ? 'selected' : ''}>${o[1]}</option>`).join('')}</select></div>`; }
   return `<label>Periodo facturado</label>${filas}<p class="gris chico" style="margin:0 4px 6px">El día es opcional, solo para saber de qué fecha a qué fecha cubre el recibo.</p>`;
 }
+function frecUpd(f){ const c = f.cat.value, ant = f.frec.value, l = frecsDe(c);
+  f.frec.innerHTML = l.map(k => `<option value="${k}" ${k === (l.includes(ant) ? ant : 'M1') ? 'selected' : ''}>${FRECS[k].charAt(0).toUpperCase() + FRECS[k].slice(1)}</option>`).join('');
+  const cr = esCredito(c); document.querySelectorAll('#ed .soloCredito').forEach(e => e.style.display = cr ? '' : 'none'); }
 function perUpd(f){ const p = D.pagos.find(x => x.id === +f.dataset.id) || {vence: iso(hoy()), periodo:''}; const cat = f.cat.value || adivinarCat(f.nombre.value);
   document.getElementById('perBox').innerHTML = perHtml(p, f.frec.value, cat);
   const sv = esServicio(cat); document.getElementById('tjBox').style.display = sv ? 'none' : ''; f.numServicio.style.display = sv ? '' : 'none'; }
@@ -298,7 +311,7 @@ function mensual(p){
 function tipo(p){
   if(p.credito || p.cat==='tarjeta') return 'Tarjetas';
   if(p.cat==='renta') return 'Vivienda';
-  if(p.cat==='streaming') return 'Streaming';
+  if(p.cat==='streaming') return 'Suscripciones';
   if(['internet','luz','telefono'].includes(p.cat)) return 'Servicios';
   if(p.cat==='tienda') return 'Tiendas';
   return 'Otros';
@@ -705,17 +718,19 @@ function detalle(id){
   abrirHoja(h);
 }
 function editor(id){
-  const p = id ? D.pagos.find(x => x.id === id) : {nombre:'', monto:'', vence:iso(hoy()), frec:'M1', cat:'', credito:false, tipoCred:'tarjeta', compartido:false, miParte:50};
+  const p = id ? D.pagos.find(x => x.id === id) : {nombre:'', monto:'', vence:iso(hoy()), frec:'M1', cat:window._catNuevo || '', credito:esCredito(window._catNuevo), tipoCred:window._catNuevo === 'tienda' ? 'departamental' : 'tarjeta', compartido:false, miParte:50};
+  let catEd = p.credito ? (p.tipoCred === 'departamental' ? 'tienda' : 'tarjeta') : (p.cat || adivinarCat(p.nombre || '') || 'otro'); if(!p.credito && esCredito(catEd)) catEd = 'otro'; window._catNuevo = '';
   const op = (o, v) => Object.entries(o).map(([k,n]) => `<option value="${k}" ${k===v?'selected':''}>${n}</option>`).join('');
   const cats = {tarjeta:'Tarjeta / banco', renta:'Renta / vivienda', streaming:'Streaming', internet:'Internet', luz:'Luz, agua o gas', telefono:'Teléfono', tienda:'Tienda', grupo:'Tanda o grupo', otro:'Otro'};
   const per = personas().map(x => `<option value="${esc(x.nombre)}">`).join('');
   abrirHoja(`<h1>${id ? 'Editar pago' : 'Nuevo pago'}</h1><form id="ed" data-id="${id || ''}">
     <label>Nombre</label><input name="nombre" required value="${esc(p.nombre)}" placeholder="Ej. Pagar Netflix">
     <div class="dos"><div><label>Monto</label><input name="monto" inputmode="decimal" value="${esc(p.monto)}" placeholder="$0"></div><div><label>Vence</label><input type="date" name="vence" required value="${p.vence}"></div></div>
-    <div class="dos"><div><label>Se repite</label><select name="frec" onchange="perUpd(this.form)">${op(FRECS, p.frec)}</select></div><div><label>Categoría</label><select name="cat" onchange="perUpd(this.form)"><option value="">Automática</option>${op(cats, p.cat)}</select></div></div>
-    <div id="perBox">${perHtml(p, p.frec || 'M1', p.cat || adivinarCat(p.nombre || ''))}</div>
-    <label>¿Es un crédito?</label><select name="credito"><option value="no">No es crédito</option><option value="tarjeta" ${p.credito && p.tipoCred!=='departamental'?'selected':''}>Tarjeta de crédito</option><option value="departamental" ${p.credito && p.tipoCred==='departamental'?'selected':''}>Crédito departamental</option></select>
-    <div class="dos"><div><label>Día de corte</label><input name="diaCorte" inputmode="numeric" value="${p.diaCorte||''}"></div><div><label>Pago mínimo</label><input name="minimo" inputmode="decimal" value="${esc(p.minimo||'')}"></div></div>
+    <label>Tipo de pago</label><select name="cat" onchange="frecUpd(this.form); perUpd(this.form)">${Object.entries(CATS).map(([k, v]) => `<option value="${k}" ${k === catEd ? 'selected' : ''}>${v[0]}  ${v[1]}</option>`).join('')}</select>
+    <label>Se repite</label><select name="frec" onchange="perUpd(this.form)">${frecsDe(catEd).map(k => `<option value="${k}" ${k === (frecsDe(catEd).includes(p.frec) ? p.frec : 'M1') ? 'selected' : ''}>${FRECS[k].charAt(0).toUpperCase() + FRECS[k].slice(1)}</option>`).join('')}</select>
+    <div id="perBox">${perHtml(p, frecsDe(catEd).includes(p.frec) ? p.frec : 'M1', catEd)}</div>
+    <label style="display:none">¿Es un crédito?</label><select name="credito" style="display:none"><option value="no">No es crédito</option><option value="tarjeta" ${p.credito && p.tipoCred!=='departamental'?'selected':''}>Tarjeta de crédito</option><option value="departamental" ${p.credito && p.tipoCred==='departamental'?'selected':''}>Crédito departamental</option></select>
+    <div class="dos soloCredito" style="${esCredito(catEd) ? '' : 'display:none'}"><div><label>Día de corte</label><input name="diaCorte" inputmode="numeric" value="${p.diaCorte||''}"></div><div><label>Pago mínimo</label><input name="minimo" inputmode="decimal" value="${esc(p.minimo||'')}"></div></div>
     ${(() => { const tj = D.pagos.filter(q => q.credito && q.id !== p.id); if(!tj.length) return '';
       return `<label>¿Con qué lo pagas?</label><select name="pagoCon"><option value="0">Efectivo, débito o transferencia</option>${tj.map(q => `<option value="${q.id}" ${p.pagoCon === q.id ? 'selected' : ''}>Tarjeta de crédito: ${esc(sinPrefijo(q.nombre))}${q.creadoPor ? ' (de ' + esc(q.creadoPor) + ')' : ''}</option>`).join('')}</select><p class="gris chico" style="margin:4px 4px 0">Si lo pagas con una tarjeta de crédito, no se suma aparte en tus totales: ya va dentro del pago de esa tarjeta.</p>`; })()}
     <label>Datos para pagar</label><input name="numServicio" value="${esc(p.numServicio||'')}" placeholder="Número de servicio" style="${esServicio(p.cat || adivinarCat(p.nombre||'')) ? '' : 'display:none'}"><div id="tjBox" style="${esServicio(p.cat || adivinarCat(p.nombre||'')) ? 'display:none' : ''}"><input name="numTarjeta" inputmode="numeric" value="" placeholder="${p.tarjetaUlt ? 'Tarjeta: ' + esc(p.tarjetaUlt) + ' (escribe para cambiar)' : 'Número de tarjeta (16 dígitos)'}">
@@ -744,7 +759,7 @@ function editor(id){
       if(Object.keys(cam).length){ enviarSolicitud(x, cam).then(() => aviso('Solicitud enviada a ' + x.creadoPor)).catch(e => alert(e.message)); }
     } else { x.nombre = f.nombre.trim(); x.monto = f.monto.trim(); if(x.vence !== f.vence){ x.vence = f.vence; x.ancla = fecha(f.vence).getDate(); } }
     x.frec = f.frec; x.cat = f.cat || adivinarCat(x.nombre);
-    if(esServicio(x.cat)){ x.numServicio = (f.numServicio||'').trim(); x.periodo = [[f.per0, f.dia0], [f.per1, f.dia1]].filter(z => z[0]).map(([m0, d0]) => { const d = parseInt(d0); return m0 + (d >= 1 && d <= 31 ? '-' + String(d).padStart(2,'0') : ''); }).join(','); f.numTarjeta = ''; f.expira = ''; f.cvv = ''; } else { x.numServicio = ''; x.periodo = ''; } x.credito = f.credito !== 'no'; x.tipoCred = f.credito === 'departamental' ? 'departamental' : 'tarjeta';
+    if(esServicio(x.cat)){ x.numServicio = (f.numServicio||'').trim(); x.periodo = f.perAnio ? f.perAnio : f.frec === 'U' ? '' : [[f.per0, f.dia0], [f.per1, f.dia1]].filter(z => z[0]).map(([m0, d0]) => { const d = parseInt(d0); return m0 + (d >= 1 && d <= 31 ? '-' + String(d).padStart(2,'0') : ''); }).join(','); f.numTarjeta = ''; f.expira = ''; f.cvv = ''; } else { x.numServicio = ''; x.periodo = ''; } x.credito = f.credito !== 'no'; x.tipoCred = f.credito === 'departamental' ? 'departamental' : 'tarjeta';
     x.pagoCon = x.credito ? 0 : (+f.pagoCon || 0);
     x.diaCorte = parseInt(f.diaCorte)||0; x.minimo = f.minimo.trim(); x.compartirDatos = !!f.compartido && !!f.compartirDatos && !x.creadoPor;
     { const nuevoD = {cuenta:f.cuenta.trim(), referencia:f.referencia.trim(), titular:f.titular.trim(), numTarjeta:(f.numTarjeta||'').replace(/\D/g,''), expira:(f.expira||'').trim(), cvv:(f.cvv||'').replace(/\D/g,'')};
@@ -1120,7 +1135,8 @@ document.addEventListener('click', (ev) => {
   switch(a){
     case 'tab': tab = +n; pintar(true); window.scrollTo({top:0}); break;
     case 'detalle': detalle(id); break;
-    case 'nuevo': b.animate([{transform:'rotate(0)'},{transform:'rotate(90deg)'}], {duration:380, easing:'cubic-bezier(.3,0,.15,1)'}); setTimeout(() => editor(null), 220); break;
+    case 'nuevo': b.animate([{transform:'rotate(0)'},{transform:'rotate(90deg)'}], {duration:380, easing:'cubic-bezier(.3,0,.15,1)'}); setTimeout(() => abrirHoja(`<h1>¿Qué quieres agregar?</h1>` + Object.entries(CATS).map(([k, v]) => `<button class="pago" data-act="nuevoTipo" data-n="${k}" style="margin-bottom:8px"><span style="font-size:24px;width:40px;text-align:center">${v[0]}</span><div class="peso nom">${v[1]}</div></button>`).join('') + `<button class="btn borde" data-act="cerrar" style="margin-top:6px">Cancelar</button>`), 220); break;
+    case 'nuevoTipo': window._catNuevo = n; if(navigator.vibrate) navigator.vibrate(20); cerrarHoja(); setTimeout(() => editor(null), 320); break;
     case 'editar': cerrarHoja(); setTimeout(() => editor(id), 320); break;
     case 'cerrar': cerrarHoja(); break;
     case 'borrar': if(confirm('¿Eliminar este pago?')){ const bp = D.pagos.find(p => p.id === id); if(bp) borrarNube(bp); D.pagos = D.pagos.filter(p => p.id !== id); guardar(); cerrarHoja(); pintar(); aviso('Pago eliminado'); } break;
