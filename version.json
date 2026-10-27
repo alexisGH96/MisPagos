@@ -1,6 +1,6 @@
 {
-  "versionCode": 106,
-  "versionName": "12.0",
+  "versionCode": 107,
+  "versionName": "12.1",
   "apk": "MisPagos.apk",
-  "notas": "Lupitas para buscar pagos y tarjetas, historial en Estadísticas, avisos de pagos confirmados y avisos con los colores de la app."
+  "notas": "Elige el tipo al agregar un pago, frecuencias por tipo, bienvenida y tutorial."
 }
