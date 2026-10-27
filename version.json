@@ -1,6 +1,6 @@
 {
-  "versionCode": 113,
-  "versionName": "12.7",
+  "versionCode": 114,
+  "versionName": "12.8",
   "apk": "MisPagos.apk",
-  "notas": "¿Con cuál comprar hoy? con vidrio en Glass y texto más ligero."
+  "notas": "Filas de vidrio en Glass sin fondo blanco. Avisos al actualizar la app."
 }
