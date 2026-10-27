@@ -1,6 +1,6 @@
 {
-  "versionCode": 108,
-  "versionName": "12.2",
+  "versionCode": 109,
+  "versionName": "12.3",
   "apk": "MisPagos.apk",
-  "notas": "Guía para agregar tu primer pago y recorrido por la app. La búsqueda sube arriba del teclado."
+  "notas": "Recorrido con textos formales, Quincenas y Tarjetas, flecha para regresar; lupita en el historial."
 }
