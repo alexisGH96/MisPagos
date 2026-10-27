@@ -1,6 +1,6 @@
 {
-  "versionCode": 104,
-  "versionName": "11.8",
+  "versionCode": 105,
+  "versionName": "11.9",
   "apk": "MisPagos.apk",
-  "notas": "Corrige el cierre al abrir la app."
+  "notas": "Servicios con número de servicio y periodo facturado. Nuevo historial de pagos por mes con buscador."
 }
