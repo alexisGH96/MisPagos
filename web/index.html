@@ -256,18 +256,22 @@ function siguiente(p){
 const MESC = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
 const esServicio = c => ['luz','internet','telefono','streaming'].includes(c);
 const mesesPer = f => f === 'M2' ? 2 : f === 'M3' ? 3 : 1;
+const casillasPer = f => f === 'M2' || f === 'M3' ? 2 : 1;
 function perTexto(per){ if(!per) return ''; const m = per.split(',').map(x => x.split('-').map(Number)); const a = m[0], z = m[m.length-1];
-  return m.length === 1 ? MESC[a[1]-1] + ' ' + a[0] : MESC[a[1]-1] + (a[0] !== z[0] ? ' ' + a[0] : '') + ' – ' + MESC[z[1]-1] + ' ' + z[0]; }
-function correrPer(per, n){ if(!per) return ''; return per.split(',').map(x => { const [y, m] = x.split('-').map(Number); const t = y*12 + m-1 + n; return Math.floor(t/12) + '-' + String(t%12+1).padStart(2,'0'); }).join(','); }
+  const fa = (a[2] ? a[2] + ' ' : '') + MESC[a[1]-1], fz = (z[2] ? z[2] + ' ' : '') + MESC[z[1]-1] + ' ' + z[0];
+  return m.length === 1 ? fz : fa + (a[0] !== z[0] ? ' ' + a[0] : '') + ' – ' + fz; }
+function correrPer(per, n){ if(!per) return ''; return per.split(',').map(x => { const [y, m, d] = x.split('-').map(Number); const t = y*12 + m-1 + n; return Math.floor(t/12) + '-' + String(t%12+1).padStart(2,'0') + (d ? '-' + String(d).padStart(2,'0') : ''); }).join(','); }
 function perHtml(p, frec, cat){
   if(!esServicio(cat)) return '';
-  const n = mesesPer(frec), h = hoy(), base = h.getFullYear()*12 + h.getMonth() - 12;
+  const n = casillasPer(frec), meses = mesesPer(frec), h = hoy(), base = h.getFullYear()*12 + h.getMonth() - 12;
   const ops = Array.from({length:18}, (_, i) => { const t = base + i; return [Math.floor(t/12) + '-' + String(t%12+1).padStart(2,'0'), MESC[t%12] + ' ' + Math.floor(t/12)]; });
-  const ya = p.periodo ? p.periodo.split(',') : []; const v = new Date(p.vence + 'T12:00'); const tv = v.getFullYear()*12 + v.getMonth() + 1;
-  let sel = '';
-  for(let k = 0; k < n; k++){ const quiero = ya.length === n ? ya[k] : Math.floor((tv - n + k - 1)/12) + '-' + String((tv - n + k - 1)%12 + 1).padStart(2,'0');
-    sel += `<select name="per${k}" style="flex:1">${ops.map(o => `<option value="${o[0]}" ${o[0] === quiero ? 'selected' : ''}>${o[1]}</option>`).join('')}</select>`; }
-  return `<label>Periodo facturado ${n > 1 ? '(' + n + ' meses)' : '(mes)'}</label><div style="display:flex;gap:8px">${sel}</div>`;
+  const ya = p.periodo ? p.periodo.split(',') : []; const v = new Date(p.vence + 'T12:00'); const tv = v.getFullYear()*12 + v.getMonth();
+  let filas = '';
+  for(let k = 0; k < n; k++){
+    const pa = ya.length === n ? ya[k].split('-') : null; const sug = k === 0 ? tv - meses : tv - 1;
+    const quiero = pa ? pa[0] + '-' + pa[1] : Math.floor(sug/12) + '-' + String(sug%12 + 1).padStart(2,'0');
+    filas += `<div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">${n === 2 ? `<span class="gris chico" style="width:46px">${k ? 'Hasta' : 'Desde'}</span>` : ''}<input name="dia${k}" inputmode="numeric" maxlength="2" placeholder="Día" value="${pa && pa[2] ? +pa[2] : ''}" style="width:70px;flex:none"><select name="per${k}" style="flex:1">${ops.map(o => `<option value="${o[0]}" ${o[0] === quiero ? 'selected' : ''}>${o[1]}</option>`).join('')}</select></div>`; }
+  return `<label>Periodo facturado</label>${filas}<p class="gris chico" style="margin:0 4px 6px">El día es opcional, solo para saber de qué fecha a qué fecha cubre el recibo.</p>`;
 }
 function perUpd(f){ const p = D.pagos.find(x => x.id === +f.dataset.id) || {vence: iso(hoy()), periodo:''}; const cat = f.cat.value || adivinarCat(f.nombre.value);
   document.getElementById('perBox').innerHTML = perHtml(p, f.frec.value, cat);
@@ -402,6 +406,34 @@ function pantallaAvisos(){
   (D.historial || []).forEach(a => a.leido = true); guardar();
   return h;
 }
+const LUPA = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></svg>';
+const coincide = (n, q) => !q || n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').includes(q.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim());
+function listaRegistro(){
+  const lt = ordenados().filter(p => (filtroPagos === 1 ? !p.compartido : filtroPagos === 2 ? p.compartido : true) && coincide(p.nombre, window._bn));
+  return filtroPagos !== 2 ? lt.map(tarjetaPago).join('') : [['Te compartieron', lt.filter(p => p.creadoPor)], ['Tú compartiste', lt.filter(p => !p.creadoPor)]].filter(x => x[1].length).map(([t0, l0]) => `<div class="gris b chico" style="margin:6px 6px 8px">${t0}</div>` + l0.map(tarjetaPago).join('')).join('');
+}
+function historialHtml(){
+  const MESL = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const meses = [...new Set(D.pagos.flatMap(p => (p.hist||[]).filter(o => o.f).map(o => o.f.slice(0,7))))].sort().reverse();
+  return `<h2>Historial de pagos</h2><input id="bh" placeholder="Buscar: luz, octubre 2026…" value="${esc(window._bh||'')}" oninput="window._bh=this.value; document.getElementById('listaH').innerHTML = listaHist()" style="margin-bottom:10px">
+    <select id="mh" onchange="window._mh=this.value; document.getElementById('listaH').innerHTML = listaHist()" style="margin-bottom:12px"><option value="">Todos los meses</option>${meses.map(m => { const [y, mm] = m.split('-'); const t0 = MESL[+mm-1]; return `<option value="${m}" ${window._mh === m ? 'selected' : ''}>${t0.charAt(0).toUpperCase() + t0.slice(1)} ${y}</option>`; }).join('')}</select>
+    <div id="listaH">${listaHist()}</div>`;
+}
+function listaHist(){
+  const regs = []; D.pagos.forEach(p => (p.hist||[]).forEach(o => o.f && regs.push({p, f:o.f, v:o.v, m:num(o.m), per:o.per||''})));
+  regs.sort((a, b) => a.f < b.f ? 1 : -1);
+  const MESL = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const q = (window._bh || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
+  let h = '', mesAnt = '', n = 0;
+  regs.forEach(r => { if(window._mh && r.f.slice(0,7) !== window._mh) return;
+    const d = new Date(r.f + 'T12:00'); const mes = MESL[d.getMonth()] + ' ' + d.getFullYear(); const pt = perTexto(r.per);
+    const todo = (r.p.nombre + ' ' + mes + ' ' + pt + ' ' + MESC[d.getMonth()]).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    if(q && !q.split(/\s+/).every(w => todo.includes(w))) return;
+    if(mes !== mesAnt){ h += `<div class="b" style="margin:${n ? 12 : 0}px 6px 8px">${mes.charAt(0).toUpperCase() + mes.slice(1)}</div>`; mesAnt = mes; }
+    h += `<button class="pago est-ver" data-act="detalle" data-id="${r.p.id}">${icono(r.p)}<div class="peso"><div class="nom">${esc(r.p.nombre)}</div><div class="gris chico">Pagado el ${corto(r.f)} · vencía ${corto(r.v)}${pt ? '<br>Periodo ' + pt : ''}</div></div><div class="der">${r.m ? `<span class="b">${dinero(r.m)}</span>` : ''}</div></button>`; n++; });
+  if(!n) h += `<p class="gris">${regs.length ? 'No encontré pagos con eso.' : 'Aún no hay pagos registrados.'}</p>`;
+  return h;
+}
 function pantallaHistorial(){
   const regs = []; D.pagos.forEach(p => (p.hist||[]).forEach(o => o.f && regs.push({p, f:o.f, v:o.v, m:num(o.m), per:o.per||''})));
   regs.sort((a, b) => a.f < b.f ? 1 : -1);
@@ -439,9 +471,9 @@ function inicio(){
   h += `<div class="sec"><h2>Próximos</h2><button class="pildora" data-act="tab" data-n="1">Ver todos ›</button></div><div class="prox">`;
   prox.forEach(p => { h += `<button class="pc" data-act="detalle" data-id="${p.id}"><div class="fila">${icono(p)}<div class="peso"><div class="b">${p.monto ? dinero(num(p.monto)) : ''}</div><div class="gris chico">${dias(p.vence) <= 0 ? 'hoy' : dias(p.vence) === 1 ? 'mañana' : 'en ' + dias(p.vence) + ' días'}</div></div>${anillo(p,36)}</div><div class="b" style="margin-top:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sinPrefijo(p.nombre))}</div><div class="gris chico">Vence ${corto(p.vence)}</div></button>`; });
   const lt = ordenados().filter(p => filtroPagos === 1 ? !p.compartido : filtroPagos === 2 ? p.compartido : true);
-  const listaHtml = filtroPagos !== 2 ? lt.map(tarjetaPago).join('') : [['Te compartieron', lt.filter(p => p.creadoPor)], ['Tú compartiste', lt.filter(p => !p.creadoPor)]].filter(x => x[1].length).map(([t0, l0]) => `<div class="gris b chico" style="margin:6px 6px 8px">${t0}</div>` + l0.map(tarjetaPago).join('')).join('');
-  h += `</div><div class="fila" style="justify-content:space-between;align-items:center"><h2>Registro de pagos</h2><button class="pildora" data-act="historial" data-n="1">Historial ›</button></div><div class="seg" id="segPagos">${['Todos','Propios','Compartidos'].map((x,i) => `<button class="${filtroPagos===i?'sel':''}" data-act="filtroPagos" data-n="${i}">${x}</button>`).join('')}</div><div id="listaPagos">`
-    + (lt.length ? listaHtml : `<p class="gris">${filtroPagos === 2 ? 'No tienes pagos compartidos.' : 'Todos tus pagos son compartidos.'}</p>`) + `</div>`;
+  const listaHtml = listaRegistro();
+  h += `</div><div class="fila" style="justify-content:space-between;align-items:center"><h2>Registro de pagos</h2><button class="mas lupa" data-act="lupa" data-n="bn" aria-label="Buscar">${LUPA}</button></div><input id="bn" class="buscar" placeholder="Buscar por nombre…" value="${esc(window._bn||'')}" oninput="window._bn=this.value; document.getElementById('listaPagos').innerHTML = listaRegistro()" style="margin-bottom:12px;${window._bnA ? '' : 'display:none'}"><div class="seg" id="segPagos">${['Todos','Propios','Compartidos'].map((x,i) => `<button class="${filtroPagos===i?'sel':''}" data-act="filtroPagos" data-n="${i}">${x}</button>`).join('')}</div><div id="listaPagos">`
+    + (lt.length || window._bn ? listaHtml : `<p class="gris">${filtroPagos === 2 ? 'No tienes pagos compartidos.' : 'Todos tus pagos son compartidos.'}</p>`) + `</div>`;
   return h;
 }
 function calendario(){
@@ -473,13 +505,18 @@ function quincenaActual(){
   return [new Date(y, m, q+1), new Date(y, m, fin)];
 }
 function carteraV(){
-  let h = `<h1>Tarjetas</h1>`;
+  let h = `<div class="fila" style="justify-content:space-between;align-items:center"><h1 style="margin:0">Tarjetas</h1><button class="mas lupa" data-act="lupa" data-n="bt" aria-label="Buscar">${LUPA}</button></div><input id="bt" class="buscar" placeholder="Buscar por nombre…" value="${esc(window._bt||'')}" oninput="window._bt=this.value; document.getElementById('listaTj').innerHTML = tarjetasLista()" style="margin:12px 0;${window._btA ? '' : 'display:none'}"><div id="listaTj">`;
+  return h + tarjetasLista() + '</div>';
+}
+function tarjetasLista(){
+  let h = '';
   {
-    const cs = D.pagos.filter(p => p.credito);
+    const buscando = !!(window._bt || '').trim();
+    const cs = D.pagos.filter(p => p.credito && coincide(p.nombre, window._bt));
     const corteDe = (dia, desde) => { let d = new Date(desde.getFullYear(), desde.getMonth(), 1); for(let k = 0; k < 3; k++){ const m = new Date(d.getFullYear(), d.getMonth() + k, 1); const f = new Date(m.getFullYear(), m.getMonth(), Math.min(dia, new Date(m.getFullYear(), m.getMonth()+1, 0).getDate())); if(f >= desde) return f; } };
     const h0 = hoy(), conC = cs.filter(p => p.diaCorte > 0).map(p => { const sig = corteDe(p.diaCorte, new Date(h0.getTime() + DIA)); return {p, faltan: Math.round((sig - h0)/DIA), sig}; }).sort((a,b) => b.faltan - a.faltan);
-    if(conC.length) h += `<div class="caja" style="margin-bottom:16px"><div class="b" style="font-size:17px">¿Con cuál comprar hoy?</div><div class="gris chico" style="margin:4px 0 8px">Usa la que ya hizo corte: lo que compres entra hasta el siguiente estado de cuenta y tienes más días para pagar sin intereses.</div>${conC.map((z,i) => `<div class="fila" style="padding:8px 0;cursor:pointer" data-act="irTarjeta" data-id="${z.p.id}"><span class="punto" style="width:24px;height:24px;display:grid;place-items:center;color:#fff;font-weight:800;background:${z.faltan >= 15 ? 'var(--r-ver)' : z.faltan <= 5 ? 'var(--r-roj)' : 'var(--r-ama)'}">${z.faltan >= 15 ? '✓' : z.faltan <= 5 ? '!' : '•'}</span><div class="peso"><div class="b">${esc(sinPrefijo(z.p.nombre))}${i === 0 ? ' · la mejor hoy' : ''}</div><div class="gris chico">${z.faltan >= 15 ? 'Ya hizo corte. Corta otra vez el ' + z.sig.getDate() + ' ' + MESES[z.sig.getMonth()] + '.' : 'Corta en ' + z.faltan + (z.faltan === 1 ? ' día' : ' días') + ': mejor espera o usa otra.'}</div></div></div>`).join('')}</div>`;
-    if(!cs.length) return h + `<div class="vacio">Aquí aparecen tus tarjetas de crédito y créditos departamentales. Para agregar uno, abre un pago, toca editar y elige el tipo de crédito.</div>`;
+    if(conC.length && !buscando) h += `<div class="caja" style="margin-bottom:16px"><div class="b" style="font-size:17px">¿Con cuál comprar hoy?</div><div class="gris chico" style="margin:4px 0 8px">Usa la que ya hizo corte: lo que compres entra hasta el siguiente estado de cuenta y tienes más días para pagar sin intereses.</div>${conC.map((z,i) => `<div class="fila" style="padding:8px 0;cursor:pointer" data-act="irTarjeta" data-id="${z.p.id}"><span class="punto" style="width:24px;height:24px;display:grid;place-items:center;color:#fff;font-weight:800;background:${z.faltan >= 15 ? 'var(--r-ver)' : z.faltan <= 5 ? 'var(--r-roj)' : 'var(--r-ama)'}">${z.faltan >= 15 ? '✓' : z.faltan <= 5 ? '!' : '•'}</span><div class="peso"><div class="b">${esc(sinPrefijo(z.p.nombre))}${i === 0 ? ' · la mejor hoy' : ''}</div><div class="gris chico">${z.faltan >= 15 ? 'Ya hizo corte. Corta otra vez el ' + z.sig.getDate() + ' ' + MESES[z.sig.getMonth()] + '.' : 'Corta en ' + z.faltan + (z.faltan === 1 ? ' día' : ' días') + ': mejor espera o usa otra.'}</div></div></div>`).join('')}</div>`;
+    if(!cs.length) return buscando ? '' : h + `<div class="vacio">Aquí aparecen tus tarjetas de crédito y créditos departamentales. Para agregar uno, abre un pago, toca editar y elige el tipo de crédito.</div>`;
     return h + cs.map(p => `<button class="pago est-${estado(p)}" id="tj-${p.id}" style="display:block" data-act="detalle" data-id="${p.id}"><div class="fila">${icono(p)}<div class="peso"><div class="nom">${esc(sinPrefijo(p.nombre))}</div><div class="gris chico" style="text-align:right">${p.tipoCred==='departamental'?'Crédito departamental':'Tarjeta de crédito'}${p.creadoPor ? '<br>Compartida por ' + esc(p.creadoPor) : ''}</div></div></div>
       <div class="dos" style="margin-top:12px"><div><div class="gris chico">Corte</div><div class="b">${p.diaCorte ? 'día ' + p.diaCorte : '—'}</div></div><div><div class="gris chico">Límite de pago</div><div class="b">${corto(p.vence)}</div></div>
       <div><div class="gris chico">Sin intereses</div><div class="b">${p.monto ? dinero(num(p.monto)) : '—'}</div></div><div><div class="gris chico">Mínimo</div><div class="b">${p.minimo ? dinero(num(p.minimo)) : '—'}</div></div></div></button>`).join('');
@@ -546,10 +583,10 @@ function estadisticas(){
   const sum = tipos.map(t => D.pagos.filter(p => tipo(p) === t).reduce((s,p) => s + mensual(p), 0));
   const tot = sum.reduce((a,b)=>a+b,0);
   h += `<h2>Por tipo (al mes)</h2>`;
-  if(!tot) return h + `<div class="vacio">Agrega montos a tus pagos para ver la gráfica.</div>`;
+  if(!tot) return h + `<div class="vacio">Agrega montos a tus pagos para ver la gráfica.</div>` + historialHtml();
   h += `<div class="caja">${pastel(sum, cols, tot)}<div class="leyenda">`;
   tipos.forEach((t,i) => { if(sum[i] > 0) h += `<div class="f"><span class="punto" style="background:${cols[i]}"></span><span class="peso">${t}</span><span class="gris chico" style="width:52px;text-align:right">${Math.round(sum[i]/tot*100)} %</span><span class="b" style="width:92px;text-align:right">${dinero(Math.round(sum[i]))}</span></div>`; });
-  return h + `</div></div>`;
+  return h + `</div></div>` + historialHtml();
 }
 function ahorros(){
   if(!(D.ingreso > 0)) return `<div class="caja est-azu"><div class="b" style="font-size:18px">Calcula cuánto puedes ahorrar</div><p class="gris">Dime cuánto ganas y cuánto gastas aparte de tus pagos (comida, transporte…). Con tus pagos te sugiero cuánto ahorrar cada quincena.</p><button class="btn lleno" data-act="presupuesto">Poner ingresos y gastos</button></div>`;
@@ -707,7 +744,7 @@ function editor(id){
       if(Object.keys(cam).length){ enviarSolicitud(x, cam).then(() => aviso('Solicitud enviada a ' + x.creadoPor)).catch(e => alert(e.message)); }
     } else { x.nombre = f.nombre.trim(); x.monto = f.monto.trim(); if(x.vence !== f.vence){ x.vence = f.vence; x.ancla = fecha(f.vence).getDate(); } }
     x.frec = f.frec; x.cat = f.cat || adivinarCat(x.nombre);
-    if(esServicio(x.cat)){ x.numServicio = (f.numServicio||'').trim(); x.periodo = [f.per0, f.per1, f.per2].filter(Boolean).join(','); f.numTarjeta = ''; f.expira = ''; f.cvv = ''; } else { x.numServicio = ''; x.periodo = ''; } x.credito = f.credito !== 'no'; x.tipoCred = f.credito === 'departamental' ? 'departamental' : 'tarjeta';
+    if(esServicio(x.cat)){ x.numServicio = (f.numServicio||'').trim(); x.periodo = [[f.per0, f.dia0], [f.per1, f.dia1]].filter(z => z[0]).map(([m0, d0]) => { const d = parseInt(d0); return m0 + (d >= 1 && d <= 31 ? '-' + String(d).padStart(2,'0') : ''); }).join(','); f.numTarjeta = ''; f.expira = ''; f.cvv = ''; } else { x.numServicio = ''; x.periodo = ''; } x.credito = f.credito !== 'no'; x.tipoCred = f.credito === 'departamental' ? 'departamental' : 'tarjeta';
     x.pagoCon = x.credito ? 0 : (+f.pagoCon || 0);
     x.diaCorte = parseInt(f.diaCorte)||0; x.minimo = f.minimo.trim(); x.compartirDatos = !!f.compartido && !!f.compartirDatos && !x.creadoPor;
     { const nuevoD = {cuenta:f.cuenta.trim(), referencia:f.referencia.trim(), titular:f.titular.trim(), numTarjeta:(f.numTarjeta||'').replace(/\D/g,''), expira:(f.expira||'').trim(), cvv:(f.cvv||'').replace(/\D/g,'')};
@@ -1091,7 +1128,8 @@ document.addEventListener('click', (ev) => {
       const p = D.pagos.find(x => x.id === id);
       if(!b.dataset.ok){ if(!p.pagado) b.innerHTML = 'Pagado <span class="verde">✓</span>'; if(navigator.vibrate) navigator.vibrate(25);
         b.dataset.ok = 1; b.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}], {duration:380, easing:'cubic-bezier(.3,0,.15,1)'}).onfinish = () => b.click(); break; }
-      if(!p.pagado){ p.pagado = true; (p.hist = p.hist||[]).push({f:iso(hoy()), v:p.vence, m:p.monto, per:p.periodo||''}); aviso('✓ Marcado como pagado'); }
+      if(!p.pagado){ p.pagado = true; (p.hist = p.hist||[]).push({f:iso(hoy()), v:p.vence, m:p.monto, per:p.periodo||''}); aviso('✓ Marcado como pagado');
+        (D.historial = D.historial || []).push({t:Date.now(), tx:'✅ Pagaste ' + p.nombre + (p.monto ? ' · ' + dinero(num(p.monto)) : '') + ' — marcado como pagado el ' + new Date().toLocaleString('es-MX', {day:'numeric', month:'long', year:'numeric', hour:'numeric', minute:'2-digit'}) + (p.periodo ? ' · periodo ' + perTexto(p.periodo) : ''), leido:true}); }
       else { p.pagado = false; if(p.hist && p.hist.length && p.hist[p.hist.length-1].v === p.vence) p.hist.pop(); aviso('Marcado como pendiente'); }
       guardar(); pintar(); detalle(id); break; }
     case 'copiarSrv': navigator.clipboard && navigator.clipboard.writeText(b.dataset.t).then(() => aviso('✓ Número de servicio copiado')); break;
@@ -1140,6 +1178,13 @@ document.addEventListener('click', (ev) => {
       tarea(async () => { await sincronizar(); return p.compartirDatos ? 'Listo: se enviaron los cambios y los datos para pagar.' : 'Listo: se enviaron los cambios. (Para enviar los datos de la tarjeta, activa "Permitir que vea y copie los datos para pagar" al editar.)'; }); break; }
     case 'calSeg': deslizar(b, () => { calSeg = +n; pintar(); }); break;
     case 'irTarjeta': { const el = document.getElementById('tj-' + b.dataset.id); if(el){ el.scrollIntoView({behavior:'smooth', block:'center'}); setTimeout(() => el.animate([{transform:'scale(1)'},{transform:'scale(1.03)'},{transform:'scale(1)'}], {duration:520, easing:'cubic-bezier(.3,0,.15,1)'}), 600); } break; }
+    case 'lupa': { const inp = document.getElementById(n); if(!inp) break; if(navigator.vibrate) navigator.vibrate(20);
+      b.animate([{transform:'scale(1)'},{transform:'scale(.86)'},{transform:'scale(1)'}], {duration:280});
+      const abrir = inp.style.display === 'none';
+      if(n === 'bn') window._bnA = abrir; else window._btA = abrir;
+      if(abrir){ inp.style.display = ''; inp.animate([{opacity:0, transform:'translateY(-12px)'},{opacity:1, transform:'none'}], {duration:260, easing:'cubic-bezier(.3,0,.15,1)'}); inp.focus(); }
+      else { inp.animate([{opacity:1},{opacity:0, transform:'translateY(-12px)'}], {duration:180}).onfinish = () => { inp.style.display = 'none'; if(inp.value){ inp.value = ''; inp.dispatchEvent(new Event('input')); } }; }
+      break; }
     case 'historial': { const d = +n ? 1 : -1; if(navigator.vibrate) navigator.vibrate(20);
       window._verHist = !!+n; pintar(); window.scrollTo(0,0); const ap = document.getElementById('app'); if(ap) ap.animate([{transform:`translateX(${d*25}%)`, opacity:0},{transform:'none', opacity:1}], {duration:420, easing:'cubic-bezier(.3,0,.15,1)'}); break; }
     case 'avisos': { const d = +n ? 1 : -1;
