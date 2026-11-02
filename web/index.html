@@ -1418,10 +1418,10 @@ document.addEventListener('click', (ev) => {
     case 'copiarSrv': navigator.clipboard && navigator.clipboard.writeText(b.dataset.t).then(() => aviso('✓ Número de servicio copiado')); break;
     case 'copiar': navigator.clipboard && navigator.clipboard.writeText(b.dataset.t).then(() => aviso('✓ Copiado')); break;
     case 'verDato': case 'copiarDato': {
-      if(!confirm(act === 'verDato' ? '¿Mostrar el dato completo?' : '¿Copiar el dato completo?')) break;
+      if(!confirm(a === 'verDato' ? '¿Mostrar el dato completo?' : '¿Copiar el dato completo?')) break;
       Boveda.leer(+b.dataset.id).then(o => { const v = o[b.dataset.k] || '';
         if(!v){ aviso(o._error ? 'Este dato no se puede leer en este celular. Vuelve a capturarlo con ✎ Editar.' : 'Este dato está vacío. Captúralo con ✎ Editar.'); return; }
-        if(act === 'verDato'){ const el = document.getElementById('dv-' + b.dataset.k); if(el){ const antes = el.textContent; el.textContent = v; setTimeout(() => { el.textContent = antes; }, 30000); } }
+        if(a === 'verDato'){ const el = document.getElementById('dv-' + b.dataset.k); if(el){ const antes = el.textContent; el.textContent = v; setTimeout(() => { el.textContent = antes; }, 30000); } }
         else navigator.clipboard.writeText(v.replace(/\s/g,'')).then(() => { aviso('✓ Copiado (se borra en 1 min)'); setTimeout(() => navigator.clipboard.writeText('').catch(() => {}), 60000); }); }); break; }
     case 'mes': { const d = +n;
       const resto = () => { const sg = document.querySelector('#app .seg'); const r = []; let m = sg ? sg.nextElementSibling : document.querySelector('#app').firstElementChild; while(m){ r.push(m); m = m.nextElementSibling; } return r; };
