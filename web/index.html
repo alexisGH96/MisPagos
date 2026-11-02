@@ -619,7 +619,7 @@ function historialHtml(){
     <div id="chipCat">${chipCatHtml()}</div><div id="listaH">${listaHist()}</div>`;
 }
 function listaHist(){
-  const regs = []; D.pagos.forEach(p => (p.hist||[]).forEach(o => o.f && regs.push({p, f:o.f, v:o.v, m:num(o.m), per:o.per||''})));
+  const regs = []; D.pagos.forEach(p => (p.hist||[]).forEach(o => o.f && regs.push({p, f:o.f, v:o.v, m:parteH(p, o.m), per:o.per||''})));
   regs.sort((a, b) => a.f < b.f ? 1 : -1);
   const MESL = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const q = (window._bh || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
@@ -634,7 +634,7 @@ function listaHist(){
   return h;
 }
 function pantallaHistorial(){
-  const regs = []; D.pagos.forEach(p => (p.hist||[]).forEach(o => o.f && regs.push({p, f:o.f, v:o.v, m:num(o.m), per:o.per||''})));
+  const regs = []; D.pagos.forEach(p => (p.hist||[]).forEach(o => o.f && regs.push({p, f:o.f, v:o.v, m:parteH(p, o.m), per:o.per||''})));
   regs.sort((a, b) => a.f < b.f ? 1 : -1);
   const MESL = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const q = (window._bh || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
@@ -707,17 +707,21 @@ function quincenaActual(){
   return [new Date(y, m, q+1), new Date(y, m, fin)];
 }
 function carteraV(){
-  let h = `<div class="fila" style="justify-content:space-between;align-items:center"><h1 style="margin:0;font-size:28px;text-align:left">Tarjetas</h1><button class="mas lupa" data-act="lupa" data-n="bt" aria-label="Buscar">${LUPA}</button></div><input id="bt" class="buscar" placeholder="Buscar por nombre…" value="${esc(window._bt||'')}" oninput="window._bt=this.value; document.getElementById('listaTj').innerHTML = tarjetasLista()" style="font-size:16px;margin:12px 0;${window._btA ? '' : 'display:none'}"><div id="listaTj">`;
-  return h + tarjetasLista() + '</div>';
+  const fc = window._fc || 0;
+  let h = `<h1 style="margin:0 0 12px;font-size:28px;text-align:left">Tarjetas</h1>${tarjetasLista('compra')}`;
+  h += `<div class="fila" style="justify-content:space-between;align-items:center"><h2>Cartera</h2><button class="mas lupa" data-act="lupa" data-n="bt" aria-label="Buscar">${LUPA}</button></div><input id="bt" class="buscar" placeholder="Buscar por nombre…" value="${esc(window._bt||'')}" oninput="window._bt=this.value; document.getElementById('listaTj').innerHTML = tarjetasLista('lista')" style="font-size:16px;margin-bottom:12px;${window._btA ? '' : 'display:none'}">
+    <div class="seg" id="segTj">${['Todas','Propias','Compartidas'].map((x,i) => `<button class="${fc===i?'sel':''}" data-act="filtroTj" data-n="${i}">${x}</button>`).join('')}</div><div id="listaTj">`;
+  return h + tarjetasLista('lista') + '</div>';
 }
-function tarjetasLista(){
+function tarjetasLista(parte){
   let h = '';
   {
-    const buscando = !!(window._bt || '').trim();
-    const cs = D.pagos.filter(p => p.credito && coincide(p.nombre, window._bt));
+    const buscando = !!(window._bt || '').trim(), fc = window._fc || 0;
+    const cs = parte === 'compra' ? D.pagos.filter(p => p.credito) : D.pagos.filter(p => p.credito && coincide(p.nombre, window._bt) && (fc === 0 || (fc === 1) === !(p.creadoPor || p.compartido)));
     const corteDe = (dia, desde) => { let d = new Date(desde.getFullYear(), desde.getMonth(), 1); for(let k = 0; k < 3; k++){ const m = new Date(d.getFullYear(), d.getMonth() + k, 1); const f = new Date(m.getFullYear(), m.getMonth(), Math.min(dia, new Date(m.getFullYear(), m.getMonth()+1, 0).getDate())); if(f >= desde) return f; } };
     const h0 = hoy(), conC = cs.filter(p => p.diaCorte > 0).map(p => { const sig = corteDe(p.diaCorte, new Date(h0.getTime() + DIA)); return {p, faltan: Math.round((sig - h0)/DIA), sig}; }).sort((a,b) => b.faltan - a.faltan);
-    if(conC.length && !buscando){
+    if(parte === 'lista') { /* la lista va aparte, debajo de "Cartera" */ }
+    else if(conC.length){
       const CART = '<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3.5" y="6" width="17" height="12.5" rx="3"/><rect x="13.5" y="10" width="7" height="4.5" rx="1.5"/></svg>';
       const CALI = c => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>`;
       h += `<div class="caja" style="margin-bottom:16px;padding:12px 10px 6px"><div class="fila" style="align-items:center;gap:12px;padding:0 4px 10px"><span class="tjIcono" style="width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none">${CART.replace('width="30" height="30"','width="22" height="22"')}</span><div class="peso"><div class="b" style="font-size:16px">¿Con cuál comprar hoy?</div><div class="gris" style="font-size:11px;margin-top:2px">Usa la que ya hizo corte para pagar sin intereses.</div></div></div>`
@@ -733,8 +737,10 @@ function tarjetasLista(){
             <span class="gris" style="font-size:20px;padding:0 2px 2px 4px">›</span></button>`; }).join('') + `</div>`;
     }
     if(!cs.length) return buscando ? '' : h + `<div class="vacio">Aquí aparecen tus tarjetas de crédito y créditos departamentales. Para agregar uno, abre un pago, toca editar y elige el tipo de crédito.</div>`;
+    if(parte === 'compra') return h;
+    if(!cs.length) return `<p class="gris">${buscando ? 'No encontré tarjetas con ese nombre.' : fc === 1 ? 'No tienes tarjetas propias.' : fc === 2 ? 'No tienes tarjetas compartidas.' : 'Aún no tienes tarjetas.'}</p>`;
     return h + cs.map(p => `<button class="pago est-${estado(p)}" id="tj-${p.id}" style="display:block" data-act="detalle" data-id="${p.id}"><div class="fila">${icono(p)}<div class="peso"><div class="nom">${esc(sinPrefijo(p.nombre))}</div><div class="gris chico" style="text-align:right">${p.tipoCred==='departamental'?'Crédito departamental':'Tarjeta de crédito'}${p.creadoPor ? '<br>Compartida por ' + esc(p.creadoPor) : ''}</div></div></div>
-      <div class="dos" style="margin-top:12px"><div><div class="gris chico">Corte</div><div class="b">${p.diaCorte ? 'día ' + p.diaCorte : '—'}</div></div><div><div class="gris chico">Límite de pago</div><div class="b">${corto(p.vence)}</div></div>
+      <div class="dos" style="margin-top:12px"><div><div class="gris chico">Corte</div><div class="b">${p.diaCorte ? 'Día ' + p.diaCorte : '—'}</div></div><div><div class="gris chico">Límite de pago</div><div class="b">${corto(p.vence)}</div></div>
       <div><div class="gris chico">Sin intereses</div><div class="b">${p.monto ? dinero(num(p.monto)) : '—'}</div></div><div><div class="gris chico">Mínimo</div><div class="b">${p.minimo ? dinero(num(p.minimo)) : '—'}</div></div></div></button>`).join('');
   }
 }
@@ -783,6 +789,8 @@ function pastel(vals, cols, total, centro, sub){
   h += `<text x="${cx}" y="${cy+2}" text-anchor="middle" font-size="19" font-weight="800" fill="var(--fg)">${centro || dinero(Math.round(total))}</text><text x="${cx}" y="${cy+20}" text-anchor="middle" font-size="11" fill="var(--gr)">${sub || 'al mes'}</text>`;
   return `<svg class="pastel" viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Gráfica de pastel">${h}</svg>`;
 }
+/* lo que te toca de un registro del historial (en compartidos, solo tu parte) */
+function parteH(p, m){ m = num(m); return p.compartido && num(p.monto) ? Math.round(m * miParteMonto(p) / num(p.monto) * 100) / 100 : m; }
 function estadisticas(){
   let h = `<div class="seg"><button class="${estad===0?'sel':''}" data-act="estad" data-n="0">Estadísticas</button><button class="${estad===1?'sel':''}" data-act="estad" data-n="1">Ahorros</button></div>`;
   if(estad === 1) return h + ahorros();
@@ -791,7 +799,7 @@ function estadisticas(){
   // barras de los últimos 6 meses (lo pagado)
   const h0 = hoy(), meses = [];
   for(let k = 5; k >= 0; k--){ const d = new Date(h0.getFullYear(), h0.getMonth()-k, 1); meses.push({y:d.getFullYear(), m:d.getMonth(), v:0}); }
-  D.pagos.forEach(p => (p.hist||[]).forEach(r => { const f = fecha(r.f); const x = meses.find(z => z.y === f.getFullYear() && z.m === f.getMonth()); if(x) x.v += num(r.m); }));
+  D.pagos.forEach(p => (p.hist||[]).forEach(r => { const f = fecha(r.f); const x = meses.find(z => z.y === f.getFullYear() && z.m === f.getMonth()); if(x) x.v += parteH(p, r.m); }));
   const mx = Math.max(1, ...meses.map(z => z.v));
   h += `<div class="caja"><div class="fila"><span class="b peso">Pagado por mes</span><span class="gris chico">${h0.getFullYear()}</span></div><div class="barras" style="display:flex;align-items:flex-end;gap:10px;height:150px;margin-top:14px">`;
   meses.forEach((z,i) => { const act = i === 5; h += `<div style="flex:1;text-align:center"><div class="gris" style="font-size:10px;height:14px">${z.v ? '$' + (z.v >= 1000 ? (z.v/1000).toFixed(1) + 'k' : Math.round(z.v)) : ''}</div><div class="b" style="animation-delay:${i*60}ms;height:${Math.max(4, z.v/mx*110)}px;border-radius:10px;background:${act ? 'var(--r-nar)' : 'var(--fg)'};opacity:${z.v ? 1 : .15};margin:0 auto;width:60%"></div><div class="${act ? 'b' : 'gris'} chico" style="margin-top:6px">${MESES[z.m]}</div></div>`; });
@@ -888,7 +896,7 @@ function ajustes(){
     <div class="gris" style="text-align:center;margin:4px 0">${correo ? esc(correo) : 'Sin cuenta'} · ${D.pagos.length} ${D.pagos.length === 1 ? 'pago' : 'pagos'}</div>
     ${grupo('Datos personales', [['Nombre', esc(D.nombre || 'Agregar'), 'nombre'], ['Correo', correo ? esc(correo) : 'Sin cuenta', 'cuenta'], ['Teléfono', esc(D.miTel || 'Agregar'), 'tel'], ['Días de pago', ({15:'Día 15 y fin de mes', 14:'Día 14 y fin de mes', 10:'Día 10 y día 25'})[D.quincena||15] || ('Día ' + D.quincena + ' y fin de mes'), 'quincena'], ['Ingreso', D.ingreso > 0 ? dinero(Math.round(D.ingreso)) + ' al mes' : 'Agregar', 'presupuesto']])}
     ${grupo('Avisos', [['Avisos de pagos en este celular', D.avisos ? 'Activados' : 'Activar', 'avisos']])}
-    ${grupo('Cuenta y personas', [['Cuenta y pagos compartidos', correo ? (D.nube.verif ? 'Conectada' : 'Sin verificar') : 'Sin cuenta', 'cuenta'], ['Personas con las que pagas', personas().length + ' personas', 'personas'], ['Entrar con contraseña', D.bloqueo && D.bloqueo.hash ? (D.bloqueo.cred ? 'Face ID y contraseña' : 'Contraseña') : 'Apagado', 'bloqueo']])}
+    ${grupo('Cuenta y seguridad', [['Cuenta y pagos compartidos', correo ? (D.nube.verif ? 'Conectada' : 'Sin verificar') : 'Sin cuenta', 'cuenta'], ['Personas con las que pagas', personas().length + ' personas', 'personas'], ['Entrar con contraseña', D.bloqueo && D.bloqueo.hash ? (D.bloqueo.cred ? 'Face ID y contraseña' : 'Contraseña') : 'Apagado', 'bloqueo']])}
     <div class="gris chico b" style="margin:22px 8px 8px">Apariencia y diseño</div><div class="caja" style="padding-bottom:4px">${[temas.slice(0,3), temas.slice(3)].map((fila,f) => `<div class="seg" style="margin:${f ? '8px' : '0'} 0 0">${fila.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div>`).join('')}<p class="gris chico" style="margin-bottom:12px">Glass sigue al sistema (de noche es oscuro). Glass blanco es blanco con toques de color.</p>
       ${(() => { const f = (n, extra, act) => `<button class="dato" style="width:100%;padding:14px 0;border-top:1px solid var(--line)" data-act="${act}"><span style="text-align:left;flex:1">${n}</span><span class="gris" style="max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${extra} ›</span></button>`;
         return f('Diseño de tarjeta principal', listaHero()[selHero()][0], 'colores') + f('Fondo del modo Glass', D.fondoGlass ? 'Tu foto' : 'Predeterminado', 'fondoGlass')
@@ -940,7 +948,7 @@ function detalle(id){
     h += `<h2>Datos para pagar</h2><div class="caja">` + (p.numServicio ? `<div class="dato"><span class="gris">No. de servicio</span><span class="fila"><b>${esc(p.numServicio)}</b><button class="pildora" data-act="copiarSrv" data-t="${esc(p.numServicio)}">Copiar</button></span></div>` : '') + [['Tarjeta',p.tarjetaUlt,'numTarjeta'],['Vencimiento',p.tarjetaUlt ? '••/••' : '','expira'],['CVV',p.tarjetaUlt ? '•••' : '','cvv'],['Cuenta',p.cuentaUlt,'cuenta'],['Referencia',p.refUlt,'referencia'],['Titular',p.titularVis,'']].filter(x => x[1]).map(([a,b,k]) => `<div class="dato"><span class="gris">${a}</span><span class="fila"><b id="dv-${k}">${esc(b)}</b>${k ? `<button class="pildora" data-act="verDato" data-id="${p.id}" data-k="${k}">Ver</button><button class="pildora" data-act="copiarDato" data-id="${p.id}" data-k="${k}">Copiar</button>` : ''}</span></div>`).join('') + `</div>`;
   }
   if(p.credito){
-    h += `<h2>${p.tipoCred==='departamental'?'Crédito departamental':'Tarjeta de crédito'}</h2><div class="caja"><div class="dato"><span class="gris">Corte</span><b>${p.diaCorte ? 'día ' + p.diaCorte : '—'}</b></div><div class="dato"><span class="gris">Límite de pago</span><b>${corto(p.vence)}</b></div><div class="dato"><span class="gris">Sin intereses</span><b>${p.monto ? dinero(num(p.monto)) : '—'}</b></div><div class="dato"><span class="gris">Pago mínimo</span><b>${p.minimo ? dinero(num(p.minimo)) : '—'}</b></div><p class="gris chico">El día de corte cierra tu periodo y se calcula cuánto debes; al día siguiente actualiza aquí el monto a pagar.</p></div>`;
+    h += `<h2>${p.tipoCred==='departamental'?'Crédito departamental':'Tarjeta de crédito'}</h2><div class="caja"><div class="dato"><span class="gris">Corte</span><b>${p.diaCorte ? 'Día ' + p.diaCorte : '—'}</b></div><div class="dato"><span class="gris">Límite de pago</span><b>${corto(p.vence)}</b></div><div class="dato"><span class="gris">Sin intereses</span><b>${p.monto ? dinero(num(p.monto)) : '—'}</b></div><div class="dato"><span class="gris">Pago mínimo</span><b>${p.minimo ? dinero(num(p.minimo)) : '—'}</b></div><p class="gris chico">El día de corte cierra tu periodo y se calcula cuánto debes; al día siguiente actualiza aquí el monto a pagar.</p></div>`;
   }
   if(p.compartido){
     const mi = miParteMonto(p), otra = num(p.monto) - mi, quien = p.conQuien || 'La otra persona';
@@ -1463,6 +1471,12 @@ document.addEventListener('click', (ev) => {
     case 'fondo': hojaFondo(); break;
     case 'colores': hojaColores(); break;
     case 'tutorial': { const p = D.pagos.find(x => !x.pagado); if(p) recorridoWeb(p.id); else bvAbrir(); break; }
+    case 'filtroTj': { const sg = b.parentElement, act = sg.querySelector('.sel'); if(act === b) break;
+      const d = [...sg.children].indexOf(b) > [...sg.children].indexOf(act) ? 1 : -1, y = window.scrollY;
+      act.animate([{transform:'none'},{transform:`translateX(${b.offsetLeft - act.offsetLeft}px)`}], {duration:420, easing:'cubic-bezier(.3,0,.15,1)', fill:'forwards'}); b.style.color = 'var(--accTxt)'; b.style.position = 'relative'; b.style.zIndex = 1;
+      if(navigator.vibrate) navigator.vibrate(20);
+      document.getElementById('listaTj').animate([{transform:'none', opacity:1},{transform:`translateX(${-d*20}%)`, opacity:0}], {duration:140, easing:'cubic-bezier(.4,0,1,1)', fill:'forwards'});
+      setTimeout(() => { window._fc = +n; pintar(); window.scrollTo(0, y); const sp = document.getElementById('segTj'); if(sp) window.scrollTo({top: sp.getBoundingClientRect().top + window.scrollY - 70, behavior:'smooth'}); const l2 = document.getElementById('listaTj'); if(l2) l2.animate([{transform:`translateX(${d*20}%)`, opacity:0},{transform:'none', opacity:1}], {duration:280, easing:'cubic-bezier(.3,0,.15,1)'}); }, 150); break; }
     case 'filtroPagos': { const sg = b.parentElement, act = sg.querySelector('.sel'); if(act === b) break;
       const d = [...sg.children].indexOf(b) > [...sg.children].indexOf(act) ? 1 : -1, y = window.scrollY;
       act.animate([{transform:'none'},{transform:`translateX(${b.offsetLeft - act.offsetLeft}px)`}], {duration:420, easing:'cubic-bezier(.3,0,.15,1)', fill:'forwards'}); b.style.color = 'var(--accTxt)'; b.style.position = 'relative'; b.style.zIndex = 1;
@@ -1788,6 +1802,7 @@ const Bloq = (() => {
   const hash = async (sal, pw) => { let h = new TextEncoder().encode(sal + '|' + pw); for(let i = 0; i < 2000; i++) h = new Uint8Array(await crypto.subtle.digest('SHA-256', h)); return b64(h); };
   let abierta = false, ocultaDesde = 0;
   const activo = () => !!(D.bloqueo && D.bloqueo.hash);
+  const tapar = x => x ? x.slice(0, Math.min(4, x.includes('@') ? Math.max(1, x.indexOf('@')) : 4)) + '••••••••' : '';
   const faceId = async () => { try{ return !!(window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()); }catch(e){ return false; } };
   const crearCred = async () => {
     const c = await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)), rp:{name:'Mis Pagos'},
@@ -1807,18 +1822,50 @@ const Bloq = (() => {
     c.animate([{opacity:1},{opacity:0, transform:'translateY(-20px)'}], {duration:280, easing:'cubic-bezier(.3,0,.15,1)'}).onfinish = () => c.remove(); };
   async function entrarConFace(){ try{ await usarCred(); cerrar(); }catch(e){ const p = document.getElementById('blPw'); if(p) p.focus(); } }
   async function mostrarEntrar(){
-    const c = pantalla(`<div class="fila" style="align-items:center"><span class="blAv">${esc((D.nombre||'•').charAt(0).toUpperCase())}</span><div class="peso" style="padding-left:14px"><b style="font-size:20px;display:block">Hola${D.nombre ? ', ' + esc(D.nombre) : ''}</b><span class="gris chico">${esc((D.nube && D.nube.correo) || '')}</span></div></div>
+    const c = pantalla(`<div class="fila" style="align-items:center"><span class="blAv">${esc((D.nombre||'•').charAt(0).toUpperCase())}</span><div class="peso" style="padding-left:14px"><b style="font-size:20px;display:block">Hola${D.nombre ? ', ' + esc(D.nombre) : ''}</b><span class="gris chico">${esc(tapar((D.nube && D.nube.correo) || ''))}</span></div></div>
       <input id="blPw" type="password" placeholder="Contraseña" autocomplete="current-password" style="margin-top:18px;font-size:16px">
       <button class="btn lleno" id="blEnt" style="margin-top:12px">Entrar</button>
-      ${D.bloqueo.cred ? `<button class="blHuella" id="blFace" aria-label="Entrar con Face ID"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 9v1.5M15 9v1.5M12 9v4h-1M9.5 16c1.5 1 3.5 1 5 0"/></svg></button><div class="gris chico" style="text-align:center;margin-top:6px">Entrar con Face ID</div>` : ''}
+      ${D.bloqueo.cred ? `<button class="blHuella" id="blFace" aria-label="Entrar con Face ID"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 9v1.5M15 9v1.5M12 9v4h-1M9.5 16c1.5 1 3.5 1 5 0"/></svg></button><div class="gris chico" style="text-align:center;margin-top:6px">Acceder con biometría</div>` : ''}
       <button class="blLink" id="blOlv">¿Olvidaste tu contraseña?</button>`);
     const pw = c.querySelector('#blPw');
     const entrar = async () => { if(await hash(D.bloqueo.sal, pw.value) === D.bloqueo.hash) cerrar(); else { pw.value = ''; pw.placeholder = 'Contraseña incorrecta'; temblar(pw); } };
     c.querySelector('#blEnt').onclick = entrar; pw.onkeydown = e => { if(e.key === 'Enter') entrar(); };
     if(D.bloqueo.cred){ c.querySelector('#blFace').onclick = entrarConFace; setTimeout(entrarConFace, 500); }
-    c.querySelector('#blOlv').onclick = async () => {
-      if(D.bloqueo.cred){ try{ await usarCred(); mostrarCrear(true); return; }catch(e){} }
-      if(confirm('Para crear otra contraseña tienes que volver a iniciar sesión con tu cuenta. ¿Continuar?')){ D.bloqueo = null; if(D.nube) D.nube = {}; guardar(); location.reload(); } };
+    c.querySelector('#blOlv').onclick = () => { if(navigator.vibrate) navigator.vibrate(15); mostrarRecuperar(); };
+  }
+  /* Olvidé mi contraseña: correo para restablecer la contraseña de la cuenta; con la nueva se comprueba que eres tú. Nunca abre sin comprobar. */
+  function mostrarRecuperar(){
+    const correo = (D.nube && D.nube.correo) || '';
+    if(!correo){
+      const c = pantalla(`<b style="font-size:22px;display:block">Recuperar contraseña</b><p class="gris" style="line-height:1.4">Como no tienes cuenta conectada, no hay a dónde enviar el correo. La única opción es borrar los datos de esta web y empezar de nuevo.</p>
+        <button class="btn borde" id="blBorrar" style="margin-top:8px">Borrar todo y empezar de nuevo</button><button class="blLink" id="blVol">Volver</button>`);
+      c.querySelector('#blVol').onclick = mostrarEntrar;
+      c.querySelector('#blBorrar').onclick = () => { if(!confirm('Se borrarán todos tus pagos de esta web. ¿Seguro?')) return; localStorage.clear(); try{ indexedDB.deleteDatabase('mispagos-boveda'); }catch(e){} location.reload(); };
+      return;
+    }
+    const c = pantalla(`<b style="font-size:22px;display:block">Recuperar contraseña</b><p class="gris" style="line-height:1.4;margin:8px 0 0">Escribe completo el correo o el teléfono de tu cuenta. Si coincide, te enviaremos un enlace para crear una contraseña nueva; luego la escribes aquí.</p>
+      <input id="blDato" type="text" placeholder="Correo o teléfono" autocomplete="off" style="margin-top:14px;font-size:16px">
+      <button class="btn lleno" id="blEnv" style="margin-top:12px">Enviar enlace de recuperación</button><p class="gris chico" id="blAv" style="display:none;line-height:1.4;margin:10px 0 0"></p>
+      <input id="blNueva" type="password" placeholder="Contraseña nueva de tu cuenta" style="margin-top:12px;font-size:16px;display:none"><button class="btn lleno" id="blComp" style="margin-top:10px;display:none">Comprobar y entrar</button>
+      <button class="blLink" id="blVol">Volver</button>`);
+    const env = c.querySelector('#blEnv'), nv = c.querySelector('#blNueva'), comp = c.querySelector('#blComp'), dato = c.querySelector('#blDato'), av = c.querySelector('#blAv');
+    c.querySelector('#blVol').onclick = mostrarEntrar;
+    env.onclick = async () => {
+      const q = dato.value.trim(), esC = q.includes('@'), d10 = x => (x||'').replace(/\D/g,'').slice(-10);
+      const ok = esC ? q.toLowerCase() === correo.toLowerCase() : (d10(q).length === 10 && d10(q) === d10(D.miTel));
+      if(!ok){ dato.value = ''; dato.placeholder = esC ? 'Ese correo no es el de tu cuenta' : 'Ese teléfono no es el de tu cuenta'; temblar(dato); return; }
+      env.disabled = true; env.textContent = 'Enviando…';
+      try{ await pedir('POST', AUTHU + 'sendOobCode?key=' + FB.key, {requestType:'PASSWORD_RESET', email:correo}); env.textContent = 'Volver a enviar';
+        av.textContent = esC ? '✓ Te enviamos un correo a ' + q + '. Revisa también spam.' : '✓ Te enviamos el enlace al correo de la cuenta del ' + q + ' (' + tapar(correo) + '). Revisa también spam.';
+        av.style.display = nv.style.display = comp.style.display = ''; nv.focus(); }
+      catch(e){ env.textContent = 'Reintentar'; aviso('No se pudo enviar el correo. Revisa tu internet.'); }
+      env.disabled = false; };
+    comp.onclick = async () => { if(nv.value.length < 6){ temblar(nv); return; } comp.disabled = true; comp.textContent = 'Comprobando…';
+      try{ await pedir('POST', AUTHU + 'signInWithPassword?key=' + FB.key, {email:correo, password:nv.value, returnSecureToken:true});
+        const sal = b64(crypto.getRandomValues(new Uint8Array(12))); D.bloqueo = {sal, hash: await hash(sal, nv.value), cred: D.bloqueo.cred || null}; guardar();
+        aviso('✓ Listo: ahora entras con la contraseña nueva'); cerrar(); }
+      catch(e){ nv.value = ''; nv.placeholder = 'No coincide. ¿Ya la cambiaste desde el correo?'; temblar(nv); }
+      comp.disabled = false; comp.textContent = 'Comprobar y entrar'; };
   }
   async function mostrarCrear(cambiar){
     const hayFace = await faceId();
@@ -1838,7 +1885,7 @@ const Bloq = (() => {
   }
   document.addEventListener('visibilitychange', () => {
     if(document.hidden){ ocultaDesde = Date.now(); return; }
-    if(activo() && ocultaDesde && Date.now() - ocultaDesde > 60000){ abierta = false; mostrarEntrar(); }
+    if(activo() && ocultaDesde && Date.now() - ocultaDesde > 60000 && !document.getElementById('bloqueo')){ abierta = false; mostrarEntrar(); }   /* si ya está la pantalla de entrada (p. ej. a medio recuperar), se queda como está */
     ocultaDesde = 0; });
   return {
     iniciar(){ if(activo() && !abierta){ mostrarEntrar(); return; }
