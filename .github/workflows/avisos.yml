@@ -1,7 +1,8 @@
 name: Avisos de pagos
 on:
   schedule:
-    - cron: '0 15 * * *'   # 9:00 a.m. hora de Monterrey (UTC-6)
+    - cron: '0 15 * * *'      # 9:00 a.m. hora de Monterrey (UTC-6): pagos por vencer
+    - cron: '*/15 * * * *'    # cada 15 min: "ya pagué mi parte", confirmaciones y recordatorios de pagos compartidos
   workflow_dispatch:
     inputs:
       prueba:
@@ -23,3 +24,5 @@ jobs:
           VAPID_PRIVATE: ${{ secrets.VAPID_PRIVATE }}
           VAPID_PUBLIC: BBWWlUcYHEoRWfJrS4J4p2rj-XzlQkzoSu9eCR5LhdSggqxL34HEPqwGJMD1YiPAczz6aJDKoOonXTQ_W5BTMVU
           PRUEBA: ${{ github.event.inputs.prueba }}
+          HORARIO: ${{ github.event.schedule }}
+          EVENTO: ${{ github.event_name }}
