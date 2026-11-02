@@ -1120,15 +1120,19 @@ async function sincronizar(){
     if(!otro.includes('@') || otro === yo) continue;
     const firma = [p.pagado ? 'P' : '', p.nombre, p.monto, p.vence, p.frec, p.miParte, p.miFijo||'', p.conQuien, otro, p.credito ? p.tipoCred || 'tarjeta' : '', p.diaCorte || 0, p.minimo || '', (p.cuentaUlt||'') + (p.refUlt||'') + (p.titularVis||'') + (p.numServicio||'') + (p.tarjetaUlt||'') + (p.e2eCambio||'') + 'd3', p._faltaPub ? Date.now() : ''].join('|');
     if(p.nubeId && firma === p.nubeFirma) continue;
+    /* datos para pagar (cifrados solo para la otra persona). Si no se pueden leer aquí o falta su llave, NO se mandan:
+       la nube conserva lo que ya tenía y a la otra persona no se le borran. */
+    const datosV = await (async () => { const o = await Boveda.leer(p.id), tj = p.credito || esCredito(p.cat);
+      if(o._error) return null;
+      if(!(o.cuenta || o.referencia || o.titular || p.numServicio || (tj && o.numTarjeta))) return '';
+      const pubO = await pubDeCorreo(otro); if(!pubO){ p._faltaPub = true; return null; }
+      const dj = {c:o.cuenta||'', r:o.referencia||'', t:o.titular||'', s:p.numServicio||''}; if(tj){ dj.n = o.numTarjeta||''; dj.e = o.expira||''; dj.v = o.cvv||''; }
+      return Boveda.e2eCifrar(pubO, JSON.stringify(dj)); })();
     const fields = {nombre:sv(p.nombre), monto:sv(p.monto), vence:sv(p.vence), pagadoV:sv(p.pagado ? p.vence : ''), frec:sv(p.frec), cat:sv(p.cat), parteCreador:iv(p.miParte||50), fijoCreador:sv(p.miFijo||''),
       credito:sv(p.credito ? p.tipoCred || 'tarjeta' : ''), diaCorte:iv(p.diaCorte || 0), minimo:sv(p.minimo || ''),
-      datos:sv(await (async () => { const o = await Boveda.leer(p.id), tj = p.credito || esCredito(p.cat);   // en una tarjeta compartida también van número, vencimiento y CVV
-        if(!(o.cuenta || o.referencia || o.titular || p.numServicio || (tj && o.numTarjeta))) return '';
-        const pubO = await pubDeCorreo(otro); if(!pubO){ p._faltaPub = true; return ''; }
-        const dj = {c:o.cuenta||'', r:o.referencia||'', t:o.titular||'', s:p.numServicio||''}; if(tj){ dj.n = o.numTarjeta||''; dj.e = o.expira||''; dj.v = o.cvv||''; }
-        return Boveda.e2eCifrar(pubO, JSON.stringify(dj)); })()),
       creadoPor:sv(uid), creadorNombre:sv(D.nombre || yo), creadorCorreo:sv(yo), otroNombre:sv(p.conQuien), otroCorreo:sv(otro),
       participantes:{arrayValue:{values:[sv(yo), sv(otro)]}}, actualizado:iv(Date.now())};
+    if(datosV !== null) fields.datos = sv(datosV);
     if(!p.nubeId){ fields.estado = sv('pendiente'); fields.solicitud = sv(''); const r = await pedir('POST', DOCS + '/compartidos', {fields}, await token()); p.nubeId = r.name.split('/').pop(); p.nubeEstado = 'pendiente'; }
     else await pedir('PATCH', DOCS + '/compartidos/' + p.nubeId + '?' + Object.keys(fields).map(k => 'updateMask.fieldPaths=' + k).join('&'), {fields}, await token());
     p.nubeFirma = firma; sub++;
