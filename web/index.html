@@ -1013,8 +1013,16 @@ function editor(id){
 }
 function personas(){
   const l = (D.personas||[]).slice();
-  D.pagos.forEach(p => { if(p.conQuien && !l.some(z => z.nombre.toLowerCase() === p.conQuien.toLowerCase())) { const q = p.conQuien.trim(); l.push({nombre:q, tel:q.replace(/\D/g,'').length >= 10 ? q : '', mail:q.includes('@') ? q : ''}); } });
-  return l;
+  D.pagos.forEach(p => { if(p.conQuien && !l.some(z => (z.nombre||'').toLowerCase() === p.conQuien.toLowerCase())) { const q = p.conQuien.trim(); l.push({nombre:q, tel:q.replace(/\D/g,'').length >= 10 ? q : '', mail:q.includes('@') ? q : ''}); } });
+  /* una sola persona por nombre, teléfono o correo (se queda el nombre de verdad, no el número) */
+  const t10 = x => (x||'').replace(/\D/g,'').slice(-10), esDato = n => /@/.test(n||'') || (/^[0-9 +()-]+$/.test(n||'') && t10(n).length >= 10);
+  const res = [];
+  l.forEach(p0 => { const p = {nombre:(p0.nombre||'').trim(), tel:p0.tel || (esDato(p0.nombre) && !/@/.test(p0.nombre) ? p0.nombre : ''), mail:p0.mail || (/@/.test(p0.nombre||'') ? p0.nombre : '')};
+    const igual = res.find(q => q.nombre.toLowerCase() === p.nombre.toLowerCase() || (t10(p.tel).length >= 10 && t10(p.tel) === t10(q.tel)) || (p.mail && q.mail && p.mail.toLowerCase() === q.mail.toLowerCase()));
+    if(!igual){ res.push(p); return; }
+    if(esDato(igual.nombre) && !esDato(p.nombre)) igual.nombre = p.nombre;
+    if(!igual.tel) igual.tel = p.tel; if(!igual.mail) igual.mail = p.mail; });
+  return res;
 }
 function hojaPersonas(){
   const l = personas();
