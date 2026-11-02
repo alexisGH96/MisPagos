@@ -126,6 +126,59 @@ input,select{width:100%;font:inherit;color:var(--fg);background:var(--surf);bord
 .barras .b{transform:scaleY(0);transform-origin:bottom}
 .barras.ver .b{animation:crece .7s cubic-bezier(.2,.8,.2,1) both}
 @keyframes crece{to{transform:none}}
+/* tarjeta principal: el "!" a la altura del monto, aire entre el mes y el monto, íconos a la altura del número */
+.heroMes{font-size:16px}
+.heroMonto{margin-left:14px}
+.heroMonto b{font-size:25px !important}
+.heroMonto.chico2 b{font-size:23px !important}
+.aviso{width:20px;height:20px;border-radius:50%;color:#fff;font-size:13px;font-weight:800;display:grid;place-items:center;flex:none;animation:pop .38s .42s cubic-bezier(.3,1.6,.5,1) both}
+.heroN .ind{align-items:center}
+/* tarjeta de balance en Estadísticas */
+.balT{display:block;width:100%;text-align:left;padding:16px;margin-bottom:14px;font:inherit;color:inherit}
+.balT .bIc{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;flex:none}
+.balT .bIc svg{width:27px;height:27px}
+.balT .bSep{width:1px;align-self:stretch;margin:6px 0;background:var(--fg);opacity:.12}
+.balT .bBtn{display:flex;align-items:center;gap:10px;margin-top:16px;padding:12px 14px 12px 16px;border-radius:100px;font-weight:700;font-size:13px}
+/* tarjetas de pago: cada dato en su renglón con ícono */
+.tp{padding:14px 16px;gap:12px}
+.tp .ico{width:40px;height:40px;border-radius:12px}
+.tp .ico svg{width:22px;height:22px}
+.tp .nom{font-size:16px;font-weight:600}
+.tp .der .b{font-size:17px;font-weight:600}
+.renglones{margin-top:4px;display:flex;flex-direction:column;gap:4px}
+.reng{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;line-height:17px}
+.reng i{width:14px;height:17px;flex:none;display:grid;place-items:center;font-style:normal}
+.reng i svg{width:13px;height:13px}
+.reng.una .peso{display:flex;align-items:center;gap:5px;white-space:nowrap;min-width:0}
+.reng.una .con{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.reng.una .pt,.reng.una .ir,.reng.una .tot{flex:none}
+.reng.una .ir{width:14px;height:17px;display:grid;place-items:center}
+.reng.una .ir svg{width:13px;height:13px}
+.reng.una .peso{gap:0}
+.reng.una .pt{padding:0 6px}
+.reng.una .tot{padding-left:8px}
+.rad{width:22px;height:22px;border-radius:50%;border:2px solid var(--gr);flex:none;position:relative;transition:border-color .2s}
+.rad{--radC:var(--acc)}
+:root[data-tema^="glass"] .rad{--radC:var(--icoSel)}
+.rad.on{border-color:var(--radC)}
+.rad::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--radC);transform:scale(0);transition:transform .25s cubic-bezier(.3,1.6,.5,1)}
+.rad.on::after{transform:none}
+.balTar{display:flex;align-items:center;width:100%;margin-bottom:14px;padding:14px 12px 14px 16px;font:inherit;color:inherit}
+.balTar.late{animation:late .9s .42s cubic-bezier(.3,0,.15,1) both}
+@keyframes late{0%,100%{transform:none}25%{transform:scale(1.04)}55%{transform:none}75%{transform:scale(1.025)}}
+.entra{animation:entra .42s cubic-bezier(.3,0,.15,1) both}
+@keyframes entra{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+.balBarra{height:12px;border-radius:99px;background:color-mix(in srgb, var(--fg) 10%, transparent);overflow:hidden;margin:14px 0 6px}
+.balBarra i{display:block;height:100%;border-radius:99px;transform-origin:left;transform:scaleX(0);animation:llena .9s cubic-bezier(.3,0,.15,1) forwards}
+@keyframes llena{to{transform:scaleX(var(--w))}}
+.balFila .ico{width:38px;height:38px;flex:none;border-radius:12px}
+.balFila .ico svg{width:20px;height:20px}
+.balFila{width:100%;align-items:center;padding:10px 0;background:none;border:0;font:inherit;color:inherit}
+.balChip{display:inline-block;margin-top:4px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--pill);color:var(--icoSel,var(--fg))}
+.heroMonto{display:flex;align-items:flex-start;gap:4px;background:none;border:0;padding:0;font:inherit;color:inherit}
+.interr{width:20px;height:20px;border-radius:50%;background:#E5484D;color:#fff;font-size:13px;font-weight:800;display:grid;place-items:center;animation:pop .38s .42s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes pop{from{transform:scale(0)}to{transform:none}}
+
 @keyframes pastelEntra{from{transform:rotate(-70deg) scale(.6);opacity:0}to{transform:none;opacity:1}}
 @keyframes pastelTexto{from{opacity:0}to{opacity:1}}
 /* ---- Glass: cristal sobre manchas de color, de día claro y de noche oscuro ---- */
@@ -268,7 +321,7 @@ function siguiente(p){
 }
 /* los pagados avanzan solos al siguiente periodo cuando pasa su fecha */
 const MESC = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-const esServicio = c => ['luz','internet','telefono','streaming'].includes(c);
+const esServicio = c => ['luz','internet','telefono'].includes(c);   // las suscripciones no: se cobran solas
 const mesesPer = f => ({M2:2, M3:3, M6:6, M12:12})[f] || 1;
 const casillasPer = f => f === 'M2' || f === 'M3' || f === 'M6' ? 2 : f === 'U' || f.startsWith('D') ? 0 : 1;
 function perTexto(per){ if(!per) return ''; if(!per.includes('-')) return 'año ' + per; const m = per.split(',').map(x => x.split('-').map(Number)); const a = m[0], z = m[m.length-1];
@@ -293,9 +346,16 @@ function perHtml(p, frec, cat){
 function frecUpd(f){ const c = f.cat.value, ant = f.frec.value, l = frecsDe(c);
   f.frec.innerHTML = l.map(k => `<option value="${k}" ${k === (l.includes(ant) ? ant : 'M1') ? 'selected' : ''}>${FRECS[k].charAt(0).toUpperCase() + FRECS[k].slice(1)}</option>`).join('');
   const cr = esCredito(c); document.querySelectorAll('#ed .soloCredito').forEach(e => e.style.display = cr ? '' : 'none'); }
+/* datos para pagar: solo lo que sirve para pagar ese tipo de pago */
+function datosVis(cat, comp){ const cred = esCredito(cat), serv = esServicio(cat), subs = cat === 'streaming', otro = ['renta','grupo','otro'].includes(cat);
+  const v = {srv:serv, tj:cred, cta:cred || otro || comp, ref:cred || serv || cat === 'renta' || cat === 'otro', tit:otro || comp};
+  if(subs){ v.cta = v.ref = v.tit = false; } /* suscripciones y membresías: nunca llevan datos para pagar */ v.alguno = v.srv || v.tj || v.cta || v.ref || v.tit; return v; }
+function datosUpd(f){ const v = datosVis(f.cat.value || adivinarCat(f.nombre.value), !!(f.compartido && f.compartido.checked));
+  const m = (el, on) => { if(el) el.style.display = on ? '' : 'none'; };
+  m(document.getElementById('datosTit'), v.alguno); m(f.numServicio, v.srv); m(document.getElementById('tjBox'), v.tj); m(f.cuenta, v.cta); m(f.referencia, v.ref); m(f.titular, v.tit); }
 function perUpd(f){ const p = D.pagos.find(x => x.id === +f.dataset.id) || {vence: iso(hoy()), periodo:''}; const cat = f.cat.value || adivinarCat(f.nombre.value);
   document.getElementById('perBox').innerHTML = perHtml(p, f.frec.value, cat);
-  const sv = esServicio(cat); document.getElementById('tjBox').style.display = sv ? 'none' : ''; f.numServicio.style.display = sv ? '' : 'none'; }
+  datosUpd(f); }
 function avanzar(){
   let cambio = false;
   D.pagos.forEach(p => { while(p.pagado && p.frec !== 'U' && dias(p.vence) < 0){ p.vence = siguiente(p); if(p.periodo) p.periodo = correrPer(p.periodo, mesesPer(p.frec)); p.pagado = false; cambio = true; } });
@@ -363,7 +423,7 @@ function anillo(p, tam=40){
   if(e === 'ver') return `<svg width="${tam}" height="${tam}" viewBox="0 0 ${tam} ${tam}" aria-label="Pagado"><circle cx="${tam/2}" cy="${tam/2}" r="${tam/2-1}" fill="var(--r-ver)"/><path d="M${tam*.3} ${tam*.52}l${tam*.13} ${tam*.13} ${tam*.26}-${tam*.28}" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
   const f = d <= 0 ? 1 : Math.max(.08, Math.min(1, 1 - d/30));
   const t = d < 0 ? '!' : d;
-  return `<svg width="${tam}" height="${tam}" viewBox="0 0 ${tam} ${tam}" aria-label="Faltan ${d} días"><circle cx="${tam/2}" cy="${tam/2}" r="${r}" fill="none" stroke="var(--line)" stroke-width="4"/><circle cx="${tam/2}" cy="${tam/2}" r="${r}" fill="none" stroke="var(--r-${e})" stroke-width="4" stroke-linecap="round" stroke-dasharray="${L*f} ${L}" transform="rotate(-90 ${tam/2} ${tam/2})"/><text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" font-size="${tam*.34}" font-weight="700" fill="var(--r-${e})">${t}</text></svg>`;
+  return `<svg width="${tam}" height="${tam}" viewBox="0 0 ${tam} ${tam}" aria-label="Faltan ${d} días"><circle cx="${tam/2}" cy="${tam/2}" r="${r}" fill="none" stroke="var(--line)" stroke-width="4"/><circle cx="${tam/2}" cy="${tam/2}" r="${r}" fill="none" stroke="var(--r-${e})" stroke-width="4" stroke-linecap="round" stroke-dasharray="${L*f} ${L}" transform="rotate(-90 ${tam/2} ${tam/2})"/><text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" font-size="${tam <= 36 ? 14 : tam*.34}" font-weight="${tam <= 36 ? 500 : 700}" fill="var(--r-${e})">${t}</text></svg>`;
 }
 function linea2(p){
   if(p.pagado) return 'Vence ' + corto(p.vence) + ' · Pagado ✓';
@@ -374,12 +434,24 @@ function linea2(p){
 /* ===================== pantallas ===================== */
 let tab = 0, cartera = 0, estad = 0, calMes = null, calSel = null;
 function ordenados(){ return [...D.pagos].sort((a,b) => (a.pagado - b.pagado) || (fecha(a.vence) - fecha(b.vence))); }
+/* cada dato de la tarjeta en su renglón, con su ícono a la izquierda */
+function renglonesPago(p){
+  const r = (ic, t, extra) => `<div class="reng${extra ? ' una' : ''}"><i>${ic}</i><span class="peso">${t}</span></div>`;
+  const L = linea2(p).replace('Pagado ✓', 'Pagado <span class="verde">✓</span>');
+  let h = r(SIMB.cal, L);
+  const total = p.compartido && p.monto ? 'Total ' + dinero(num(p.monto)) : '';
+  if(total) h += r(SIMB3.personas, 'Dividido con ' + esc(nombreVisible(p.creadoPor || p.conQuien)));
+  const q = p.pagoCon && !p.credito && D.pagos.find(z => z.id === p.pagoCon);
+  if(q) h += r(SIMB3.tarjeta, `<span class="con">Con ${esc(sinPrefijo(q.nombre))}</span>${total ? `<span class="pt">·</span><i class="ir">${SIMB3.recibo}</i><span class="tot">${total}</span>` : ''}`, true);   /* "Con X · Total" en un solo renglón */
+  else if(total) h += r(SIMB3.recibo, total);
+  if(p.periodo && !p.pagado && esServicio(p.cat || adivinarCat(p.nombre))) h += r(SIMB.reloj, 'Periodo ' + perTexto(p.periodo));
+  return h;
+}
 function tarjetaPago(p){
-  return `<button class="pago est-${estado(p)}" data-act="detalle" data-id="${p.id}">
+  return `<button class="pago tp est-${estado(p)}" data-act="detalle" data-id="${p.id}">
     ${icono(p)}
-    <div class="peso"><div class="nom">${esc(p.nombre)}</div><div class="gris chico">${linea2(p)}${p.periodo && !p.pagado ? '<br>Periodo ' + perTexto(p.periodo) : ''}${(() => { const q = p.pagoCon && !p.credito && D.pagos.find(z => z.id === p.pagoCon); return q ? '<br>💳 Con ' + esc(sinPrefijo(q.nombre)) : ''; })()}</div></div>
-    ${p.numServicio ? `<span class="pildora" style="margin-top:8px;font-size:12px;padding:6px 12px;display:inline-block" data-act="copiarSrv" data-t="${esc(p.numServicio)}">Copiar no. de servicio</span>` : ''}
-    <div class="der">${p.monto ? `<span class="b">${dinero(num(p.monto))}</span>` : ''}${anillo(p)}</div></button>`;
+    <div class="peso" style="min-width:0"><div class="nom">${esc(p.nombre)}</div><div class="renglones gris">${renglonesPago(p)}</div></div>
+    <div class="der">${p.monto ? `<span class="b">${dinero(p.compartido ? Math.round(miParteMonto(p)*100)/100 : num(p.monto))}</span>` : ''}${anillo(p, 33)}</div></button>`;
 }
 const SIMB = {cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="9" cy="15" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l5 4.5 9-9.5"/></svg>',
@@ -393,6 +465,98 @@ function grupos(){
 function calDia(d){
   return `<svg viewBox="0 0 24 24" width="46" height="46"><path d="M3 10V7.5a3 3 0 0 1 3-3h12a3 3 0 0 1 3 3V10z" fill="currentColor"/><rect x="3" y="4.5" width="18" height="17" rx="3" fill="none" stroke="var(--icono,#46464F)" stroke-width="1.3"/><path d="M3 10h18" stroke="var(--icono,#46464F)" stroke-width="1.3"/>${[7.5,12,16.5].map(x => `<rect x="${x-1}" y="2.5" width="2" height="4.5" rx="1" fill="var(--icono,#46464F)"/>`).join('')}<text x="12" y="18.4" text-anchor="middle" font-size="7.5" font-weight="800" fill="var(--fg)" font-family="inherit">${d}</text></svg>`;
 }
+/* ===================== balance del mes (tus pagos contra tu ingreso) ===================== */
+let verBalance = false, enfocarBal = false;
+const MESL = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+/* pagos del mes: pagados y pendientes (con los vencidos que aún debes) */
+function pagosDelMes(){
+  const hy = hoy(), m = hy.getMonth(), y = hy.getFullYear(), r = {pag:[], pen:[]};
+  D.pagos.forEach(p => { const f = fecha(p.vence), mm = miMonto(p); if(mm <= 0) return;
+    if(f.getMonth() === m && f.getFullYear() === y) (p.pagado ? r.pag : r.pen).push({p, dia:f, completo:mm, pagar:mm, nota:''});
+    else if(!p.pagado && f < hy) r.pen.unshift({p, dia:f, completo:mm, pagar:mm, nota:'', vencido:true});
+    (p.hist || []).forEach(h => { if(!h || !h.v || h.v === p.vence) return; const fv = fecha(h.v); if(fv.getMonth() === m && fv.getFullYear() === y) r.pag.push({p, dia:fv, completo:num(h.m) * (p.compartido ? (miMonto(p) / (num(p.monto) || 1)) : 1)}); }); });
+  return r;
+}
+function libreMes(){ if(!(D.ingreso > 0)) return null; const r = pagosDelMes(), tot = [...r.pag, ...r.pen].reduce((s,x) => s + x.completo, 0); return [D.ingreso, tot, D.ingreso - tot]; }
+const SIMB3 = {personas:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8.5" r="3.2"/><path d="M3 20a6 6 0 0 1 12 0"/><path d="M15.5 5.8a3 3 0 0 1 0 5.6M17 14.5a5 5 0 0 1 4.5 5.5"/></svg>',
+  tarjeta:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3 10h18M7 14.5h3"/></svg>',
+  recibo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5.5 20.5V5.5A2.5 2.5 0 0 1 8 3h8a2.5 2.5 0 0 1 2.5 2.5v15l-2.2-1.7-2.1 1.7-2.2-1.7-2.2 1.7-2.1-1.7z"/><path d="M9 8.5h6M9 12.5h4"/></svg>'};
+const SIMB2 = {alerta:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M12 3.5l9.5 16.5h-19z"/><path d="M12 9.5V14"/><circle cx="12" cy="17" r="1.2" fill="currentColor"/></svg>',
+  bolsa:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><rect x="3.5" y="6" width="17" height="13" rx="3.5"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/></svg>',
+  cartera:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3.5" y="6" width="17" height="12.5" rx="3"/><rect x="13.5" y="10" width="7" height="4.5" rx="1.5"/></svg>',
+  barras:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 19v-7M12 19V6M18 19v-9"/></svg>'};
+function tarjetaBalanceW(){
+  const lib = libreMes(), osc = ['oscuro','glassn'].includes(document.documentElement.dataset.tema);
+  let col, colT, ico, tit, monto, sub, pct = '—', bot = 'Ver mi balance y cómo repartir mis pagos';
+  if(!lib){ col = 'var(--icoSel,var(--acc))'; colT = 'var(--fg)'; ico = 'cartera'; tit = '¿Te alcanza este mes?'; monto = 'Pon tu ingreso'; sub = 'Y te muestro tu balance con tus pagos.'; bot = 'Poner mis ingresos'; }
+  else { pct = Math.round(lib[1] / lib[0] * 100) + ' %';
+    if(lib[2] < 0){ col = '#E5484D'; colT = osc ? '#FF8A8C' : '#D32F35'; ico = 'alerta'; tit = 'Gastas más de lo que ganas'; sub = 'Tus pagos superan tus ingresos.'; monto = '-' + dinero(Math.abs(Math.round(lib[2]))) + ' de ' + dinero(Math.round(lib[0])); }
+    else if(lib[2] < lib[0] * .1){ col = '#F2A600'; colT = osc ? '#FFC94D' : '#A86F00'; ico = 'alerta'; tit = 'Cuidado: casi no te queda libre'; sub = 'Te queda menos del 10 % de tu ingreso.'; monto = dinero(Math.round(lib[2])) + ' de ' + dinero(Math.round(lib[0])); }
+    else { col = '#1FA463'; colT = osc ? '#6EDBA4' : '#178A52'; ico = 'bolsa'; tit = 'Te queda libre este mes'; sub = 'Tus pagos caben en tu ingreso.'; monto = dinero(Math.round(lib[2])) + ' de ' + dinero(Math.round(lib[0])); } }
+  const tinte = a => `color-mix(in srgb, ${col} ${a}%, transparent)`;
+  return `<button class="caja balT entra${enfocarBal ? ' late' : ''}" data-act="${lib ? 'verBalance' : 'presupuesto'}"><div class="fila" style="align-items:center">
+    <span class="bIc" style="background:${tinte(osc ? 20 : 14)};color:${col}">${SIMB2[ico]}</span>
+    <span class="peso" style="padding:0 8px 0 12px;min-width:0"><b style="display:block;font-size:13px;color:${colT};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${tit}</b><b style="display:block;font-size:18px;margin:3px 0 2px;white-space:nowrap">${monto}</b><span class="gris" style="font-size:12px;line-height:1.3;display:block">${sub}</span></span>
+    <span class="bSep"></span><span style="text-align:center;padding:0 0 0 10px"><b style="display:block;font-size:18px">${pct}</b><span class="gris" style="font-size:12px">en pagos</span></span></div>
+    <span class="bBtn" style="background:${tinte(osc ? 18 : 12)}"><span style="width:22px;height:22px;display:grid;place-items:center">${SIMB2[lib ? 'barras' : 'cartera']}</span><span class="peso" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${bot}</span><span style="font-size:22px;font-weight:400">›</span></span></button>`;
+}
+function barraBal(frac, col, retraso){ return `<div class="balBarra"><i style="--w:${Math.max(0, Math.min(1, frac))};background:${col};animation-delay:${retraso || 300}ms"></i></div>`; }
+function pantallaBalance(){
+  const hy = hoy(), ing = D.ingreso, otros = D.otros || 0;
+  const r = pagosDelMes(), yaPagado = r.pag.reduce((s,x) => s + x.completo, 0), pend = r.pen, pendiente = pend.reduce((s,x) => s + x.completo, 0);
+  const totalPagos = yaPagado + pendiente, dif = ing - otros - totalPagos, frac = totalPagos / ing;   // con tus otros gastos, igual que el plan
+  // plan: pagar el mínimo (o un poco más) en tus tarjetas, empezando por la que más alivia
+  const falta = pendiente - (ing - otros - yaPagado);
+  const cand = pend.filter(x => x.p.credito && !x.p.creadoPor && num(x.p.minimo) > 0).map(x => { x.min = num(x.p.minimo) * (x.p.compartido && num(x.p.monto) ? x.completo / num(x.p.monto) : 1); return x; }).filter(x => x.min < x.completo).sort((a,b) => (b.completo - b.min) - (a.completo - a.min));
+  let resto = Math.max(0, falta), alivio = 0;
+  cand.forEach(x => { if(resto <= 0) return; const baja = Math.min(x.completo - x.min, resto); x.pagar = Math.round((x.completo - baja)*100)/100; resto -= baja; alivio += baja; x.nota = x.pagar <= x.min + .5 ? 'Pago mínimo' : 'Más que el mínimo (' + dinero(Math.round(x.min)) + ')'; });
+  const intro = !pend.length ? 'Ya pagaste todo lo de este mes. 🎉' : falta <= 0 ? `Te alcanza para pagar todo completo y te quedan ${dinero(Math.round(-falta))}. Págalos en este orden, por fecha:`
+    : resto <= .5 ? `Te faltan ${dinero(Math.round(falta))}. Si pagas así tus tarjetas, te alcanza para todo este mes:`
+    : `Te faltan ${dinero(Math.round(falta))}.` + (alivio > 0 ? ` Pagando el mínimo donde se puede bajas ${dinero(Math.round(alivio))}, pero aún te faltarían ${dinero(Math.round(resto))}.` : ' No tienes tarjetas propias con pago mínimo registrado para aligerar el mes.');
+  const sobra = falta <= 0 ? -falta : resto <= .5 ? 0 : -resto;
+  const fila = (a, b, col) => `<div class="fila" style="margin-top:6px">${col ? `<span class="punto" style="background:${col}"></span>` : ''}<span class="peso gris chico">${a}</span><b>${b}</b></div>`;
+  let h = `<div class="fila" style="align-items:center;margin-bottom:16px"><button class="pildora flechaCal" data-act="verBalance" data-n="0" aria-label="Atrás">‹</button><div class="peso" style="padding-left:12px"><div class="b" style="font-size:22px">Balance del mes</div><div class="gris chico">${MESL[hy.getMonth()]} ${hy.getFullYear()} · tus pagos y tus ingresos</div></div></div>`;
+  h += `<div class="caja est-${dif < 0 ? 'roj' : 'ver'} entra" style="animation-delay:60ms"><div class="gris chico b">${dif < 0 ? 'TE FALTAN' : 'TE QUEDAN'}</div><div class="contar" data-v="${Math.abs(Math.round(dif))}" style="font-size:36px;font-weight:800;margin:6px 0 0">${dinero(0)}</div>
+    <div class="gris chico">${dif < 0 ? (otros > 0 ? 'Tus pagos y otros gastos del mes pasan tu ingreso' : 'Tus pagos del mes son más que tu ingreso') : (otros > 0 ? 'de tu ingreso después de tus pagos y otros gastos' : 'de tu ingreso después de todos tus pagos del mes')}</div>
+    ${barraBal(frac, frac > 1 ? '#E5484D' : frac > .9 ? '#F2A600' : '#1FA463')}
+    <div class="fila chico"><span class="peso gris">${Math.round(frac*100)} % de tu ingreso en pagos</span><b style="color:${frac > 1 ? '#D9534F' : 'inherit'}">${frac > 1 ? 'Te pasas' : frac > .5 ? 'Ideal: 50 % o menos' : 'Vas bien'}</b></div>
+    <div style="margin-top:10px">${fila('Ingreso del mes', dinero(Math.round(ing)))}${fila('Tus pagos del mes', dinero(Math.round(totalPagos)))}${fila('Ya pagaste', dinero(Math.round(yaPagado)), '#1FA463')}${fila('Te falta pagar', dinero(Math.round(pendiente)), 'var(--r-nar)')}${otros > 0 ? fila('Otros gastos (comida, transporte…)', dinero(Math.round(otros)), 'var(--r-ama)') : ''}</div></div>`;
+  h += `<h2 class="entra" style="animation-delay:120ms">${falta > 0 ? 'Plan para que te alcance' : 'Así puedes repartirlo'}</h2><div class="caja entra" style="animation-delay:160ms"><p style="margin:0 0 6px;line-height:1.4">${intro}</p>`
+    + pend.map((x, i) => `<button class="fila balFila" data-act="detalle" data-id="${x.p.id}" style="${i ? 'border-top:1px solid var(--line)' : ''}">${icono(x.p)}<span class="peso" style="text-align:left;padding:0 8px 0 12px;min-width:0"><b style="display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sinPrefijo(x.p.nombre))}</b><span class="chico" style="color:${x.vencido ? '#D9534F' : 'var(--gr)'}">${x.vencido ? 'Vencido el ' : 'Vence '}${corto(x.p.vence)}${x.p.compartido && x.p.creadoPor ? ' · de ' + esc(x.p.creadoPor) : ''}</span>${x.nota ? `<span class="balChip">${x.nota}</span>` : ''}</span><span style="text-align:right"><b style="display:block">${dinero(Math.round(x.pagar*100)/100)}</b>${x.pagar < x.completo ? `<s class="gris chico">${dinero(Math.round(x.completo*100)/100)}</s>` : ''}</span></button>`).join('')
+    + (pend.length ? `<div class="fila" style="padding-top:10px;border-top:1px solid var(--line)"><b class="peso">${sobra >= 0 ? 'Te quedan libres' : 'Aún te faltan'}</b><b style="font-size:16px;color:${sobra >= 0 ? '#1FA463' : '#D9534F'}">${dinero(Math.abs(Math.round(sobra)))}</b></div>` : '') + `</div>`;
+  if((D.ingresoFrec || 0) === 0 && pend.length){
+    let q1 = 0, q2 = 0; pend.forEach(x => { if(x.vencido || x.dia.getDate() <= 15) q1 += x.pagar; else q2 += x.pagar; });
+    const porQ = (ing - otros) / 2;
+    const bq = (n, v) => `<div style="margin-bottom:12px"><div class="fila chico"><b class="peso">${n}</b><span style="color:${v > porQ ? '#D9534F' : 'var(--gr)'}">${dinero(Math.round(v))} de ${dinero(Math.round(Math.max(0, porQ)))}</span></div>${barraBal(porQ > 0 ? v / porQ : 1, v > porQ ? '#E5484D' : 'var(--r-azu)', 500)}</div>`;
+    const qt = q1 > porQ && q2 < porQ ? `Tu primera quincena está más cargada. Aparta ${dinero(Math.round(Math.min(q1 - porQ, porQ - q2)))} de tu pago de fin de mes para cubrir lo que vence del 1 al 15.`
+      : q2 > porQ && q1 < porQ ? `Tu segunda quincena está más cargada. Aparta ${dinero(Math.round(Math.min(q2 - porQ, porQ - q1)))} de tu pago del día 15 para lo que vence después.`
+      : q1 > porQ && q2 > porQ ? 'Las dos quincenas pasan de lo que te queda en cada una; sigue el plan de arriba para aligerarlas.' : 'Tus pagos están bien repartidos entre tus dos quincenas.';
+    h += `<h2 class="entra" style="animation-delay:200ms">Por quincena</h2><div class="caja entra" style="animation-delay:240ms">${bq('1ª quincena (día 1 al 15)', q1)}${bq('2ª quincena (día 16 en adelante)', q2)}<p class="gris chico" style="margin:0;line-height:1.4">${qt}</p></div>`;
+  }
+  const tips = [], ven = pend.filter(x => x.vencido), vencidos = ven.reduce((s,x) => s + x.completo, 0);
+  if(ven.length) tips.push(`Tienes ${ven.length} ${ven.length === 1 ? 'pago vencido' : 'pagos vencidos'} por ${dinero(Math.round(vencidos))}. Dales prioridad para evitar recargos e intereses moratorios.`);
+  const pasa = pend.reduce((s,x) => s + (x.completo - x.pagar), 0);
+  if(pasa > 0) tips.push(`Pagar menos del total genera intereses: los ${dinero(Math.round(pasa))} que no pagues este mes se pasan al siguiente con intereses. Procura liquidarlos el próximo mes.`);
+  if(resto > .5) tips.push(`Aun con el mínimo te faltan ${dinero(Math.round(resto))}. Habla con el banco o la tienda antes de la fecha límite: muchas veces ofrecen reestructurar o diferir el pago.`);
+  const subs = pend.filter(x => (x.p.cat || adivinarCat(x.p.nombre)) === 'streaming' && !x.p.pagoCon);
+  if(resto > .5 && subs.length) tips.push(`Pausar suscripciones este mes (${subs.slice(0,3).map(x => esc(sinPrefijo(x.p.nombre))).join(', ')}) te libera ${dinero(Math.round(subs.reduce((s,x) => s + x.completo, 0)))}.`);
+  if(frac > .5) tips.push(`Tus pagos son el ${Math.round(frac*100)} % de tu ingreso. Lo recomendable es que no pasen del 50 %; evita nuevas compras a meses hasta bajarlo.`);
+  const comp = pend.filter(x => x.p.compartido);
+  if(comp.length) tips.push(`De lo que te falta, ${dinero(Math.round(comp.reduce((s,x) => s + x.completo, 0)))} son pagos compartidos con ${[...new Set(comp.map(x => esc(nombreVisible(x.p.creadoPor || x.p.conQuien))))].join(', ')}. Pónganse de acuerdo para pagar a tiempo.`);
+  if(!(otros > 0)) tips.push('Agrega tus otros gastos del mes (comida, transporte, gasolina) para que el balance sea más real.');
+  if(falta <= 0 && -falta > ing * .1) tips.push(`Te sobran ${dinero(Math.round(-falta))}: puedes adelantar pagos de tus tarjetas o apartarlos para tu ahorro (pestaña Ahorros).`);
+  if(!tips.length) tips.push('¡Vas muy bien! Sigue pagando a tiempo y revisa tu balance cada mes.');
+  h += `<h2 class="entra" style="animation-delay:280ms">Recomendaciones para ti</h2><div class="caja entra" style="animation-delay:320ms">${tips.map(t => `<div class="fila" style="align-items:flex-start;margin-bottom:12px"><span class="punto" style="background:var(--r-azu);margin-top:7px"></span><span class="peso" style="line-height:1.4">${t}</span></div>`).join('')}<p class="gris" style="font-size:11px;margin:0">Son sugerencias generales con base en lo que registraste, no asesoría financiera.</p></div>
+    <button class="btn borde entra" style="margin-top:14px;animation-delay:360ms" data-act="presupuesto">Editar ingresos y gastos</button>`;
+  return h;
+}
+/* el número grande sube de 0 a su valor */
+function animarBalance(){
+  document.querySelectorAll('.contar').forEach(el => { const v = +el.dataset.v, t0 = performance.now();
+    const paso = t => { const k = Math.min(1, (t - t0 - 200) / 900); const e = k <= 0 ? 0 : 1 - Math.pow(1 - k, 3); el.textContent = dinero(Math.round(v * e)); if(k < 1) requestAnimationFrame(paso); };
+    requestAnimationFrame(paso); });
+  const lt = document.querySelector('.balT.late'); if(lt){ enfocarBal = false; setTimeout(() => { if(navigator.vibrate) navigator.vibrate(25); }, 420); }
+}
 function heroNuevo(delMes, pag, tot){
   const g = grupos(), hy = hoy();
   const suma = l => dinero(Math.round(l.reduce((s,p) => s + miMonto(p), 0)));
@@ -403,7 +567,9 @@ function heroNuevo(delMes, pag, tot){
   const pie = (du == null ? 'Aún no registras pagos' : 'Último pago ' + (du <= 0 ? 'hoy' : du === 1 ? 'hace 1 día' : 'hace ' + du + ' días')) + ' · ' + (dp == null ? 'sin pagos próximos' : 'Próximo ' + (dp === 0 ? 'hoy' : dp === 1 ? 'mañana' : 'en ' + dp + ' días'));
   const ind = (n, t, l, ic, col, lleno) => `<button class="ind" data-act="filtro" data-n="${n}"><span class="indIc" style="${lleno ? `background:${col};color:#fff` : `background:color-mix(in srgb, ${col} 18%, transparent);color:${col}`}">${SIMB[ic]}</span><span><span class="chico gris">${t}</span><b style="display:block;font-size:16px">${l.length}</b><span class="chico gris">${suma(l)}</span></span></button>`;
   return `<div class="hero heroN" id="hero" style="${estiloHero()}">
-    <div class="fila" style="align-items:center"><span class="heroIc">${calDia(hy.getDate())}</span><div class="peso" style="padding-left:12px"><b style="font-size:16px">Por pagar este mes</b><div class="chico gris">${pag} de ${delMes.length} pagos</div></div><b style="font-size:26px">${dinero(tot)}</b></div>
+    <div class="fila" style="align-items:center"><span class="heroIc">${calDia(hy.getDate())}</span><div class="peso" style="padding-left:12px;min-width:0"><b class="heroMes">${MESL[hy.getMonth()]}</b><div class="chico gris">${pag} de ${delMes.length} pagos</div></div>${(() => { const lib = libreMes();
+      const col = !lib ? '' : lib[2] < 0 ? '#E5484D' : lib[2] < lib[0] * .1 ? '#F2A600' : '';   // ! rojo: te pasas de tu ingreso; ámbar: casi no te queda
+      return `<button class="heroMonto${col && tot >= 10000 ? ' chico2' : ''}" data-act="irBalance" aria-label="Ver mi balance" style="align-items:center"><b>${dinero(tot)}</b>${col ? `<span class="aviso" style="background:${col}">!</span>` : ''}</button>`; })()}</div>
     <div class="heroLin"></div>
     <div class="fila" style="align-items:stretch">${ind(1,'Pagados',g[1],'check','#1FA463',true)}<i class="heroSep"></i>${ind(2,'Pendientes',g[2],'reloj','currentColor',false)}<i class="heroSep"></i>${ind(3,'Vence pronto',g[3],'cal','#7C5CE6',false)}</div>
     <div class="heroPie"><span style="width:16px;height:16px;display:inline-block">${SIMB.reloj}</span> ${pie}</div></div>`;
@@ -547,7 +713,7 @@ function tarjetasLista(){
           return `<button class="tjFila" data-act="irTj" data-id="${p.id}" style="display:flex;align-items:center;width:100%;text-align:left;gap:10px;padding:7px 6px 7px 10px;border-radius:16px;margin-bottom:6px">
             <span style="width:28px;height:28px;border-radius:50%;background:${col};display:grid;place-items:center;flex:none">${ico.replace(/width="20" height="20"/, 'width="15" height="15"')}</span>
             <span class="peso" style="min-width:0"><span class="b" style="display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sinPrefijo(p.nombre))}${p.creadoPor ? ' (de ' + esc(p.creadoPor) + ')' : ''}</span><span class="gris" style="display:block;font-size:11px;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${buena ? 'Corte hace ' + hace + (hace === 1 ? ' día' : ' días') + ' · Mejor hoy' : (faltan === 0 ? 'Corta hoy' : 'Corta en ' + faltan + (faltan === 1 ? ' día' : ' días')) + ' · Espera o usa otra'}</span></span>
-            <span style="display:flex;align-items:center;background:${col}24;border-radius:12px;padding:3px 10px;flex:none;text-align:center"><span style="color:${colT};line-height:1.2"><span style="display:block;font-size:10px">${faltan === 0 ? 'Corta hoy' : faltan === 1 ? 'Corta mañana' : 'Corta el'}</span><b style="font-size:11px">${corto(iso(sig))}</b></span></span>
+            <span style="display:flex;align-items:center;padding:3px 4px 3px 6px;flex:none;text-align:right"><span style="line-height:1.2"><span class="gris" style="display:block;font-size:11px">${faltan === 0 ? 'Corta hoy' : faltan === 1 ? 'Corta mañana' : 'Corta el'}</span><b style="font-size:14px">${corto(iso(sig))}</b></span></span>
             <span class="gris" style="font-size:20px;padding:0 2px 2px 4px">›</span></button>`; }).join('') + `</div>`;
     }
     if(!cs.length) return buscando ? '' : h + `<div class="vacio">Aquí aparecen tus tarjetas de crédito y créditos departamentales. Para agregar uno, abre un pago, toca editar y elige el tipo de crédito.</div>`;
@@ -604,6 +770,8 @@ function pastel(vals, cols, total, centro, sub){
 function estadisticas(){
   let h = `<div class="seg"><button class="${estad===0?'sel':''}" data-act="estad" data-n="0">Estadísticas</button><button class="${estad===1?'sel':''}" data-act="estad" data-n="1">Ahorros</button></div>`;
   if(estad === 1) return h + ahorros();
+  if(verBalance && D.ingreso > 0) return pantallaBalance();
+  h += tarjetaBalanceW();
   // barras de los últimos 6 meses (lo pagado)
   const h0 = hoy(), meses = [];
   for(let k = 5; k >= 0; k--){ const d = new Date(h0.getFullYear(), h0.getMonth()-k, 1); meses.push({y:d.getFullYear(), m:d.getMonth(), v:0}); }
@@ -659,7 +827,7 @@ function grupo(titulo, filas){
   return `<div class="gris chico b" style="margin:22px 8px 8px">${titulo}</div><div class="caja" style="padding:4px 16px">${filas.map(([n, extra, act]) => `<button class="dato" style="width:100%;padding:14px 0" data-act="${act}"><span>${n}</span><span class="gris" style="max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${extra} ›</span></button>`).join('')}</div>`;
 }
 function ajustes(){
-  const temas = [['auto','Auto'],['claro1','Claro 1'],['claro2','Claro 2'],['oscuro','Oscuro'],['glass','Glass'],['glassb','Glass blanco']];
+  const temas = [['auto','Auto'],['claro1','Claro'],['oscuro','Oscuro'],['glass','Glass'],['glassb','Glass blanco'],['glasso','Glass oscuro']];
   const correo = D.nube && D.nube.correo ? D.nube.correo : '';
   const ini = esc((D.nombre || '?')[0].toUpperCase());
   return `<div style="position:relative;height:232px">
@@ -670,17 +838,17 @@ function ajustes(){
       </button></div>
     <button data-act="nombre" style="display:block;margin:6px auto 0;font-size:24px;font-weight:800">${esc(D.nombre || 'Tu nombre')}</button>
     <div class="gris" style="text-align:center;margin:4px 0">${correo ? esc(correo) : 'Sin cuenta'} · ${D.pagos.length} ${D.pagos.length === 1 ? 'pago' : 'pagos'}</div>
-    ${grupo('Datos personales', [['Nombre', esc(D.nombre || 'Agregar'), 'nombre'], ['Correo', correo ? esc(correo) : 'Sin cuenta', 'cuenta'], ['Teléfono', esc(D.miTel || 'Agregar'), 'tel'], ['Días de quincena', (D.quincena||15) + ' y fin de mes', 'quincena'], ['Ingreso', D.ingreso > 0 ? dinero(Math.round(D.ingreso)) + ' al mes' : 'Agregar', 'presupuesto']])}
+    ${grupo('Datos personales', [['Nombre', esc(D.nombre || 'Agregar'), 'nombre'], ['Correo', correo ? esc(correo) : 'Sin cuenta', 'cuenta'], ['Teléfono', esc(D.miTel || 'Agregar'), 'tel'], ['Días de pago', ({15:'Día 15 y fin de mes', 14:'Día 14 y fin de mes', 10:'Día 10 y día 25'})[D.quincena||15] || ('Día ' + D.quincena + ' y fin de mes'), 'quincena'], ['Ingreso', D.ingreso > 0 ? dinero(Math.round(D.ingreso)) + ' al mes' : 'Agregar', 'presupuesto']])}
     ${grupo('Avisos', [['Avisos de pagos en este celular', D.avisos ? 'Activados' : 'Activar', 'avisos']])}
     ${grupo('Cuenta y personas', [['Cuenta y pagos compartidos', correo ? (D.nube.verif ? 'Conectada' : 'Sin verificar') : 'Sin cuenta', 'cuenta'], ['Personas con las que pagas', personas().length + ' personas', 'personas']])}
-    <div class="gris chico b" style="margin:22px 8px 8px">Apariencia</div><div class="caja">${[temas.slice(0,3), temas.slice(3)].map((fila,f) => `<div class="seg" style="margin:${f ? '8px' : '0'} 0 0">${fila.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div>`).join('')}<p class="gris chico" style="margin-bottom:0">Glass sigue al sistema (de noche es oscuro). Glass blanco es blanco con toques de color.</p></div>
-    ${grupo('Fondo del modo Glass', [['Tu imagen de fondo', D.fondoGlass ? 'Tu foto' : 'Predeterminado', 'fondoGlass']])}
-    ${document.documentElement.dataset.tema === 'glass' ? grupo('Glass', [['Desenfoque del fondo', ['Normal','30 % más','50 % más','80 % más'][D.glassBlur || 0], 'glassBlur']]) : ''}
+    <div class="gris chico b" style="margin:22px 8px 8px">Apariencia y diseño</div><div class="caja" style="padding-bottom:4px">${[temas.slice(0,3), temas.slice(3)].map((fila,f) => `<div class="seg" style="margin:${f ? '8px' : '0'} 0 0">${fila.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div>`).join('')}<p class="gris chico" style="margin-bottom:12px">Glass sigue al sistema (de noche es oscuro). Glass blanco es blanco con toques de color.</p>
+      ${(() => { const f = (n, extra, act) => `<button class="dato" style="width:100%;padding:14px 0;border-top:1px solid var(--line)" data-act="${act}"><span style="text-align:left;flex:1">${n}</span><span class="gris" style="max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${extra} ›</span></button>`;
+        return f('Diseño de tarjeta principal', listaHero()[selHero()][0], 'colores') + f('Fondo del modo Glass', D.fondoGlass ? 'Tu foto' : 'Predeterminado', 'fondoGlass')
+          + (document.documentElement.dataset.tema === 'glass' ? f('Desenfoque del fondo', ['Normal','30 % más','50 % más','80 % más'][D.glassBlur || 0], 'glassBlur') : ''); })()}</div>
     ${grupo('Ayuda', [['Ver tutorial', '', 'tutorial']])}
-    ${grupo('Colores', [['Color de "Por pagar este mes"', listaHero()[selHero()][0], 'colores']])}
     ${grupo('Tus datos', [['Respaldo en la nube', D.respaldoNube ? 'Guardado' : 'Guardar', 'respNube'], ['Guardar respaldo en archivo', 'archivo', 'exportar'], ['Cargar respaldo de archivo', 'archivo', 'importar']])}
     <input type="file" id="imp" accept="application/json" data-act="importar" hidden>
-    <div class="gris chico b" style="margin:22px 8px 8px">Acerca de</div><div class="caja"><p class="chico" style="margin-top:0"><b>Ponla en tu iPhone como app:</b> en Safari toca Compartir y luego "Agregar a pantalla de inicio".</p><p class="gris chico" style="margin-bottom:0">Los avisos llegan cada mañana a las 9:00 (necesitas cuenta y activarlos en "Avisos"). El iPhone no permite que una web vibre por su cuenta. Tus pagos se guardan en este navegador; usa "Guardar respaldo" de vez en cuando.</p></div>`;
+    <div class="gris chico b" style="margin:22px 8px 8px">Acerca de</div><div class="caja"><p class="chico" style="margin-top:0"><b>Ponla en tu iPhone como app:</b> en Safari toca Compartir y luego "Agregar a pantalla de inicio".</p><p class="gris chico" style="margin-bottom:0">Los avisos de pagos por vencer llegan cada mañana a las 9:00 y los de pagos compartidos en unos minutos (necesitas cuenta y activarlos en "Avisos"). El iPhone no permite que una web vibre por su cuenta. Tus pagos se guardan en este navegador; usa "Guardar respaldo" de vez en cuando.</p></div>`;
 }
 /* reduce una imagen y la devuelve como dataURL */
 function reducir(archivo, max, recorte){
@@ -716,9 +884,12 @@ function detalle(id){
   let h = `<div class="pago est-${estado(p)}" style="display:block"><div class="fila">${icono(p)}<div class="peso"><div class="nom">${esc(p.nombre)}</div><div class="gris chico">${p.monto ? dinero(num(p.monto)) + ' · ' : ''}${FRECS[p.frec]}</div></div>${anillo(p,44)}</div>
     ${p.creadoPor ? `<div class="gris chico b" style="margin-top:10px">☁ Creado por ${esc(p.creadoPor)}</div>` : ''}
     <div class="b" style="margin:14px 0">Vence ${corto(p.vence)} · ${p.pagado ? 'pagado ✓' : d < 0 ? 'venció hace ' + (-d) + ' días' : d === 0 ? 'vence hoy' : d === 1 ? 'vence mañana' : 'faltan ' + d + ' días'}</div>
-    <button class="btn borde" data-act="pagar" data-id="${p.id}">${p.pagado ? 'Pagado <span class="verde">✓</span>' : 'Confirmar pago'}</button></div>`;
-  if(p.tieneDatos){
-    h += `<h2>Datos para pagar</h2><div class="caja">` + [['Tarjeta',p.tarjetaUlt,'numTarjeta'],['Vencimiento',p.tarjetaUlt ? '••/••' : '','expira'],['CVV',p.tarjetaUlt ? '•••' : '','cvv'],['Cuenta',p.cuentaUlt,'cuenta'],['Referencia',p.refUlt,'referencia'],['Titular',p.titularVis,'']].filter(x => x[1]).map(([a,b,k]) => `<div class="dato"><span class="gris">${a}</span><span class="fila"><b id="dv-${k}">${esc(b)}</b>${k ? `<button class="pildora" data-act="verDato" data-id="${p.id}" data-k="${k}">Ver</button><button class="pildora" data-act="copiarDato" data-id="${p.id}" data-k="${k}">Copiar</button>` : ''}</span></div>`).join('') + `</div>`;
+    ${p.creadoPor && !p.pagado && p.nubeId ? ((D.parteAvisada || {})[p.nubeId] === p.vence ? `<button class="btn borde gris" data-act="pagueParte" data-id="${p.id}" data-n="1">Esperando confirmación…</button>` : `<button class="btn borde" data-act="pagueParte" data-id="${p.id}">Ya pagué mi parte</button>`) : p.creadoPor && p.pagado ? `<button class="btn borde" disabled>Pagado <span class="verde">✓</span></button>` : `<button class="btn borde" data-act="pagar" data-id="${p.id}">${p.pagado ? 'Pagado <span class="verde">✓</span>' : 'Confirmar pago'}</button>`}</div>`;
+  { const pide = (D.partePide || {})[p.nubeId];   // creaste el pago y la otra persona dice que ya te pagó su parte
+    if(!p.creadoPor && p.nubeId && pide && pide.v === p.vence){ const ok = (D.parteOk || {})[p.nubeId] === p.vence;
+      h += `<div class="caja est-${ok ? 'ver' : 'azu'} entra" style="margin-top:12px"><div class="fila" style="align-items:center"><span style="font-size:22px">${ok ? '✅' : '💸'}</span><div class="peso" style="padding-left:12px"><b style="display:block">${ok ? 'Confirmaste el pago de ' + esc(pide.de) : esc(pide.de) + ' dice que ya te pagó'}</b><span class="gris chico">${ok ? 'Ya le aparece como pagado.' : 'Su parte' + (num(pide.monto) ? ' de ' + dinero(num(pide.monto)) : '') + '. Confírmalo cuando lo veas en tu cuenta.'}</span></div></div>${ok ? '' : `<button class="btn lleno" style="margin-top:12px" data-act="confParte" data-id="${p.id}">Confirmar que lo recibí</button>`}</div>`; } }
+  if(p.tieneDatos || p.numServicio){
+    h += `<h2>Datos para pagar</h2><div class="caja">` + (p.numServicio ? `<div class="dato"><span class="gris">No. de servicio</span><span class="fila"><b>${esc(p.numServicio)}</b><button class="pildora" data-act="copiarSrv" data-t="${esc(p.numServicio)}">Copiar</button></span></div>` : '') + [['Tarjeta',p.tarjetaUlt,'numTarjeta'],['Vencimiento',p.tarjetaUlt ? '••/••' : '','expira'],['CVV',p.tarjetaUlt ? '•••' : '','cvv'],['Cuenta',p.cuentaUlt,'cuenta'],['Referencia',p.refUlt,'referencia'],['Titular',p.titularVis,'']].filter(x => x[1]).map(([a,b,k]) => `<div class="dato"><span class="gris">${a}</span><span class="fila"><b id="dv-${k}">${esc(b)}</b>${k ? `<button class="pildora" data-act="verDato" data-id="${p.id}" data-k="${k}">Ver</button><button class="pildora" data-act="copiarDato" data-id="${p.id}" data-k="${k}">Copiar</button>` : ''}</span></div>`).join('') + `</div>`;
   }
   if(p.credito){
     h += `<h2>${p.tipoCred==='departamental'?'Crédito departamental':'Tarjeta de crédito'}</h2><div class="caja"><div class="dato"><span class="gris">Corte</span><b>${p.diaCorte ? 'día ' + p.diaCorte : '—'}</b></div><div class="dato"><span class="gris">Límite de pago</span><b>${corto(p.vence)}</b></div><div class="dato"><span class="gris">Sin intereses</span><b>${p.monto ? dinero(num(p.monto)) : '—'}</b></div><div class="dato"><span class="gris">Pago mínimo</span><b>${p.minimo ? dinero(num(p.minimo)) : '—'}</b></div><p class="gris chico">El día de corte cierra tu periodo y se calcula cuánto debes; al día siguiente actualiza aquí el monto a pagar.</p></div>`;
@@ -755,19 +926,20 @@ function editor(id){
     <div class="dos soloCredito" style="${esCredito(catEd) ? '' : 'display:none'}"><div><label>Día de corte</label><input name="diaCorte" inputmode="numeric" value="${p.diaCorte||''}"></div><div><label>Pago mínimo</label><input name="minimo" inputmode="decimal" value="${esc(p.minimo||'')}"></div></div>
     ${(() => { const tj = D.pagos.filter(q => q.credito && q.id !== p.id); if(!tj.length) return '';
       return `<label>¿Con qué lo pagas?</label><select name="pagoCon"><option value="0">Efectivo, débito o transferencia</option>${tj.map(q => `<option value="${q.id}" ${p.pagoCon === q.id ? 'selected' : ''}>Tarjeta de crédito: ${esc(sinPrefijo(q.nombre))}${q.creadoPor ? ' (de ' + esc(q.creadoPor) + ')' : ''}</option>`).join('')}</select><p class="gris chico" style="margin:4px 4px 0">Si lo pagas con una tarjeta de crédito, no se suma aparte en tus totales: ya va dentro del pago de esa tarjeta.</p>`; })()}
-    <label>Datos para pagar</label><input name="numServicio" value="${esc(p.numServicio||'')}" placeholder="Número de servicio" style="${esServicio(p.cat || adivinarCat(p.nombre||'')) ? '' : 'display:none'}"><div id="tjBox" style="${esServicio(p.cat || adivinarCat(p.nombre||'')) ? 'display:none' : ''}"><input name="numTarjeta" inputmode="numeric" value="" placeholder="${p.tarjetaUlt ? 'Tarjeta: ' + esc(p.tarjetaUlt) + ' (escribe para cambiar)' : 'Número de tarjeta (16 dígitos)'}">
+    <label id="datosTit">Datos para pagar</label><input name="numServicio" value="${esc(p.numServicio||'')}" placeholder="Número de servicio"><div id="tjBox"><input name="numTarjeta" inputmode="numeric" value="" placeholder="${p.tarjetaUlt ? 'Tarjeta: ' + esc(p.tarjetaUlt) + ' (escribe para cambiar)' : 'Número de tarjeta (16 dígitos)'}">
     <div class="dos" style="margin-top:8px;grid-template-columns:1.6fr 1fr"><input name="expira" maxlength="5" inputmode="numeric" value="" placeholder="${p.tarjetaUlt ? 'Vencimiento: ••/••' : 'Vencimiento MM/AA'}" oninput="const d=this.value.replace(/[^0-9]/g,'').slice(0,4); const sube=(this._a||0) < this.value.length; this.value = d.length > 2 ? d.slice(0,2)+'/'+d.slice(2) : (d.length===2 && sube ? d+'/' : d); this._a=this.value.length"><input name="cvv" type="password" inputmode="numeric" maxlength="4" value="" placeholder="${p.tarjetaUlt ? 'CVV: •••' : 'CVV'}"></div></div>
     <input name="cuenta" id="edCuenta" style="margin-top:8px" value="" placeholder="${p.tieneDatos ? 'Cuenta: ' + esc(p.cuentaUlt||'') + ' (escribe para cambiar)' : 'Número de cuenta o CLABE'}"><input name="referencia" style="margin-top:8px" value="" placeholder="${p.tieneDatos && p.refUlt ? 'Referencia: ' + esc(p.refUlt) : 'Referencia'}"><input name="titular" style="margin-top:8px" value="${esc(p.titularVis||'')}" placeholder="Titular">
-    <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" name="compartido" style="width:auto;flex:none;margin:0" ${p.compartido?'checked':''}><span style="flex:1">Lo pago con alguien más</span></label>
+    <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" name="compartido" onchange="datosUpd(this.form)" style="width:auto;flex:none;margin:0" ${p.compartido?'checked':''}><span style="flex:1">Lo pago con alguien más</span></label>
     <input name="conQuien" list="per" type="text" value="${esc(p.conQuien||'')}" placeholder="Correo o número" style="width:100%"><datalist id="per">${per}</datalist>
     <select name="modoParte" style="margin-top:10px" onchange="const e=this.value==='monto'; this.form.miParte.style.display=e?'none':''; this.form.miFijo.style.display=e?'':'none'; document.getElementById('elOtro').style.display=e?'':'none'"><option value="pct">Dividir por porcentaje (%)</option><option value="monto" ${p.miFijo ? 'selected' : ''}>Dividir por montos exactos ($)</option></select>
     <input name="miParte" inputmode="numeric" value="${p.miParte||50}" placeholder="Mi parte %" style="width:100%;margin-top:8px;${p.miFijo ? 'display:none' : ''}">
     <input name="miFijo" inputmode="decimal" value="${esc(p.miFijo||'')}" placeholder="Lo que pagas tú ($)" style="width:100%;margin-top:8px;${p.miFijo ? '' : 'display:none'}" oninput="const t=num(this.form.monto.value), y=num(this.value); document.getElementById('elOtro').textContent = t ? 'La otra persona paga ' + dinero(Math.max(0, Math.round((t-y)*100)/100)) + ' (de ' + dinero(t) + ')' : ''">
     <p class="gris chico" id="elOtro" style="margin:4px 4px 0;${p.miFijo ? '' : 'display:none'}"></p>
-    ${p.creadoPor ? '' : `<label style="display:flex;align-items:center;gap:10px;margin-top:10px"><input type="checkbox" name="compartirDatos" style="width:auto;flex:none;margin:0" ${p.compartirDatos ? 'checked' : ''}><span style="flex:1">Permitir que vea y copie los datos para pagar</span></label>`}
+    ${p.creadoPor ? '' : `<p class="gris chico" style="margin:8px 4px 0">La otra persona verá tu cuenta o CLABE y el titular para depositarte su parte. Los datos de tus tarjetas nunca se comparten.</p>`}
     <button class="btn lleno" style="margin-top:20px" type="submit">Guardar</button>
     <div class="dos" style="margin-top:10px"><button class="btn borde" type="button" data-act="cerrar">Cancelar</button>${id ? `<button class="btn borde" type="button" style="color:var(--r-roj)" data-act="borrar" data-id="${id}">Eliminar</button>` : '<span></span>'}</div>
   </form>`);
+  datosUpd(document.getElementById('ed'));
   document.getElementById('ed').onsubmit = (ev) => {
     ev.preventDefault(); const f = Object.fromEntries(new FormData(ev.target));
     const x = id ? D.pagos.find(z => z.id === id) : {id: Date.now(), pagado:false, hist:[]};
@@ -783,10 +955,15 @@ function editor(id){
     x.frec = f.frec; x.cat = f.cat || adivinarCat(x.nombre);
     if(esServicio(x.cat)){ x.numServicio = (f.numServicio||'').trim(); x.periodo = f.perAnio ? f.perAnio : f.frec === 'U' ? '' : [[f.per0, f.dia0], [f.per1, f.dia1]].filter(z => z[0]).map(([m0, d0]) => { const d = parseInt(d0); return m0 + (d >= 1 && d <= 31 ? '-' + String(d).padStart(2,'0') : ''); }).join(','); f.numTarjeta = ''; f.expira = ''; f.cvv = ''; } else { x.numServicio = ''; x.periodo = ''; } x.credito = f.credito !== 'no'; x.tipoCred = f.credito === 'departamental' ? 'departamental' : 'tarjeta';
     x.pagoCon = x.credito ? 0 : (+f.pagoCon || 0);
-    x.diaCorte = parseInt(f.diaCorte)||0; x.minimo = f.minimo.trim(); x.compartirDatos = !!f.compartido && !!f.compartirDatos && !x.creadoPor;
-    { const nuevoD = {cuenta:f.cuenta.trim(), referencia:f.referencia.trim(), titular:f.titular.trim(), numTarjeta:(f.numTarjeta||'').replace(/\D/g,''), expira:(f.expira||'').trim(), cvv:(f.cvv||'').replace(/\D/g,'')};
+    x.diaCorte = parseInt(f.diaCorte)||0; x.minimo = f.minimo.trim(); x.compartirDatos = !!f.compartido && !x.creadoPor;
+    const vis = datosVis(x.cat, !!f.compartido); if(!vis.srv) x.numServicio = '';
+    if(!vis.cta || !vis.ref || !vis.tit || !vis.tj) Boveda.leer(x.id).then(o => { const d = {cuenta:vis.cta ? o.cuenta : '', referencia:vis.ref ? o.referencia : '', titular:vis.tit ? o.titular : '', numTarjeta:vis.tj ? o.numTarjeta || '' : '', expira:vis.tj ? o.expira || '' : '', cvv:vis.tj ? o.cvv || '' : ''};
+      if(d.cuenta === o.cuenta && d.referencia === o.referencia && d.titular === o.titular && d.numTarjeta === (o.numTarjeta||'')) return;
+      return Boveda.guardar(x.id, d).then(() => { x.cuentaUlt = ocultar(d.cuenta); x.refUlt = ocultar(d.referencia); x.titularVis = d.titular; x.tarjetaUlt = ocultar(d.numTarjeta); x.tieneDatos = !!(d.cuenta || d.referencia || d.titular || d.numTarjeta); guardar(); }); }).catch(() => {});
+    { if(!vis.cta) f.cuenta = ''; if(!vis.ref) f.referencia = ''; if(!vis.tit) f.titular = x.titularVis || ''; if(!vis.tj){ f.numTarjeta = ''; f.expira = ''; f.cvv = ''; }
+      const nuevoD = {cuenta:f.cuenta.trim(), referencia:f.referencia.trim(), titular:f.titular.trim(), numTarjeta:(f.numTarjeta||'').replace(/\D/g,''), expira:(f.expira||'').trim(), cvv:(f.cvv||'').replace(/\D/g,'')};
       if(nuevoD.cuenta || nuevoD.referencia || nuevoD.numTarjeta || nuevoD.expira || nuevoD.cvv || nuevoD.titular !== (x.titularVis||'')){
-        Boveda.leer(x.id).then(o => { const d = {cuenta:nuevoD.cuenta || o.cuenta, referencia:nuevoD.referencia || o.referencia, titular:nuevoD.titular, numTarjeta:nuevoD.numTarjeta || o.numTarjeta || '', expira:nuevoD.expira || o.expira || '', cvv:nuevoD.cvv || o.cvv || ''};
+        Boveda.leer(x.id).then(o => { const d = {cuenta:vis.cta ? nuevoD.cuenta || o.cuenta : '', referencia:vis.ref ? nuevoD.referencia || o.referencia : '', titular:vis.tit ? nuevoD.titular : '', numTarjeta:vis.tj ? nuevoD.numTarjeta || o.numTarjeta || '' : '', expira:vis.tj ? nuevoD.expira || o.expira || '' : '', cvv:vis.tj ? nuevoD.cvv || o.cvv || '' : ''};
           return Boveda.guardar(x.id, d).then(() => { x.cuentaUlt = ocultar(d.cuenta); x.refUlt = ocultar(d.referencia); x.titularVis = d.titular; x.tarjetaUlt = ocultar(d.numTarjeta); x.tieneDatos = !!(d.cuenta || d.referencia || d.titular || d.numTarjeta); x.e2eCambio = Date.now(); guardar(); pintar(); }); }); } }
     x.compartido = !!f.compartido; x.conQuien = f.conQuien.trim(); x.miParte = Math.max(0, Math.min(100, parseInt(f.miParte)||50));
     if(f.modoParte === 'monto' && (f.miFijo||'').trim()){ x.miFijo = f.miFijo.trim(); const t0 = num(x.monto); x.miParte = t0 ? Math.round(Math.min(t0, num(x.miFijo)) / t0 * 100) : 50; } else x.miFijo = '';
@@ -877,12 +1054,13 @@ async function sincronizar(){
     const tel = ((per && per.tel) || p.conQuien).replace(/\D/g, '');
     if(!otro && tel.length >= 10) otro = await correoDeTelefono(tel.slice(-10));
     if(!otro.includes('@') || otro === yo) continue;
-    const firma = [p.nombre, p.monto, p.vence, p.frec, p.miParte, p.miFijo||'', p.conQuien, otro, p.credito ? p.tipoCred || 'tarjeta' : '', p.diaCorte || 0, p.minimo || '', p.compartirDatos ? (p.cuentaUlt||'') + (p.titularVis||'') + (p.tarjetaUlt||'') + (p.e2eCambio||'') : '', p._faltaPub ? Date.now() : ''].join('|');
+    const firma = [p.pagado ? 'P' : '', p.nombre, p.monto, p.vence, p.frec, p.miParte, p.miFijo||'', p.conQuien, otro, p.credito ? p.tipoCred || 'tarjeta' : '', p.diaCorte || 0, p.minimo || '', (p.cuentaUlt||'') + (p.refUlt||'') + (p.titularVis||'') + (p.numServicio||'') + (p.e2eCambio||'') + 'd2', p._faltaPub ? Date.now() : ''].join('|');
     if(p.nubeId && firma === p.nubeFirma) continue;
-    const fields = {nombre:sv(p.nombre), monto:sv(p.monto), vence:sv(p.vence), frec:sv(p.frec), cat:sv(p.cat), parteCreador:iv(p.miParte||50), fijoCreador:sv(p.miFijo||''),
+    const fields = {nombre:sv(p.nombre), monto:sv(p.monto), vence:sv(p.vence), pagadoV:sv(p.pagado ? p.vence : ''), frec:sv(p.frec), cat:sv(p.cat), parteCreador:iv(p.miParte||50), fijoCreador:sv(p.miFijo||''),
       credito:sv(p.credito ? p.tipoCred || 'tarjeta' : ''), diaCorte:iv(p.diaCorte || 0), minimo:sv(p.minimo || ''),
-      datos:sv(p.compartirDatos ? await (async () => { const pubO = await pubDeCorreo(otro); if(!pubO){ p._faltaPub = true; return ''; }
-        const o = await Boveda.leer(p.id); return Boveda.e2eCifrar(pubO, JSON.stringify({c:o.cuenta, r:o.referencia, t:o.titular, n:o.numTarjeta||'', e:o.expira||'', v:o.cvv||''})); })() : ''),
+      datos:sv(await (async () => { const o = await Boveda.leer(p.id); if(!(o.cuenta || o.referencia || o.titular || p.numServicio)) return '';   // solo datos para depositar; los de tarjeta nunca se comparten
+        const pubO = await pubDeCorreo(otro); if(!pubO){ p._faltaPub = true; return ''; }
+        return Boveda.e2eCifrar(pubO, JSON.stringify({c:o.cuenta||'', r:o.referencia||'', t:o.titular||'', s:p.numServicio||''})); })()),
       creadoPor:sv(uid), creadorNombre:sv(D.nombre || yo), creadorCorreo:sv(yo), otroNombre:sv(p.conQuien), otroCorreo:sv(otro),
       participantes:{arrayValue:{values:[sv(yo), sv(otro)]}}, actualizado:iv(Date.now())};
     if(!p.nubeId){ fields.estado = sv('pendiente'); fields.solicitud = sv(''); const r = await pedir('POST', DOCS + '/compartidos', {fields}, await token()); p.nubeId = r.name.split('/').pop(); p.nubeEstado = 'pendiente'; }
@@ -894,7 +1072,9 @@ async function sincronizar(){
   (Array.isArray(res) ? res : []).forEach(x => {
     const d = x.document; if(!d) return; const id = d.name.split('/').pop(), f = d.fields; vistos.add(id);
     try{ const ro = JSON.parse(gs(f,'recordatorio') || 'null'); D.recVisto = D.recVisto || {};
-      if(ro && ro.deCorreo !== yo && ro.t > (D.recVisto[id] || 0)){ D.recVisto[id] = ro.t; avisoNube(`🔔 ${ro.de} te recuerda: ${ro.msg}`); } }catch(e){}
+      if(ro && ro.deCorreo !== yo && ro.t > (D.recVisto[id] || 0)){ D.recVisto[id] = ro.t;
+        if(ro.tipo === 'pagueParte'){ (D.partePide = D.partePide || {})[id] = {v:ro.v, monto:ro.monto || '', de:ro.de}; avisoNube(`💸 ${ro.de} dice que ya te pagó su parte de ${gs(f,'nombre')}${ro.monto ? ' (' + dinero(num(ro.monto)) + ')' : ''}. Ábrelo para confirmarlo.`); }
+        else if(ro.tipo !== 'parteOk') avisoNube(ro.tipo === 'confirmar' ? `✅ ${ro.de} te pide confirmar un pago: ${ro.msg}` : `🔔 ${ro.de} te recuerda: ${ro.msg}`); } }catch(e){}
     const estado = gs(f,'estado') || 'aceptado', sol = gs(f,'solicitud');
     let p = D.pagos.find(z => z.nubeId === id);
     D.avisosNube = D.avisosNube || [];
@@ -919,16 +1099,20 @@ async function sincronizar(){
     }
     const nuevo = !p;
     if(nuevo) p = {id: Date.now() + Math.floor(Math.random()*1000), nubeId:id, pagado:false, hist:[]};
-    const firma = [gs(f,'nombre'), gs(f,'monto'), gs(f,'vence'), gs(f,'frec'), gi(f,'parteCreador',50), gs(f,'fijoCreador'), gs(f,'credito'), gi(f,'diaCorte',0), gs(f,'minimo'), gs(f,'datos')].join('|');
+    const firma = [gs(f,'pagadoV'), gs(f,'parteOk'), gs(f,'nombre'), gs(f,'monto'), gs(f,'vence'), gs(f,'frec'), gi(f,'parteCreador',50), gs(f,'fijoCreador'), gs(f,'credito'), gi(f,'diaCorte',0), gs(f,'minimo'), gs(f,'datos')].join('|');
     if(!nuevo && firma === p.nubeFirma) return;
     if(!nuevo && p.vence !== gs(f,'vence')) p.pagado = false;
     Object.assign(p, {nombre:gs(f,'nombre'), monto:gs(f,'monto'), vence:gs(f,'vence'), frec:gs(f,'frec') || 'M1', cat:gs(f,'cat') || adivinarCat(gs(f,'nombre')),
       compartido:true, miParte:100 - gi(f,'parteCreador',50), miFijo: gs(f,'fijoCreador') ? String(Math.max(0, num(gs(f,'monto')) - num(gs(f,'fijoCreador'))).toFixed(2)) : '', conQuien:nomCreador(f), creadoPor:nomCreador(f), nubeFirma:firma,
       credito:!!gs(f,'credito'), tipoCred:gs(f,'credito') || 'tarjeta', diaCorte:gi(f,'diaCorte',0), minimo:gs(f,'minimo')});
+    { const pv = gs(f,'pagadoV'), po = gs(f,'parteOk');   // quien lo creó confirmó el pago (o que recibió tu parte): aquí queda pagado
+      const parte = po && po === p.vence;
+      if(((pv && pv === p.vence) || parte) && !p.pagado){ p.pagado = true; (p.hist = p.hist||[]).push({f:iso(hoy()), v:p.vence, m:p.monto, per:p.periodo||''}); if(!nuevo) avisoNube(`✅ ${nomCreador(f)} confirmó tu pago de ${sinPrefijo(p.nombre)}${parte ? ' (recibió tu parte)' : ''}.`); }
+      else if(!pv && !po && p.pagado && !nuevo){ p.pagado = false; } }
     { const pp = D.pagos.find(z => z.nubeId === id); const crudo = gs(f,'datos');
       const creador = ((f.participantes && f.participantes.arrayValue && f.participantes.arrayValue.values) || []).map(v => v.stringValue).find(e => e && e.toLowerCase() !== yo.toLowerCase()) || '';
       if(pp && crudo.startsWith('e2e1:')) pubDeCorreo(creador).then(pubC => Boveda.e2eDescifrar(pubC, crudo)).then(txt => { const dd = JSON.parse(txt);
-        const o = {cuenta:dd.c||'', referencia:dd.r||'', titular:dd.t||'', numTarjeta:dd.n||'', expira:dd.e||'', cvv:dd.v||''};
+        const o = {cuenta:dd.c||'', referencia:dd.r||'', titular:dd.t||'', numTarjeta:'', expira:'', cvv:''}; pp.numServicio = dd.s || '';
         pp.cuentaUlt = ocultar(o.cuenta); pp.refUlt = ocultar(o.referencia); pp.titularVis = o.titular; pp.tarjetaUlt = ocultar(o.numTarjeta); pp.tieneDatos = true; guardar();
         return Boveda.guardar(pp.id, o); }).catch(() => {});
       else if(pp){ let dd = null; try{ dd = crudo ? JSON.parse(crudo) : null; }catch(e){}
@@ -1139,7 +1323,7 @@ async function migrarBoveda(){
 setTimeout(() => migrarBoveda().catch(() => {}), 500);
 function hojaColores(){
   const L = listaHero(), gl = grupoHero() === 'glass';
-  abrirHoja(`<h1>Color de "Por pagar este mes"</h1>${L.map((c,i) => {
+  abrirHoja(`<h1>Diseño de tarjeta principal</h1>${L.map((c,i) => {
     const bg = gl ? `background:linear-gradient(120deg,${c[1] || 'rgba(255,255,255,.35)'},${c[1] || 'rgba(255,255,255,.35)'}),var(--card);border:1px solid rgba(127,127,127,.25);color:var(--fg)` : `background:linear-gradient(120deg,${c[1]},${c[2]});color:${c[3]};${grupoHero() === 'claro' && i === 0 ? 'border:1px solid #E2E6EE' : ''}`;
     return `<div class="gris chico b" style="margin:12px 4px 6px">${c[0]}${selHero() === i ? ' ✓' : ''}</div><button data-act="colorRes" data-n="${i}" class="colorOp" style="display:block;width:100%;text-align:left;border-radius:20px;padding:14px;${bg}"><div class="chico">Por pagar este mes</div><div style="font-size:24px;font-weight:800;margin:4px 0 8px">$1,019</div><div style="height:5px;border-radius:5px;background:${gl ? 'rgba(127,127,127,.3)' : c[5]}"><i style="display:block;height:100%;width:30%;border-radius:5px;background:${gl ? 'var(--fg)' : c[6]}"></i></div></button>`; }).join('')}<button class="btn borde" style="margin-top:16px" data-act="cerrar">Cerrar</button>`);
 }
@@ -1157,7 +1341,7 @@ document.addEventListener('click', (ev) => {
   const a = b.dataset.act, id = b.dataset.id ? +b.dataset.id : null, n = b.dataset.n;
   if(navigator.vibrate) navigator.vibrate(8);
   switch(a){
-    case 'tab': tab = +n; pintar(true); window.scrollTo({top:0}); break;
+    case 'tab': if(+n === 3 && tab === 3 && verBalance){ verBalance = false; pintar(true); break; } tab = +n; verBalance = false; pintar(true); window.scrollTo({top:0}); break;
     case 'detalle': detalle(id); break;
     case 'nuevo': b.animate([{transform:'rotate(0)'},{transform:'rotate(90deg)'}], {duration:380, easing:'cubic-bezier(.3,0,.15,1)'}); setTimeout(() => abrirHoja(`<h1>¿Qué quieres agregar?</h1>` + Object.entries(CATS).map(([k, v]) => `<button class="pago" data-act="nuevoTipo" data-n="${k}" style="margin-bottom:8px"><span style="font-size:24px;width:40px;text-align:center">${v[0]}</span><div class="peso nom">${v[1]}</div></button>`).join('') + `<button class="btn borde" data-act="cerrar" style="margin-top:6px">Cancelar</button>`), 220); break;
     case 'nuevoTipo': window._catNuevo = n; if(navigator.vibrate) navigator.vibrate(20); cerrarHoja(); setTimeout(() => editor(null), 320); break;
@@ -1188,10 +1372,16 @@ document.addEventListener('click', (ev) => {
     case 'dia': calSel = b.dataset.d; pintar(); break;
     case 'cartera': deslizar(b, () => { cartera = +n; pintar(); }); break;
     case 'estad': deslizar(b, () => { estad = +n; pintar(); }); break;
+    case 'irBalance': b.animate([{transform:'scale(1)'},{transform:'scale(1.07)'},{transform:'scale(1)'}], {duration:320, easing:'cubic-bezier(.3,0,.15,1)'});
+      setTimeout(() => { estad = 0; verBalance = false; enfocarBal = true; tab = 3; pintar(true); window.scrollTo({top:0}); animarBalance(); }, 200); break;
+    case 'verBalance': { const abre = n !== '0'; if(navigator.vibrate) navigator.vibrate(15); setTimeout(() => { verBalance = abre; pintar(true); window.scrollTo({top:0}); animarBalance(); }, abre ? 140 : 0); break; }
     case 'tema': { const hacer = () => { D.tema = n; guardar(); aplicarTema(); pintar(); };
       if(document.startViewTransition) document.startViewTransition(hacer); else { document.body.animate([{opacity:.4},{opacity:1}], {duration:480, easing:'cubic-bezier(.3,0,.15,1)'}); hacer(); } break; }
     case 'nombre': { const v = prompt('¿Cómo te llamas?', D.nombre); if(v !== null){ D.nombre = v.trim(); guardar(); pintar(); } break; }
-    case 'quincena': { const v = prompt('¿Qué día es tu primera quincena?', D.quincena||15); if(v){ D.quincena = Math.max(1, Math.min(28, parseInt(v)||15)); guardar(); pintar(); } break; }
+    case 'quincena': { const q = D.quincena || 15;
+      abrirHoja(`<h1>Días de pago</h1><div class="caja" style="padding:4px 16px">${[[15,'Día 15 y fin de mes'],[14,'Día 14 y fin de mes'],[10,'Día 10 y día 25 (aprox.)']].map(([v, t], i) => `<button class="dato opRadio" style="width:100%;padding:14px 0;${i ? 'border-top:1px solid var(--line)' : ''}" data-act="quincenaSel" data-n="${v}"><span class="rad${v === q ? ' on' : ''}"></span><span class="peso" style="text-align:left;padding-left:14px">${t}</span></button>`).join('')}</div><button class="btn borde" style="margin-top:14px" data-act="cerrar">Cerrar</button>`); break; }
+    case 'quincenaSel': { b.querySelector('.rad').classList.add('on'); document.querySelectorAll('.opRadio .rad').forEach(r => { if(!b.contains(r)) r.classList.remove('on'); });
+      D.quincena = +n; guardar(); setTimeout(() => { cerrarHoja(); pintar(); }, 220); break; }
     case 'personas': hojaPersonas(); break;
     case 'respNube':
       if(!D.nube || !D.nube.refresh){ alert('Inicia sesión en Mi perfil → Cuenta y pagos compartidos para guardar tu respaldo en la nube.'); break; }
@@ -1236,8 +1426,8 @@ document.addEventListener('click', (ev) => {
       setTimeout(() => { verAvisos = !!+n; pintar(); window.scrollTo(0,0); const ap = document.getElementById('app'); if(ap) ap.animate([{transform:`translateX(${d*25}%)`, opacity:0},{transform:'none', opacity:1}], {duration:420, easing:'cubic-bezier(.3,0,.15,1)'}); }, +n ? 180 : 0); break; }
     case 'borrarAvisos': if(confirm('¿Borrar todos los avisos?')){ D.historial = []; guardar(); pintar(); } break;
     case 'filtro': filtroIni = +n; pintar(); window.scrollTo(0,0); break;
-    case 'glassBlur': abrirHoja(`<h1>Desenfoque del fondo</h1>${['Normal','30 % más','50 % más','80 % más'].map((x,i) => `<button class="btn ${(D.glassBlur||0)===i?'lleno':'borde'}" style="margin-top:10px" data-act="glassBlurSel" data-n="${i}">${x}</button>`).join('')}<button class="btn borde" style="margin-top:16px" data-act="cerrar">Cerrar</button>`); break;
-    case 'glassBlurSel': D.glassBlur = +n; guardar(); aplicarTema(); cerrarHoja(); pintar(); break;
+    case 'glassBlur': abrirHoja(`<h1>Desenfoque del fondo</h1><div class="caja" style="padding:4px 16px">${['Normal','30 % más','50 % más','80 % más'].map((x,i) => `<button class="dato opRadio" style="width:100%;padding:14px 0;${i ? 'border-top:1px solid var(--line)' : ''}" data-act="glassBlurSel" data-n="${i}"><span class="rad${(D.glassBlur||0)===i ? ' on' : ''}"></span><span class="peso" style="text-align:left;padding-left:14px">${x}</span></button>`).join('')}</div><button class="btn borde" style="margin-top:14px" data-act="cerrar">Cerrar</button>`); break;
+    case 'glassBlurSel': document.querySelectorAll('.opRadio .rad').forEach(r => r.classList.toggle('on', b.contains(r))); D.glassBlur = +n; guardar(); aplicarTema(); setTimeout(() => { cerrarHoja(); pintar(); }, 220); break;
     case 'fotoGuardar': if(window._rcGuardar) window._rcGuardar(); break;
     case 'colorRes': (D.coloresResumen = D.coloresResumen || {})[grupoHero()] = +n; guardar();
       b.animate([{transform:'scale(1)'},{transform:'scale(1.05)'},{transform:'scale(1)'}], {duration:240}); setTimeout(() => { cerrarHoja(); pintar(); }, 260); break;
@@ -1266,6 +1456,18 @@ document.addEventListener('click', (ev) => {
     case 'solSi': { const p = D.pagos.find(z => z.id === id); cerrarHoja(); tarea(() => responderSolicitud(p, true)); break; }
     case 'solNo': { const p = D.pagos.find(z => z.id === id); cerrarHoja(); tarea(() => responderSolicitud(p, false)); break; }
     case 'avisoNubeOk': D.avisosNube = []; guardar(); pintar(); break;
+    case 'pagueParte': { const p = D.pagos.find(z => z.id === id); if(!p) break; const quien = nombreVisible(p.creadoPor), yaAv = n === '1';
+      if(!confirm((yaAv ? `Ya le avisaste a ${quien}. ¿Quieres recordárselo?\n\n` : `¿Ya le pagaste a ${quien}?\n\n`) + `Le llegará un aviso para que confirme que recibió tu parte (${dinero(Math.round(miMonto(p)*100)/100)}). Cuando lo confirme, aquí aparecerá como pagado.`)) break;
+      if(navigator.vibrate) navigator.vibrate(20); tarea(async () => {
+      await pedir('PATCH', DOCS + '/compartidos/' + p.nubeId + '?updateMask.fieldPaths=recordatorio&updateMask.fieldPaths=actualizado', {fields:{recordatorio:sv(JSON.stringify({de:D.nombre || D.nube.correo, deCorreo:D.nube.correo, tipo:'pagueParte', v:p.vence, monto:miMonto(p).toFixed(2), msg:`Ya te pagué mi parte de ${sinPrefijo(p.nombre)} (${dinero(Math.round(miMonto(p)*100)/100)}). Confírmalo en Mis Pagos.`, t:Date.now()})), actualizado:iv(Date.now())}}, await token());
+      (D.parteAvisada = D.parteAvisada || {})[p.nubeId] = p.vence; guardar();
+      return 'Listo: le avisaste a ' + quien + '. Cuando confirme que lo recibió, aparecerá como pagado.'; }); break; }
+    case 'confParte': { const p = D.pagos.find(z => z.id === id); if(!p) break; const pide = (D.partePide || {})[p.nubeId] || {v:p.vence, de:''};
+      b.animate([{transform:'scale(1)'},{transform:'scale(1.05)'},{transform:'scale(1)'}], {duration:360, easing:'cubic-bezier(.3,0,.15,1)'}); if(navigator.vibrate) navigator.vibrate([20, 40, 20]);
+      tarea(async () => {
+      await pedir('PATCH', DOCS + '/compartidos/' + p.nubeId + '?updateMask.fieldPaths=parteOk&updateMask.fieldPaths=recordatorio&updateMask.fieldPaths=actualizado', {fields:{parteOk:sv(pide.v), recordatorio:sv(JSON.stringify({de:D.nombre || D.nube.correo, deCorreo:D.nube.correo, tipo:'parteOk', v:pide.v, msg:`Confirmé que recibí tu parte de ${sinPrefijo(p.nombre)}.`, t:Date.now()})), actualizado:iv(Date.now())}}, await token());
+      (D.parteOk = D.parteOk || {})[p.nubeId] = pide.v; avisoNube(`✅ Confirmaste el pago${pide.de ? ' de ' + pide.de : ''} en ${sinPrefijo(p.nombre)}.`); guardar(); setTimeout(() => detalle(p.id), 50);
+      return 'Listo: le confirmaste el pago. Le llegará un aviso y le aparecerá como pagado.'; }); break; }
     case 'recordar': { const p = D.pagos.find(z => z.id === id); tarea(async () => {
       await pedir('PATCH', DOCS + '/compartidos/' + p.nubeId + '?updateMask.fieldPaths=recordatorio&updateMask.fieldPaths=actualizado', {fields:{recordatorio:sv(JSON.stringify({de:D.nombre || D.nube.correo, deCorreo:D.nube.correo, msg:b.dataset.m, t:Date.now()})), actualizado:iv(Date.now())}}, await token());
       return 'Recordatorio enviado. Le llegará una notificación de Mis Pagos.'; }); break; }
@@ -1296,7 +1498,9 @@ function aplicarTema(){
   const noche = matchMedia('(prefers-color-scheme: dark)').matches;
   if(t === 'auto') t = noche ? 'oscuro' : 'claro1';
   if(t === 'glass') t = noche ? 'glassn' : 'glass';
-  if(t === 'glassb') t = 'glassb';
+  if(t === 'glassb') t = noche ? 'glassn' : 'glassb';   // de noche, Glass blanco pasa a Glass oscuro
+  if(t === 'glasso') t = 'glassn';
+  if(t === 'claro2') t = 'claro1';   // "Claro 2" ya no existe
   document.documentElement.dataset.tema = t;
   if(D.fondoGlass) document.documentElement.style.setProperty('--fondoGlass', `url(${D.fondoGlass})`); else document.documentElement.style.removeProperty('--fondoGlass');
   document.querySelector('meta[name=theme-color]').content = getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();
