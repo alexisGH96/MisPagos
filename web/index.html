@@ -157,6 +157,18 @@ input,select{width:100%;font:inherit;color:var(--fg);background:var(--surf);bord
 .reng.una .peso{gap:0}
 .reng.una .pt{padding:0 6px}
 .reng.una .tot{padding-left:8px}
+#bloqueo{position:fixed;inset:0;z-index:9999;background:var(--bg);overflow:auto;animation:entra .4s cubic-bezier(.3,0,.15,1) both}
+.blFondo{min-height:100%;display:flex;flex-direction:column;padding:calc(env(safe-area-inset-top,0) + 10px) 16px 30px}
+.blIlus{width:100%;max-height:36vh;margin:6px 0 -10px}
+.blFlota{animation:flota 3.2s ease-in-out infinite alternate}
+@keyframes flota{to{transform:translateY(-6px)}}
+.blIco{animation:flota 2.6s ease-in-out infinite alternate}
+.blTar{padding:22px;border-radius:28px}
+.blAv{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:20px;background:var(--pill);color:var(--icoSel,#fff);flex:none}
+.blHuella{display:grid;place-items:center;width:76px;height:76px;margin:22px auto 0;border-radius:50%;background:color-mix(in srgb, var(--pill) 18%, transparent);color:var(--pill);border:0;animation:late2 2.4s ease-in-out infinite}
+.blHuella svg{width:40px;height:40px}
+@keyframes late2{50%{box-shadow:0 0 0 12px color-mix(in srgb, var(--pill) 12%, transparent)}}
+.blLink{display:block;margin:16px auto 0;background:none;border:0;font:inherit;font-weight:700;font-size:13px;color:var(--pill)}
 .rad{width:22px;height:22px;border-radius:50%;border:2px solid var(--gr);flex:none;position:relative;transition:border-color .2s}
 .rad{--radC:var(--acc)}
 :root[data-tema^="glass"] .rad{--radC:var(--icoSel)}
@@ -876,7 +888,7 @@ function ajustes(){
     <div class="gris" style="text-align:center;margin:4px 0">${correo ? esc(correo) : 'Sin cuenta'} · ${D.pagos.length} ${D.pagos.length === 1 ? 'pago' : 'pagos'}</div>
     ${grupo('Datos personales', [['Nombre', esc(D.nombre || 'Agregar'), 'nombre'], ['Correo', correo ? esc(correo) : 'Sin cuenta', 'cuenta'], ['Teléfono', esc(D.miTel || 'Agregar'), 'tel'], ['Días de pago', ({15:'Día 15 y fin de mes', 14:'Día 14 y fin de mes', 10:'Día 10 y día 25'})[D.quincena||15] || ('Día ' + D.quincena + ' y fin de mes'), 'quincena'], ['Ingreso', D.ingreso > 0 ? dinero(Math.round(D.ingreso)) + ' al mes' : 'Agregar', 'presupuesto']])}
     ${grupo('Avisos', [['Avisos de pagos en este celular', D.avisos ? 'Activados' : 'Activar', 'avisos']])}
-    ${grupo('Cuenta y personas', [['Cuenta y pagos compartidos', correo ? (D.nube.verif ? 'Conectada' : 'Sin verificar') : 'Sin cuenta', 'cuenta'], ['Personas con las que pagas', personas().length + ' personas', 'personas']])}
+    ${grupo('Cuenta y personas', [['Cuenta y pagos compartidos', correo ? (D.nube.verif ? 'Conectada' : 'Sin verificar') : 'Sin cuenta', 'cuenta'], ['Personas con las que pagas', personas().length + ' personas', 'personas'], ['Entrar con contraseña', D.bloqueo && D.bloqueo.hash ? (D.bloqueo.cred ? 'Face ID y contraseña' : 'Contraseña') : 'Apagado', 'bloqueo']])}
     <div class="gris chico b" style="margin:22px 8px 8px">Apariencia y diseño</div><div class="caja" style="padding-bottom:4px">${[temas.slice(0,3), temas.slice(3)].map((fila,f) => `<div class="seg" style="margin:${f ? '8px' : '0'} 0 0">${fila.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div>`).join('')}<p class="gris chico" style="margin-bottom:12px">Glass sigue al sistema (de noche es oscuro). Glass blanco es blanco con toques de color.</p>
       ${(() => { const f = (n, extra, act) => `<button class="dato" style="width:100%;padding:14px 0;border-top:1px solid var(--line)" data-act="${act}"><span style="text-align:left;flex:1">${n}</span><span class="gris" style="max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${extra} ›</span></button>`;
         return f('Diseño de tarjeta principal', listaHero()[selHero()][0], 'colores') + f('Fondo del modo Glass', D.fondoGlass ? 'Tu foto' : 'Predeterminado', 'fondoGlass')
@@ -1098,13 +1110,15 @@ async function sincronizar(){
     const tel = ((per && per.tel) || p.conQuien).replace(/\D/g, '');
     if(!otro && tel.length >= 10) otro = await correoDeTelefono(tel.slice(-10));
     if(!otro.includes('@') || otro === yo) continue;
-    const firma = [p.pagado ? 'P' : '', p.nombre, p.monto, p.vence, p.frec, p.miParte, p.miFijo||'', p.conQuien, otro, p.credito ? p.tipoCred || 'tarjeta' : '', p.diaCorte || 0, p.minimo || '', (p.cuentaUlt||'') + (p.refUlt||'') + (p.titularVis||'') + (p.numServicio||'') + (p.e2eCambio||'') + 'd2', p._faltaPub ? Date.now() : ''].join('|');
+    const firma = [p.pagado ? 'P' : '', p.nombre, p.monto, p.vence, p.frec, p.miParte, p.miFijo||'', p.conQuien, otro, p.credito ? p.tipoCred || 'tarjeta' : '', p.diaCorte || 0, p.minimo || '', (p.cuentaUlt||'') + (p.refUlt||'') + (p.titularVis||'') + (p.numServicio||'') + (p.tarjetaUlt||'') + (p.e2eCambio||'') + 'd3', p._faltaPub ? Date.now() : ''].join('|');
     if(p.nubeId && firma === p.nubeFirma) continue;
     const fields = {nombre:sv(p.nombre), monto:sv(p.monto), vence:sv(p.vence), pagadoV:sv(p.pagado ? p.vence : ''), frec:sv(p.frec), cat:sv(p.cat), parteCreador:iv(p.miParte||50), fijoCreador:sv(p.miFijo||''),
       credito:sv(p.credito ? p.tipoCred || 'tarjeta' : ''), diaCorte:iv(p.diaCorte || 0), minimo:sv(p.minimo || ''),
-      datos:sv(await (async () => { const o = await Boveda.leer(p.id); if(!(o.cuenta || o.referencia || o.titular || p.numServicio)) return '';   // solo datos para depositar; los de tarjeta nunca se comparten
+      datos:sv(await (async () => { const o = await Boveda.leer(p.id), tj = p.credito || esCredito(p.cat);   // en una tarjeta compartida también van número, vencimiento y CVV
+        if(!(o.cuenta || o.referencia || o.titular || p.numServicio || (tj && o.numTarjeta))) return '';
         const pubO = await pubDeCorreo(otro); if(!pubO){ p._faltaPub = true; return ''; }
-        return Boveda.e2eCifrar(pubO, JSON.stringify({c:o.cuenta||'', r:o.referencia||'', t:o.titular||'', s:p.numServicio||''})); })()),
+        const dj = {c:o.cuenta||'', r:o.referencia||'', t:o.titular||'', s:p.numServicio||''}; if(tj){ dj.n = o.numTarjeta||''; dj.e = o.expira||''; dj.v = o.cvv||''; }
+        return Boveda.e2eCifrar(pubO, JSON.stringify(dj)); })()),
       creadoPor:sv(uid), creadorNombre:sv(D.nombre || yo), creadorCorreo:sv(yo), otroNombre:sv(p.conQuien), otroCorreo:sv(otro),
       participantes:{arrayValue:{values:[sv(yo), sv(otro)]}}, actualizado:iv(Date.now())};
     if(!p.nubeId){ fields.estado = sv('pendiente'); fields.solicitud = sv(''); const r = await pedir('POST', DOCS + '/compartidos', {fields}, await token()); p.nubeId = r.name.split('/').pop(); p.nubeEstado = 'pendiente'; }
@@ -1156,7 +1170,7 @@ async function sincronizar(){
     { const pp = D.pagos.find(z => z.nubeId === id); const crudo = gs(f,'datos');
       const creador = ((f.participantes && f.participantes.arrayValue && f.participantes.arrayValue.values) || []).map(v => v.stringValue).find(e => e && e.toLowerCase() !== yo.toLowerCase()) || '';
       if(pp && crudo.startsWith('e2e1:')) pubDeCorreo(creador).then(pubC => Boveda.e2eDescifrar(pubC, crudo)).then(txt => { const dd = JSON.parse(txt);
-        const o = {cuenta:dd.c||'', referencia:dd.r||'', titular:dd.t||'', numTarjeta:'', expira:'', cvv:''}; pp.numServicio = dd.s || '';
+        const o = {cuenta:dd.c||'', referencia:dd.r||'', titular:dd.t||'', numTarjeta:dd.n||'', expira:dd.e||'', cvv:dd.v||''}; pp.numServicio = dd.s || '';
         pp.cuentaUlt = ocultar(o.cuenta); pp.refUlt = ocultar(o.referencia); pp.titularVis = o.titular; pp.tarjetaUlt = ocultar(o.numTarjeta); pp.tieneDatos = true; guardar();
         return Boveda.guardar(pp.id, o); }).catch(() => {});
       else if(pp){ let dd = null; try{ dd = crudo ? JSON.parse(crudo) : null; }catch(e){}
@@ -1354,7 +1368,8 @@ const Boveda = (() => {
     async e2eCifrar(pubOtro, texto){ const iv = crypto.getRandomValues(new Uint8Array(12)); const ct = new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM', iv}, await comun(pubOtro), new TextEncoder().encode(texto))); const t = new Uint8Array(12 + ct.length); t.set(iv); t.set(ct, 12); return 'e2e1:' + b64(t); },
     async e2eDescifrar(pubOtro, s){ const t = deB64(s.slice(5)); return new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM', iv:t.slice(0,12)}, await comun(pubOtro), t.slice(12))); },
     async guardar(id, obj){ const iv = crypto.getRandomValues(new Uint8Array(12)); const ct = await crypto.subtle.encrypt({name:'AES-GCM', iv}, await llave(), new TextEncoder().encode(JSON.stringify(obj))); await op('datos', 'readwrite', s => s.put({iv, ct}, String(id))); },
-    async leer(id){ const r = await op('datos', 'readonly', s => s.get(String(id))); if(!r) return {cuenta:'', referencia:'', titular:''}; return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM', iv:r.iv}, await llave(), r.ct))); }
+    async leer(id){ try{ const r = await op('datos', 'readonly', s => s.get(String(id))); if(!r) return {cuenta:'', referencia:'', titular:''}; return JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM', iv:r.iv}, await llave(), r.ct))); }
+      catch(e){ return {cuenta:'', referencia:'', titular:'', _error:true}; } },   /* nunca deja a medias la sincronización ni el botón Ver */
   };
 })();
 const ocultar = v => { const d = (v || '').replace(/\s/g,''); return d.length <= 4 ? (d ? '••••' : '') : '•••• ' + d.slice(-4); };
@@ -1405,6 +1420,7 @@ document.addEventListener('click', (ev) => {
     case 'verDato': case 'copiarDato': {
       if(!confirm(act === 'verDato' ? '¿Mostrar el dato completo?' : '¿Copiar el dato completo?')) break;
       Boveda.leer(+b.dataset.id).then(o => { const v = o[b.dataset.k] || '';
+        if(!v){ aviso(o._error ? 'Este dato no se puede leer en este celular. Vuelve a capturarlo con ✎ Editar.' : 'Este dato está vacío. Captúralo con ✎ Editar.'); return; }
         if(act === 'verDato'){ const el = document.getElementById('dv-' + b.dataset.k); if(el){ const antes = el.textContent; el.textContent = v; setTimeout(() => { el.textContent = antes; }, 30000); } }
         else navigator.clipboard.writeText(v.replace(/\s/g,'')).then(() => { aviso('✓ Copiado (se borra en 1 min)'); setTimeout(() => navigator.clipboard.writeText('').catch(() => {}), 60000); }); }); break; }
     case 'mes': { const d = +n;
@@ -1428,6 +1444,9 @@ document.addEventListener('click', (ev) => {
     case 'quincenaSel': { b.querySelector('.rad').classList.add('on'); document.querySelectorAll('.opRadio .rad').forEach(r => { if(!b.contains(r)) r.classList.remove('on'); });
       D.quincena = +n; guardar(); setTimeout(() => { cerrarHoja(); pintar(); }, 220); break; }
     case 'personas': hojaPersonas(); break;
+    case 'bloqueo': Bloq.ajustes(); break;
+    case 'blCambiar': Bloq.cambiar(); break;
+    case 'blQuitar': Bloq.quitar(); break;
     case 'respNube':
       if(!D.nube || !D.nube.refresh){ alert('Inicia sesión en Mi perfil → Cuenta y pagos compartidos para guardar tu respaldo en la nube.'); break; }
       abrirHoja(`<h1>Respaldo en la nube</h1><p class="gris">Se guarda en tu cuenta (${esc(D.nube.correo)}); solo tú puedes verlo.${D.respaldoNube ? '<br>Último respaldo: ' + new Date(D.respaldoNube).toLocaleString('es-MX') : ''}</p>
@@ -1763,6 +1782,79 @@ function recorridoWeb(id){
   aIni(); setTimeout(mostrar, 300);
 }
 
+/* ===================== bloqueo: contraseña y Face ID (como una app de banco) ===================== */
+const Bloq = (() => {
+  const b64 = a => btoa(String.fromCharCode(...new Uint8Array(a))), deB64 = t => Uint8Array.from(atob(t), c => c.charCodeAt(0));
+  const hash = async (sal, pw) => { let h = new TextEncoder().encode(sal + '|' + pw); for(let i = 0; i < 2000; i++) h = new Uint8Array(await crypto.subtle.digest('SHA-256', h)); return b64(h); };
+  let abierta = false, ocultaDesde = 0;
+  const activo = () => !!(D.bloqueo && D.bloqueo.hash);
+  const faceId = async () => { try{ return !!(window.PublicKeyCredential && await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()); }catch(e){ return false; } };
+  const crearCred = async () => {
+    const c = await navigator.credentials.create({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)), rp:{name:'Mis Pagos'},
+      user:{id:crypto.getRandomValues(new Uint8Array(16)), name:(D.nube && D.nube.correo) || 'mispagos', displayName:D.nombre || 'Mis Pagos'},
+      pubKeyCredParams:[{type:'public-key', alg:-7},{type:'public-key', alg:-257}], authenticatorSelection:{authenticatorAttachment:'platform', userVerification:'required'}, timeout:60000}});
+    return b64(c.rawId);
+  };
+  const usarCred = async () => { await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)), allowCredentials:[{type:'public-key', id:deB64(D.bloqueo.cred)}], userVerification:'required', timeout:60000}}); };
+  const ilus = () => `<svg class="blIlus" viewBox="0 0 360 230" aria-hidden="true"><defs><linearGradient id="blg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1F3C85"/><stop offset="1" stop-color="#223F8A"/></linearGradient></defs>
+    <circle cx="180" cy="118" r="104" fill="var(--icoSel,var(--acc))" opacity=".10"/><circle cx="180" cy="118" r="80" fill="var(--icoSel,var(--acc))" opacity=".14"/>
+    ${[[52,58,-10,'#1FA463'],[300,50,9,'#F08042'],[48,180,7,'#3E7BFA'],[306,176,-8,'#E2AA14']].map(([x,y,r,c],i) => `<g class="blFlota" style="animation-delay:${i*.6}s" transform="rotate(${r} ${x} ${y})"><rect x="${x-36}" y="${y-21}" width="72" height="42" rx="10" fill="var(--card,#fff)" filter="drop-shadow(0 3px 6px rgba(0,0,0,.18))"/><circle cx="${x-21}" cy="${y}" r="7" fill="${c}"/><rect x="${x-9}" y="${y-8}" width="34" height="4" rx="2" fill="#000" opacity=".15"/><rect x="${x-9}" y="${y+2}" width="22" height="4" rx="2" fill="#000" opacity=".15"/></g>`).join('')}
+    <g class="blIco"><rect x="132" y="70" width="96" height="96" rx="30" fill="url(#blg)"/><circle cx="180" cy="118" r="30" fill="none" stroke="#4A68B8" stroke-width="6" stroke-dasharray="30 200" transform="rotate(200 180 118)" stroke-linecap="round"/><circle cx="180" cy="118" r="30" fill="none" stroke="#F08042" stroke-width="6" stroke-dasharray="136 200" transform="rotate(-75 180 118)" stroke-linecap="round"/>
+    <rect x="164" y="103" width="32" height="29" rx="4" fill="#fff"/><path d="M164 107a4 4 0 0 1 4-4h24a4 4 0 0 1 4 4v4h-32z" fill="#F08042"/><path d="M171 120l6 6 11-11" fill="none" stroke="#1FA463" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></g></svg>`;
+  const pantalla = (html) => { let c = document.getElementById('bloqueo'); if(!c){ c = document.createElement('div'); c.id = 'bloqueo'; document.body.appendChild(c); } c.innerHTML = `<div class="blFondo">${ilus()}<div class="caja blTar">${html}</div></div>`; return c; };
+  const temblar = el => { el.animate([{transform:'translateX(0)'},{transform:'translateX(12px)'},{transform:'translateX(-10px)'},{transform:'translateX(6px)'},{transform:'none'}], {duration:380}); if(navigator.vibrate) navigator.vibrate([40, 40, 40]); };
+  const cerrar = () => { abierta = true; const c = document.getElementById('bloqueo'); if(!c) return; if(navigator.vibrate) navigator.vibrate(20);
+    c.animate([{opacity:1},{opacity:0, transform:'translateY(-20px)'}], {duration:280, easing:'cubic-bezier(.3,0,.15,1)'}).onfinish = () => c.remove(); };
+  async function entrarConFace(){ try{ await usarCred(); cerrar(); }catch(e){ const p = document.getElementById('blPw'); if(p) p.focus(); } }
+  async function mostrarEntrar(){
+    const c = pantalla(`<div class="fila" style="align-items:center"><span class="blAv">${esc((D.nombre||'•').charAt(0).toUpperCase())}</span><div class="peso" style="padding-left:14px"><b style="font-size:20px;display:block">Hola${D.nombre ? ', ' + esc(D.nombre) : ''}</b><span class="gris chico">${esc((D.nube && D.nube.correo) || '')}</span></div></div>
+      <input id="blPw" type="password" placeholder="Contraseña" autocomplete="current-password" style="margin-top:18px;font-size:16px">
+      <button class="btn lleno" id="blEnt" style="margin-top:12px">Entrar</button>
+      ${D.bloqueo.cred ? `<button class="blHuella" id="blFace" aria-label="Entrar con Face ID"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 9v1.5M15 9v1.5M12 9v4h-1M9.5 16c1.5 1 3.5 1 5 0"/></svg></button><div class="gris chico" style="text-align:center;margin-top:6px">Entrar con Face ID</div>` : ''}
+      <button class="blLink" id="blOlv">¿Olvidaste tu contraseña?</button>`);
+    const pw = c.querySelector('#blPw');
+    const entrar = async () => { if(await hash(D.bloqueo.sal, pw.value) === D.bloqueo.hash) cerrar(); else { pw.value = ''; pw.placeholder = 'Contraseña incorrecta'; temblar(pw); } };
+    c.querySelector('#blEnt').onclick = entrar; pw.onkeydown = e => { if(e.key === 'Enter') entrar(); };
+    if(D.bloqueo.cred){ c.querySelector('#blFace').onclick = entrarConFace; setTimeout(entrarConFace, 500); }
+    c.querySelector('#blOlv').onclick = async () => {
+      if(D.bloqueo.cred){ try{ await usarCred(); mostrarCrear(true); return; }catch(e){} }
+      if(confirm('Para crear otra contraseña tienes que volver a iniciar sesión con tu cuenta. ¿Continuar?')){ D.bloqueo = null; if(D.nube) D.nube = {}; guardar(); location.reload(); } };
+  }
+  async function mostrarCrear(cambiar){
+    const hayFace = await faceId();
+    const c = pantalla(`<b style="font-size:22px;display:block">${cambiar ? 'Nueva contraseña' : 'Protege Mis Pagos'}</b><p class="gris" style="line-height:1.4;margin:8px 0 0">Crea una contraseña para entrar a la app, como en una app de banco. Así nadie más ve tus pagos ni los datos de tus tarjetas.</p>
+      <input id="blA" type="password" placeholder="Contraseña (mínimo 4 caracteres)" autocomplete="new-password" style="margin-top:16px;font-size:16px"><input id="blB" type="password" placeholder="Repite la contraseña" autocomplete="new-password" style="margin-top:10px;font-size:16px">
+      ${hayFace ? `<label style="display:flex;align-items:center;gap:10px;margin-top:12px"><input type="checkbox" id="blF" checked style="width:auto;margin:0"><span>También entrar con Face ID</span></label>` : ''}
+      <button class="btn lleno" id="blG" style="margin-top:14px">Guardar contraseña</button>${cambiar ? '' : '<button class="blLink" id="blNo">Ahora no</button>'}`);
+    c.querySelector('#blG').onclick = async () => {
+      const a = c.querySelector('#blA'), b = c.querySelector('#blB');
+      if(a.value.length < 4){ a.value = ''; a.placeholder = 'Mínimo 4 caracteres'; temblar(a); return; }
+      if(a.value !== b.value){ b.value = ''; b.placeholder = 'No coincide'; temblar(b); return; }
+      const sal = b64(crypto.getRandomValues(new Uint8Array(12)));
+      let cred = null; const f = c.querySelector('#blF'); if(f && f.checked){ try{ cred = await crearCred(); }catch(e){ cred = null; } }
+      D.bloqueo = {sal, hash: await hash(sal, a.value), cred}; D.bloqueoPreg = true; guardar();
+      aviso(cred ? '✓ Listo: entrarás con Face ID o tu contraseña' : '✓ Contraseña guardada'); cerrar(); pintar(); };
+    const no = c.querySelector('#blNo'); if(no) no.onclick = () => { D.bloqueoPreg = true; guardar(); cerrar(); };
+  }
+  document.addEventListener('visibilitychange', () => {
+    if(document.hidden){ ocultaDesde = Date.now(); return; }
+    if(activo() && ocultaDesde && Date.now() - ocultaDesde > 60000){ abierta = false; mostrarEntrar(); }
+    ocultaDesde = 0; });
+  return {
+    iniciar(){ if(activo() && !abierta){ mostrarEntrar(); return; }
+      if(!activo() && !D.bloqueoPreg && D.pagos.length) setTimeout(() => { D.bloqueoPreg = true; guardar(); mostrarCrear(false); }, 1200); },
+    ajustes(){ if(!activo()) return mostrarCrear(true);
+      abrirHoja(`<h1>Entrar con contraseña${D.bloqueo.cred ? ' y Face ID' : ''}</h1><div class="caja" style="padding:4px 16px">
+        <button class="dato" style="width:100%;padding:14px 0" data-act="blCambiar"><span>Cambiar contraseña</span><span class="gris">›</span></button>
+        <button class="dato" style="width:100%;padding:14px 0;border-top:1px solid var(--line)" data-act="blQuitar"><span>Quitar el bloqueo</span><span class="gris">›</span></button></div>
+        <button class="btn borde" style="margin-top:14px" data-act="cerrar">Cerrar</button>`); },
+    cambiar(){ cerrarHoja(); mostrarCrear(true); },
+    async quitar(){ const pw = prompt('Escribe tu contraseña para quitar el bloqueo'); if(pw === null) return;
+      if(await hash(D.bloqueo.sal, pw) !== D.bloqueo.hash){ aviso('Contraseña incorrecta'); return; } D.bloqueo = null; guardar(); cerrarHoja(); pintar(); aviso('Bloqueo quitado'); }
+  };
+})();
+
+setTimeout(() => Bloq.iniciar(), 50);
 </script>
 </body>
 </html>
