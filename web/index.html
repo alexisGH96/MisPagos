@@ -80,6 +80,7 @@ h2{font-size:19px;margin:24px 4px 12px}
 nav{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0));width:min(520px,calc(100% - 40px));height:64px;background:var(--nav);border-radius:40px;box-shadow:var(--sombra);display:flex;align-items:center;justify-content:space-around;padding:0 6px;border:1px solid var(--line)}
 nav button{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;color:var(--ico);transition:background .25s,color .25s}
 nav button svg{width:26px;height:26px}
+nav.solo{left:auto;right:max(20px, calc((100% - 520px) / 2));transform:none;width:auto;padding:0 6px;justify-content:center}
 nav button.sel{background:var(--pill);color:var(--icoSel)}
 :root[data-tema="oscuro"] nav button.sel{background:linear-gradient(90deg,#968FF5,#766EE2)}
 /* segmentos */
@@ -128,6 +129,10 @@ input,select{width:100%;font:inherit;color:var(--fg);background:var(--surf);bord
 @keyframes crece{to{transform:none}}
 /* tarjeta principal: el "!" a la altura del monto, aire entre el mes y el monto, íconos a la altura del número */
 .heroMes{font-size:16px}
+.filaQ{display:flex;justify-content:space-between;align-items:center;width:100%;padding:2px 0;font-size:13px;color:var(--gr)}
+.filaQb{display:flex;align-items:center;padding:4px 0 4px 8px;font:inherit;font-size:13px;color:var(--gr);background:none;border:0;transition:transform .18s cubic-bezier(.3,0,.15,1)}
+.filaQb:active{transform:scale(.95)}
+.filaQ .flechaQ{font-size:18px;font-weight:400;margin-left:8px;color:var(--fg)}
 .heroMonto{margin-left:14px}
 .heroMonto b{font-size:25px !important}
 .heroMonto.chico2 b{font-size:23px !important}
@@ -187,7 +192,7 @@ input,select{width:100%;font:inherit;color:var(--fg);background:var(--surf);bord
 .balFila .ico svg{width:20px;height:20px}
 .balFila{width:100%;align-items:center;padding:10px 0;background:none;border:0;font:inherit;color:inherit}
 .balChip{display:inline-block;margin-top:4px;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:var(--pill);color:var(--icoSel,var(--fg))}
-.heroMonto{display:flex;align-items:flex-start;gap:4px;background:none;border:0;padding:0;font:inherit;color:inherit}
+.heroMonto{display:flex;align-items:flex-start;gap:10px;background:none;border:0;padding:0;font:inherit;color:inherit}
 .interr{width:20px;height:20px;border-radius:50%;background:#E5484D;color:#fff;font-size:13px;font-weight:800;display:grid;place-items:center;animation:pop .38s .42s cubic-bezier(.3,1.6,.5,1) both}
 @keyframes pop{from{transform:scale(0)}to{transform:none}}
 
@@ -537,13 +542,15 @@ function pantallaBalance(){
     + pend.map((x, i) => `<button class="fila balFila" data-act="detalle" data-id="${x.p.id}" style="${i ? 'border-top:1px solid var(--line)' : ''}">${icono(x.p)}<span class="peso" style="text-align:left;padding:0 8px 0 12px;min-width:0"><b style="display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sinPrefijo(x.p.nombre))}</b><span class="chico" style="color:${x.vencido ? '#D9534F' : 'var(--gr)'}">${x.vencido ? 'Vencido el ' : 'Vence '}${corto(x.p.vence)}${x.p.compartido && x.p.creadoPor ? ' · de ' + esc(x.p.creadoPor) : ''}</span>${x.nota ? `<span class="balChip">${x.nota}</span>` : ''}</span><span style="text-align:right"><b style="display:block">${dinero(Math.round(x.pagar*100)/100)}</b>${x.pagar < x.completo ? `<s class="gris chico">${dinero(Math.round(x.completo*100)/100)}</s>` : ''}</span></button>`).join('')
     + (pend.length ? `<div class="fila" style="padding-top:10px;border-top:1px solid var(--line)"><b class="peso">${sobra >= 0 ? 'Te quedan libres' : 'Aún te faltan'}</b><b style="font-size:16px;color:${sobra >= 0 ? '#1FA463' : '#D9534F'}">${dinero(Math.abs(Math.round(sobra)))}</b></div>` : '') + `<p class="gris" style="font-size:12px;margin:10px 0 2px;line-height:1.4">Reporta el pago mínimo de tus tarjetas (en cada tarjeta, ✎ Editar → Pago mínimo) para que la distribución sea correcta.</p></div>`;
   if((D.ingresoFrec || 0) === 0 && pend.length){
-    let q1 = 0, q2 = 0; pend.forEach(x => { if(x.vencido || x.dia.getDate() <= 15) q1 += x.pagar; else q2 += x.pagar; });
-    const porQ = (ing - otros) / 2;
+    /* cada quincena con TODO lo del mes: lo ya pagado y lo que falta (antes solo lo pendiente: salía "bien repartido" aunque estuvieras en números rojos) */
+    let q1 = 0, q2 = 0; r.pag.forEach(x => { if(x.dia.getDate() <= 15) q1 += x.completo; else q2 += x.completo; });
+    pend.forEach(x => { if(x.vencido || x.dia.getDate() <= 15) q1 += x.pagar; else q2 += x.pagar; });
+    const porQ = (ing - otros) / 2, pasaQ = q1 + q2 - (ing - otros);
     const bq = (n, v) => `<div style="margin-bottom:12px"><div class="fila chico"><b class="peso">${n}</b><span style="color:${v > porQ ? '#D9534F' : 'var(--gr)'}">${dinero(Math.round(v))} de ${dinero(Math.round(Math.max(0, porQ)))}</span></div>${barraBal(porQ > 0 ? v / porQ : 1, v > porQ ? '#E5484D' : 'var(--r-azu)', 500)}</div>`;
-    const qt = q1 > porQ && q2 < porQ ? `Tu primera quincena está más cargada. Aparta ${dinero(Math.round(Math.min(q1 - porQ, porQ - q2)))} de tu pago de fin de mes para cubrir lo que vence del 1 al 15.`
+    const qt = (pasaQ > 0.5 ? `Entre las dos quincenas tus pagos pasan lo que te queda de tu ingreso por ${dinero(Math.round(pasaQ))}${q1 > porQ && q2 > porQ ? ', y las dos quincenas van cargadas' : q1 > porQ ? ', sobre todo en la primera quincena' : ', sobre todo en la segunda quincena'}. Sigue el plan de arriba para aligerarlas.` : q1 > porQ && q2 < porQ ? `Tu primera quincena está más cargada. Aparta ${dinero(Math.round(Math.min(q1 - porQ, porQ - q2)))} de tu pago de fin de mes para cubrir lo que vence del 1 al 15.`
       : q2 > porQ && q1 < porQ ? `Tu segunda quincena está más cargada. Aparta ${dinero(Math.round(Math.min(q2 - porQ, porQ - q1)))} de tu pago del día 15 para lo que vence después.`
-      : q1 > porQ && q2 > porQ ? 'Las dos quincenas pasan de lo que te queda en cada una; sigue el plan de arriba para aligerarlas.' : 'Tus pagos están bien repartidos entre tus dos quincenas.';
-    h += `<h2 class="entra" style="animation-delay:200ms">Por quincena</h2><div class="caja entra" style="animation-delay:240ms">${bq('1ª quincena (día 1 al 15)', q1)}${bq('2ª quincena (día 16 en adelante)', q2)}<p class="gris chico" style="margin:0;line-height:1.4">${qt}</p></div>`;
+      : q1 > porQ && q2 > porQ ? 'Las dos quincenas pasan de lo que te queda en cada una; sigue el plan de arriba para aligerarlas.' : 'Tus pagos están bien repartidos entre tus dos quincenas.') + ' Incluye lo que ya pagaste.';
+    h += `<h2 class="entra" style="animation-delay:200ms">Por quincena</h2><div class="caja entra" style="animation-delay:240ms">${bq('1ª quincena (día 1 al 15)', q1)}${bq('2ª quincena (día 16 en adelante)', q2)}<p class="${pasaQ > 0.5 ? '' : 'gris '}chico" style="margin:0;line-height:1.4${pasaQ > 0.5 ? ';color:#D9534F' : ''}">${qt}</p></div>`;
   }
   const tips = [], ven = pend.filter(x => x.vencido), vencidos = ven.reduce((s,x) => s + x.completo, 0);
   if(ven.length) tips.push(`Tienes ${ven.length} ${ven.length === 1 ? 'pago vencido' : 'pagos vencidos'} por ${dinero(Math.round(vencidos))}. Dales prioridad para evitar recargos e intereses moratorios.`);
@@ -579,7 +586,7 @@ function heroNuevo(delMes, pag, tot){
   const pie = (du == null ? 'Aún no registras pagos' : 'Último pago ' + (du <= 0 ? 'hoy' : du === 1 ? 'hace 1 día' : 'hace ' + du + ' días')) + ' · ' + (dp == null ? 'sin pagos próximos' : 'Próximo ' + (dp === 0 ? 'hoy' : dp === 1 ? 'mañana' : 'en ' + dp + ' días'));
   const ind = (n, t, l, ic, col, lleno) => `<button class="ind" data-act="filtro" data-n="${n}"><span class="indIc" style="${lleno ? `background:${col};color:#fff` : `background:color-mix(in srgb, ${col} 18%, transparent);color:${col}`}">${SIMB[ic]}</span><span><span class="chico gris">${t}</span><b style="display:block;font-size:16px">${l.length}</b><span class="chico gris">${suma(l)}</span></span></button>`;
   return `<div class="hero heroN" id="hero" style="${estiloHero()}">
-    <div class="fila" style="align-items:center"><span class="heroIc">${calDia(hy.getDate())}</span><div class="peso" style="padding-left:12px;min-width:0"><b class="heroMes">${MESL[hy.getMonth()]}</b><div class="chico gris">${pag} de ${delMes.length} pagos</div></div>${(() => { const lib = libreMes();
+    <div class="fila" style="align-items:center"><span class="heroIc">${calDia(hy.getDate())}</span><div class="peso" style="padding-left:6px;min-width:0"><b class="heroMes">${MESL[hy.getMonth()]}</b><div class="chico gris">${pag} de ${delMes.length} pagos</div></div>${(() => { const lib = libreMes();
       const col = !lib ? '' : lib[2] < 0 ? '#E5484D' : lib[2] < lib[0] * .1 ? '#F2A600' : '';   // ! rojo: te pasas de tu ingreso; ámbar: casi no te queda
       return `<button class="heroMonto${col && tot >= 10000 ? ' chico2' : ''}" data-act="irBalance" aria-label="Ver mi balance" style="align-items:center"><b>${dinero(tot)}</b>${col ? `<span class="aviso" style="background:${col}">!</span>` : ''}</button>`; })()}</div>
     <div class="heroLin"></div>
@@ -593,12 +600,14 @@ function listaFiltro(){
     + (l.length ? l.map(tarjetaPago).join('') : '<p class="gris">No hay pagos aquí por ahora.</p>');
 }
 let filtroIni = 0, calSeg = 0, filtroPagos = 0, verAvisos = false;
+const ahoraTxt = () => new Date().toLocaleString('es-MX', {day:'numeric', month:'long', year:'numeric', hour:'numeric', minute:'2-digit'});
+function movimiento(txt){ (D.historial = D.historial || []).push({t:Date.now(), tx:txt + ' · ' + ahoraTxt(), leido:false}); if(D.historial.length > 100) D.historial = D.historial.slice(-100); }
 function avisoNube(txt){ (D.avisosNube = D.avisosNube || []).push(txt); (D.historial = D.historial || []).push({t:Date.now(), tx:txt, leido:false}); if(D.historial.length > 100) D.historial = D.historial.slice(-100); }
 const CAMPANA = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M6 17v-6a6 6 0 0 1 12 0v6l1.5 1.5h-15z"/><path d="M12 3.2V5M10 18.5a2 2 0 0 0 4 0"/></svg>';
 function pantallaAvisos(){
   const l = (D.historial || []).slice().reverse();
   const hace = t => { const m = Math.floor((Date.now()-t)/60000); return m < 1 ? 'ahora' : m < 60 ? 'hace ' + m + ' min' : m < 1440 ? 'hace ' + Math.floor(m/60) + ' h' : 'hace ' + Math.floor(m/1440) + ' días'; };
-  const h = `<div class="fila" style="align-items:center;margin-bottom:16px"><button class="pildora flechaCal" data-act="avisos" data-n="0" aria-label="Atrás">‹</button><div class="peso" style="padding-left:12px"><div class="b" style="font-size:22px">Avisos</div><div class="gris chico">Cambios, solicitudes, recordatorios y alertas</div></div></div>`
+  const h = `<div class="fila" style="align-items:center;margin-bottom:16px"><div class="peso" style="padding-left:6px"><div class="b" style="font-size:22px">Avisos</div><div class="gris chico">Movimientos, cambios, solicitudes y alertas</div></div></div>`
     + (l.length ? l.map(a => `<div class="caja" style="margin-bottom:10px;display:flex;gap:12px;align-items:flex-start"><span style="width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb, currentColor 8%, transparent);flex:none">${CAMPANA.replace('width="22" height="22"','width="18" height="18"')}</span><div class="peso"><div>${esc(a.tx)}${a.leido ? '' : ' <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#E5484D"></span>'}</div><div class="gris chico">${hace(a.t)}</div></div></div>`).join('')
       + `<button class="btn borde" style="margin-top:6px" data-act="borrarAvisos">Borrar avisos</button>` : '<p class="gris">Aún no tienes avisos. Aquí verás cuando alguien cambie un pago compartido o te mande un recordatorio.</p>');
   (D.historial || []).forEach(a => a.leido = true); guardar();
@@ -610,22 +619,24 @@ function listaRegistro(){
   const lt = ordenados().filter(p => (filtroPagos === 1 ? !p.compartido : filtroPagos === 2 ? p.compartido : true) && coincide(p.nombre, window._bn));
   return filtroPagos !== 2 ? lt.map(tarjetaPago).join('') : [['Te compartieron', lt.filter(p => p.creadoPor)], ['Tú compartiste', lt.filter(p => !p.creadoPor)]].filter(x => x[1].length).map(([t0, l0]) => `<div class="gris b chico" style="margin:6px 6px 8px">${t0}</div>` + l0.map(tarjetaPago).join('')).join('');
 }
+/* mes al que pertenece un pago registrado: el de su VENCIMIENTO, no el día en que se pagó (el del 1 nov pagado el 31 oct cuenta en noviembre) */
+const mesH = o => (o.v || o.f).slice(0,7);
 function historialHtml(){
   const MESL = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const h0 = hoy(), actual = h0.getFullYear() + '-' + String(h0.getMonth()+1).padStart(2,'0');
-  const meses = [...new Set([actual, ...D.pagos.flatMap(p => (p.hist||[]).filter(o => o.f).map(o => o.f.slice(0,7)))])].sort().reverse();
+  const meses = [...new Set([actual, ...D.pagos.flatMap(p => (p.hist||[]).filter(o => o.f).map(mesH))])].sort().reverse();
   return `<div id="anclaH"></div><div class="fila" style="justify-content:space-between;align-items:center"><h2>Historial de pagos</h2><button class="mas lupa" data-act="lupa" data-n="bh" aria-label="Buscar">${LUPA}</button></div><input id="bh" placeholder="Buscar: luz, octubre 2026…" value="${esc(window._bh||'')}" oninput="window._bh=this.value; document.getElementById('listaH').innerHTML = listaHist()" style="font-size:16px;margin-bottom:10px;${window._bhA ? '' : 'display:none'}">
      <select id="mh" onchange="if(this.value!==window._mh) window._cat=''; window._mh=this.value; pintar()" style="margin-bottom:12px"><option value="">Todos los meses</option>${meses.map(m => { const [y, mm] = m.split('-'); const t0 = MESL[+mm-1]; return `<option value="${m}" ${window._mh === m ? 'selected' : ''}>${t0.charAt(0).toUpperCase() + t0.slice(1)} ${y}</option>`; }).join('')}</select>
     <div id="chipCat">${chipCatHtml()}</div><div id="listaH">${listaHist()}</div>`;
 }
 function listaHist(){
-  const regs = []; D.pagos.forEach(p => (p.hist||[]).forEach(o => o.f && regs.push({p, f:o.f, v:o.v, m:parteH(p, o.m), per:o.per||''})));
-  regs.sort((a, b) => a.f < b.f ? 1 : -1);
+  const regs = []; D.pagos.forEach(p => (p.hist||[]).forEach(o => o.f && regs.push({p, f:o.f, v:o.v, mv:mesH(o), m:parteH(p, o.m), per:o.per||''})));
+  regs.sort((a, b) => a.mv !== b.mv ? (a.mv < b.mv ? 1 : -1) : (a.f < b.f ? 1 : -1));
   const MESL = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const q = (window._bh || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
   let h = '', mesAnt = '', n = 0;
-  regs.forEach(r => { if(window._mh && r.f.slice(0,7) !== window._mh) return; if(window._cat && (r.p.cat || adivinarCat(r.p.nombre)) !== window._cat) return;
-    const d = new Date(r.f + 'T12:00'); const mes = MESL[d.getMonth()] + ' ' + d.getFullYear(); const pt = perTexto(r.per);
+  regs.forEach(r => { if(window._mh && r.mv !== window._mh) return; if(window._cat && (r.p.cat || adivinarCat(r.p.nombre)) !== window._cat) return;
+    const d = new Date(r.mv + '-15T12:00'); const mes = MESL[d.getMonth()] + ' ' + d.getFullYear(); const pt = perTexto(r.per);
     const todo = (r.p.nombre + ' ' + mes + ' ' + pt + ' ' + MESC[d.getMonth()]).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
     if(q && !q.split(/\s+/).every(w => todo.includes(w))) return;
     if(mes !== mesAnt){ h += `<div class="b" style="margin:${n ? 12 : 0}px 6px 8px">${mes.charAt(0).toUpperCase() + mes.slice(1)}</div>`; mesAnt = mes; }
@@ -634,14 +645,14 @@ function listaHist(){
   return h;
 }
 function pantallaHistorial(){
-  const regs = []; D.pagos.forEach(p => (p.hist||[]).forEach(o => o.f && regs.push({p, f:o.f, v:o.v, m:parteH(p, o.m), per:o.per||''})));
-  regs.sort((a, b) => a.f < b.f ? 1 : -1);
+  const regs = []; D.pagos.forEach(p => (p.hist||[]).forEach(o => o.f && regs.push({p, f:o.f, v:o.v, mv:mesH(o), m:parteH(p, o.m), per:o.per||''})));
+  regs.sort((a, b) => a.mv !== b.mv ? (a.mv < b.mv ? 1 : -1) : (a.f < b.f ? 1 : -1));
   const MESL = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
   const q = (window._bh || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();
   let h = `<div class="fila" style="align-items:center;margin-bottom:14px"><button class="pildora flechaCal" data-act="historial" data-n="0" aria-label="Atrás">‹</button><div class="peso" style="padding-left:12px"><div class="b" style="font-size:22px">Historial de pagos</div><div class="gris chico">Todo lo que has pagado, mes por mes</div></div></div>
     <input id="bh" placeholder="Buscar: luz, octubre, sep 2026…" value="${esc(window._bh||'')}" oninput="window._bh=this.value; const y=window.scrollY; pintar(); const e=document.getElementById('bh'); e.focus(); e.setSelectionRange(e.value.length,e.value.length); window.scrollTo(0,y)" style="margin-bottom:14px">`;
   let mesAnt = '', n = 0;
-  regs.forEach(r => { const d = new Date(r.f + 'T12:00'); const mes = MESL[d.getMonth()] + ' ' + d.getFullYear(); const pt = perTexto(r.per);
+  regs.forEach(r => { const d = new Date(r.mv + '-15T12:00'); const mes = MESL[d.getMonth()] + ' ' + d.getFullYear(); const pt = perTexto(r.per);
     const todo = (r.p.nombre + ' ' + mes + ' ' + pt + ' ' + MESC[d.getMonth()]).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
     if(q && !q.split(/\s+/).every(w => todo.includes(w))) return;
     if(mes !== mesAnt){ h += `<div class="b" style="margin:${n ? 12 : 0}px 6px 8px">${mes.charAt(0).toUpperCase() + mes.slice(1)}</div>`; mesAnt = mes; }
@@ -750,7 +761,7 @@ function quincenasV(){
   const bloque = (t, x, y, act) => {
     const ps = ordenados().filter(p => { const f = fecha(p.vence); return f >= x && f <= y; });
     const pend = ps.filter(p => !p.pagado).reduce((s,p) => s + miMonto(p), 0);
-    return `<div class="caja" style="margin-bottom:14px"><div class="gris chico b">${t} · ${x.getDate()} – ${y.getDate()} ${MESES[y.getMonth()]}</div><div style="font-size:32px;font-weight:800;margin:6px 0 2px">${dinero(pend)}</div><div class="gris chico">por pagar · ${ps.filter(p=>!p.pagado).length} pagos</div><div style="margin-top:12px">${ps.map(tarjetaPago).join('') || '<span class="gris chico">Sin pagos en esta quincena.</span>'}</div></div>`;
+    return `<div class="caja" style="margin-bottom:14px"><div class="gris chico b">${t} · ${x.getDate()} – ${y.getDate()} ${MESES[y.getMonth()]}</div><div style="font-size:32px;font-weight:800;margin:6px 0 2px">${dinero(pend)}</div>${act ? `<div class="filaQ"><span>Pendientes de pago: ${ps.filter(p=>!p.pagado).length}</span><button class="filaQb" data-act="irHist">Pagos realizados: ${ps.filter(p=>p.pagado).length}<b class="flechaQ">›</b></button></div>` : `<div class="gris chico">${ps.filter(p=>!p.pagado).length} pagos</div>`}<div style="margin-top:12px">${ps.map(tarjetaPago).join('') || '<span class="gris chico">Sin pagos en esta quincena.</span>'}</div></div>`;
   };
   return `<p class="gris chico" style="margin:0 4px 10px">Cuánto apartar de cada pago de nómina</p>` + bloque('Quincena actual', a, b, true) + bloque('Siguiente', sigA, sigB, false);
 }
@@ -793,13 +804,12 @@ function pastel(vals, cols, total, centro, sub){
 function parteH(p, m){ m = num(m); return p.compartido && num(p.monto) ? Math.round(m * miParteMonto(p) / num(p.monto) * 100) / 100 : m; }
 function estadisticas(){
   let h = `<div class="seg"><button class="${estad===0?'sel':''}" data-act="estad" data-n="0">Estadísticas</button><button class="${estad===1?'sel':''}" data-act="estad" data-n="1">Ahorros</button></div>`;
-  if(estad === 1) return h + ahorros();
-  if(verBalance && D.ingreso > 0) return pantallaBalance();
-  h += tarjetaBalanceW();
+  if(estad === 1 && verBalance && D.ingreso > 0) return pantallaBalance();
+  if(estad === 1) return h + (D.ingreso > 0 ? tarjetaBalanceW() : '') + ahorros();   // el balance vive arriba en Ahorros
   // barras de los últimos 6 meses (lo pagado)
   const h0 = hoy(), meses = [];
   for(let k = 5; k >= 0; k--){ const d = new Date(h0.getFullYear(), h0.getMonth()-k, 1); meses.push({y:d.getFullYear(), m:d.getMonth(), v:0}); }
-  D.pagos.forEach(p => (p.hist||[]).forEach(r => { const f = fecha(r.f); const x = meses.find(z => z.y === f.getFullYear() && z.m === f.getMonth()); if(x) x.v += parteH(p, r.m); }));
+  D.pagos.forEach(p => (p.hist||[]).forEach(r => { const f = fecha(r.v || r.f); const x = meses.find(z => z.y === f.getFullYear() && z.m === f.getMonth()); if(x) x.v += parteH(p, r.m); }));
   const mx = Math.max(1, ...meses.map(z => z.v));
   h += `<div class="caja"><div class="fila"><span class="b peso">Pagado por mes</span><span class="gris chico">${h0.getFullYear()}</span></div><div class="barras" style="display:flex;align-items:flex-end;gap:10px;height:150px;margin-top:14px">`;
   meses.forEach((z,i) => { const act = i === 5; h += `<div style="flex:1;text-align:center"><div class="gris" style="font-size:10px;height:14px">${z.v ? '$' + (z.v >= 1000 ? (z.v/1000).toFixed(1) + 'k' : Math.round(z.v)) : ''}</div><div class="b" style="animation-delay:${i*60}ms;height:${Math.max(4, z.v/mx*110)}px;border-radius:10px;background:${act ? 'var(--r-nar)' : 'var(--fg)'};opacity:${z.v ? 1 : .15};margin:0 auto;width:60%"></div><div class="${act ? 'b' : 'gris'} chico" style="margin-top:6px">${MESES[z.m]}</div></div>`; });
@@ -817,8 +827,8 @@ function porTipoHtml(){
   if(enCurso){ const [yy, mm] = mes.split('-').map(Number);
     D.pagos.forEach(p => { const f = fecha(p.vence), m = miMonto(p); if(m <= 0) return;
       if((f.getFullYear() === yy && f.getMonth() === mm-1) || (mes === actual && !p.pagado && f < new Date(yy, mm-1, 1))) sum[idx(p)] += m;
-      (p.hist||[]).forEach(o => { if(o.f && o.v !== p.vence && o.f.slice(0,7) === mes) sum[idx(p)] += num(o.m) * (p.compartido && num(p.monto) ? miMonto(p)/num(p.monto) : 1); }); }); }
-  else D.pagos.forEach(p => (p.hist||[]).forEach(o => { if(!o.f || (mes && o.f.slice(0,7) !== mes)) return; sum[idx(p)] += num(o.m) * (p.compartido && num(p.monto) ? miMonto(p)/num(p.monto) : 1); }));
+      (p.hist||[]).forEach(o => { if(o.f && o.v !== p.vence && mesH(o) === mes) sum[idx(p)] += num(o.m) * (p.compartido && num(p.monto) ? miMonto(p)/num(p.monto) : 1); }); }); }
+  else D.pagos.forEach(p => (p.hist||[]).forEach(o => { if(!o.f || (mes && mesH(o) !== mes)) return; sum[idx(p)] += num(o.m) * (p.compartido && num(p.monto) ? miMonto(p)/num(p.monto) : 1); }));
   const tot = sum.reduce((a,b)=>a+b,0), MESL0 = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const tit = mes ? 'Por tipo · ' + MESL0[+mes.slice(5)-1] + (+mes.slice(0,4) !== h0.getFullYear() ? ' ' + mes.slice(0,4) : '') : 'Por tipo · todos los meses';
   let h = `<h2 id="porTipo">${tit}</h2>`;
@@ -999,6 +1009,7 @@ function editor(id){
   document.getElementById('ed').onsubmit = (ev) => {
     ev.preventDefault(); const f = Object.fromEntries(new FormData(ev.target));
     const x = id ? D.pagos.find(z => z.id === id) : {id: Date.now(), pagado:false, hist:[]};
+    const antesMov = {nombre:x.nombre, monto:x.monto, vence:x.vence, compartido:!!x.compartido, conQuien:x.conQuien || '', frec:x.frec, miParte:x.miParte, miFijo:x.miFijo || ''};
     if(f.compartido && !(id && x.creadoPor) && !x.nubeId && (f.conQuien||'').trim() !== (x.conQuien||'')){
       const q = (f.conQuien || '').trim(), per = personas().find(z => z.nombre.toLowerCase() === q.toLowerCase());
       const ok = (q.includes('@') && q.includes('.')) || q.replace(/\D/g,'').length >= 10 || (per && (per.mail || (per.tel || '').replace(/\D/g,'').length >= 10));
@@ -1024,6 +1035,12 @@ function editor(id){
     x.compartido = !!f.compartido; x.conQuien = f.conQuien.trim(); x.miParte = Math.max(0, Math.min(100, parseInt(f.miParte)||50));
     if(f.modoParte === 'monto' && (f.miFijo||'').trim()){ x.miFijo = f.miFijo.trim(); const t0 = num(x.monto); x.miParte = t0 ? Math.round(Math.min(t0, num(x.miFijo)) / t0 * 100) : 50; } else x.miFijo = '';
     if(!x.ancla) x.ancla = fecha(x.vence).getDate();
+    try { const con = x.compartido && x.conQuien ? nombreVisible(x.conQuien) : '';
+      if(!id) movimiento((con ? '➕ Compartiste ' + sinPrefijo(x.nombre) + ' con ' + con : '➕ Agregaste ' + sinPrefijo(x.nombre)) + (x.monto ? ' — ' + (con ? 'total ' + dinero(num(x.monto)) + ' · tu parte ' + dinero(Math.round(miMonto(x)*100)/100) : dinero(num(x.monto))) : '') + ' · vence el ' + corto(x.vence));
+      else { const cam = []; if(antesMov.nombre !== x.nombre) cam.push('nombre'); if(antesMov.monto !== x.monto) cam.push('monto ' + (antesMov.monto ? dinero(num(antesMov.monto)) + ' → ' : '') + (x.monto ? dinero(num(x.monto)) : 'sin monto')); if(antesMov.vence !== x.vence) cam.push('vence el ' + corto(x.vence));
+        if(antesMov.compartido !== x.compartido || antesMov.conQuien !== x.conQuien) cam.push(con ? 'compartido con ' + con : 'ya no es compartido'); else if(x.compartido && (antesMov.miParte !== x.miParte || antesMov.miFijo !== x.miFijo)) cam.push('tu parte ' + dinero(Math.round(miMonto(x)*100)/100));
+        if(antesMov.frec !== x.frec) cam.push('frecuencia');
+        if(cam.length) movimiento('✏️ Editaste ' + sinPrefijo(x.nombre) + ' — ' + cam.join(', ')); } } catch(e){}
     if(!id) D.pagos.push(x);
     if(x.conQuien && !personas().some(z => z.nombre.toLowerCase() === x.conQuien.toLowerCase())) D.personas.push({nombre:x.conQuien, tel:'', mail:''});
     guardar(); cerrarHoja(); pintar(); aviso('✓ Guardado');
@@ -1235,6 +1252,7 @@ async function correoDeTelefono(tel){
 }
 async function responderInvitacion(id, aceptar){
   await pedir('PATCH', DOCS + '/compartidos/' + id + '?updateMask.fieldPaths=estado&updateMask.fieldPaths=actualizado', {fields:{estado:sv(aceptar ? 'aceptado' : 'rechazado'), actualizado:iv(Date.now())}}, await token());
+  const inv = (D.invitaciones || []).find(z => z.id === id); if(inv) movimiento((aceptar ? '🤝 Aceptaste ' : '✖️ Rechazaste ') + sinPrefijo(inv.nombre || 'un pago compartido') + (inv.de ? ' (de ' + inv.de + ')' : ''));
   D.invitaciones = (D.invitaciones || []).filter(z => z.id !== id); guardar();
   if(aceptar){ await sincronizar(); return 'Aceptado. Ya aparece en tus pagos.'; }
   return 'Rechazado. Le avisaremos a quien te lo compartió.';
@@ -1412,13 +1430,16 @@ document.addEventListener('click', (ev) => {
   const a = b.dataset.act, id = b.dataset.id ? +b.dataset.id : null, n = b.dataset.n;
   if(navigator.vibrate) navigator.vibrate(8);
   switch(a){
+    case 'irHist': { if(navigator.vibrate) navigator.vibrate(20); b.animate([{transform:'scale(1)'},{transform:'scale(1.03)'},{transform:'scale(1)'}], {duration:300, easing:'cubic-bezier(.3,0,.15,1)'});
+      setTimeout(() => { window._mh = undefined; window._cat = ''; estad = 0; verBalance = false; tab = 3; pintar(true); window.scrollTo({top:0});
+        setTimeout(() => { const an = document.getElementById('anclaH'); if(an){ if(navigator.vibrate) navigator.vibrate(15); window.scrollTo({top: an.getBoundingClientRect().top + window.scrollY - 70, behavior:'smooth'}); } }, 420); }, 200); break; }
     case 'tab': if(+n === 3 && tab === 3 && verBalance){ verBalance = false; pintar(true); break; } if(+n === 3 && tab !== 3){ window._mh = undefined; window._cat = ''; } tab = +n; verBalance = false; pintar(true); window.scrollTo({top:0}); break;
     case 'detalle': detalle(id); break;
     case 'nuevo': b.animate([{transform:'rotate(0)'},{transform:'rotate(90deg)'}], {duration:380, easing:'cubic-bezier(.3,0,.15,1)'}); setTimeout(() => abrirHoja(`<h1>¿Qué quieres agregar?</h1>` + Object.entries(CATS).map(([k, v]) => `<button class="pago" data-act="nuevoTipo" data-n="${k}" style="margin-bottom:8px"><span style="font-size:24px;width:40px;text-align:center">${v[0]}</span><div class="peso nom">${v[1]}</div></button>`).join('') + `<button class="btn borde" data-act="cerrar" style="margin-top:6px">Cancelar</button>`), 220); break;
     case 'nuevoTipo': window._catNuevo = n; if(navigator.vibrate) navigator.vibrate(20); cerrarHoja(); setTimeout(() => editor(null), 320); break;
     case 'editar': cerrarHoja(); setTimeout(() => editor(id), 320); break;
     case 'cerrar': cerrarHoja(); break;
-    case 'borrar': if(confirm('¿Eliminar este pago?')){ const bp = D.pagos.find(p => p.id === id); if(bp) borrarNube(bp); D.pagos = D.pagos.filter(p => p.id !== id); guardar(); cerrarHoja(); pintar(); aviso('Pago eliminado'); } break;
+    case 'borrar': if(confirm('¿Eliminar este pago?')){ const bp = D.pagos.find(p => p.id === id); if(bp){ borrarNube(bp); movimiento('🗑️ Eliminaste ' + sinPrefijo(bp.nombre) + (bp.compartido && bp.conQuien ? ' (era compartido con ' + nombreVisible(bp.conQuien) + ')' : '')); } D.pagos = D.pagos.filter(p => p.id !== id); guardar(); cerrarHoja(); pintar(); aviso('Pago eliminado'); } break;
     case 'pagar': {
       const p = D.pagos.find(x => x.id === id);
       if(!b.dataset.ok){ if(!p.pagado) b.innerHTML = 'Pagado <span class="verde">✓</span>'; if(navigator.vibrate) navigator.vibrate(25);
@@ -1446,7 +1467,7 @@ document.addEventListener('click', (ev) => {
     case 'estad': deslizar(b, () => { estad = +n; pintar(); }); break;
     case 'porCat': filtrarCat(n); break;
     case 'irBalance': b.animate([{transform:'scale(1)'},{transform:'scale(1.07)'},{transform:'scale(1)'}], {duration:320, easing:'cubic-bezier(.3,0,.15,1)'});
-      setTimeout(() => { estad = 0; verBalance = false; enfocarBal = true; tab = 3; pintar(true); window.scrollTo({top:0}); animarBalance(); }, 200); break;
+      setTimeout(() => { estad = 1; verBalance = false; enfocarBal = true; tab = 3; pintar(true); window.scrollTo({top:0}); animarBalance(); }, 200); break;
     case 'verBalance': { const abre = n !== '0'; if(navigator.vibrate) navigator.vibrate(15); setTimeout(() => { verBalance = abre; pintar(true); window.scrollTo({top:0}); animarBalance(); }, abre ? 140 : 0); break; }
     case 'tema': { const hacer = () => { D.tema = n; guardar(); aplicarTema(); pintar(); };
       if(document.startViewTransition) document.startViewTransition(hacer); else { document.body.animate([{opacity:.4},{opacity:1}], {duration:480, easing:'cubic-bezier(.3,0,.15,1)'}); hacer(); } break; }
@@ -1542,7 +1563,7 @@ document.addEventListener('click', (ev) => {
       if(!confirm((yaAv ? `Ya le avisaste a ${quien}. ¿Quieres recordárselo?\n\n` : `¿Ya le pagaste a ${quien}?\n\n`) + `Le llegará un aviso para que confirme que recibió tu parte (${dinero(Math.round(miMonto(p)*100)/100)}). Cuando lo confirme, aquí aparecerá como pagado.`)) break;
       if(navigator.vibrate) navigator.vibrate(20); tarea(async () => {
       await pedir('PATCH', DOCS + '/compartidos/' + p.nubeId + '?updateMask.fieldPaths=recordatorio&updateMask.fieldPaths=actualizado', {fields:{recordatorio:sv(JSON.stringify({de:D.nombre || D.nube.correo, deCorreo:D.nube.correo, tipo:'pagueParte', v:p.vence, monto:miMonto(p).toFixed(2), msg:`Ya te pagué mi parte de ${sinPrefijo(p.nombre)} (${dinero(Math.round(miMonto(p)*100)/100)}). Confírmalo en Mis Pagos.`, t:Date.now()})), actualizado:iv(Date.now())}}, await token());
-      (D.parteAvisada = D.parteAvisada || {})[p.nubeId] = p.vence; guardar();
+      (D.parteAvisada = D.parteAvisada || {})[p.nubeId] = p.vence; movimiento('✅ Avisaste que pagaste tu parte de ' + sinPrefijo(p.nombre) + ' — ' + dinero(Math.round(miMonto(p)*100)/100)); guardar();
       return 'Listo: le avisaste a ' + quien + '. Cuando confirme que lo recibió, aparecerá como pagado.'; }); break; }
     case 'confParte': { const p = D.pagos.find(z => z.id === id); if(!p) break; const pide = (D.partePide || {})[p.nubeId] || {v:p.vence, de:''};
       b.animate([{transform:'scale(1)'},{transform:'scale(1.05)'},{transform:'scale(1)'}], {duration:360, easing:'cubic-bezier(.3,0,.15,1)'}); if(navigator.vibrate) navigator.vibrate([20, 40, 20]);
@@ -1552,6 +1573,7 @@ document.addEventListener('click', (ev) => {
       return 'Listo: le confirmaste el pago. Le llegará un aviso y le aparecerá como pagado.'; }); break; }
     case 'recordar': { const p = D.pagos.find(z => z.id === id); tarea(async () => {
       await pedir('PATCH', DOCS + '/compartidos/' + p.nubeId + '?updateMask.fieldPaths=recordatorio&updateMask.fieldPaths=actualizado', {fields:{recordatorio:sv(JSON.stringify({de:D.nombre || D.nube.correo, deCorreo:D.nube.correo, msg:b.dataset.m, t:Date.now()})), actualizado:iv(Date.now())}}, await token());
+      movimiento('🔔 Enviaste un recordatorio de ' + sinPrefijo(p.nombre)); guardar();
       return 'Recordatorio enviado. Le llegará una notificación de Mis Pagos.'; }); break; }
     case 'avisos': tarea(activarAvisos); break;
     case 'sync': cerrarHoja(); tarea(sincronizar); break;
@@ -1598,6 +1620,9 @@ function pintar(anim){
   app.querySelectorAll('.pastel, .barras').forEach(g => obs.observe(g));
   const n = [['inicio','Inicio'],['cal','Calendario'],['cartera','Quincenas y tarjetas'],['stats','Estadísticas'],['perfil','Ajustes']];
   const calHoy = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><text x="12" y="18.6" text-anchor="middle" font-size="8.5" font-weight="800" fill="currentColor" stroke="none" font-family="system-ui,sans-serif">${hoy().getDate()}</text></svg>`;   /* el número del día de hoy */
+  const navEl = document.getElementById('nav'), solo = tab === 0 && verAvisos;   // en Avisos: solo Atrás, abajo a la derecha
+  if(navEl.classList.contains('solo') !== solo){ navEl.classList.toggle('solo', solo); if(!matchMedia('(prefers-reduced-motion: reduce)').matches) navEl.animate([{opacity:0, translate:'0 24px'}, {opacity:1, translate:'0 0'}], {duration:320, easing:'cubic-bezier(.3,0,.15,1)'}); }
+  if(solo){ navEl.innerHTML = `<button class="sel" data-act="avisos" data-n="0" aria-label="Atrás"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>`; return; }
   document.getElementById('nav').innerHTML = n.map(([k,t],i) => `<button class="${i===tab?'sel':''}" data-act="tab" data-n="${i}" aria-label="${t}" ${i===tab?'aria-current="page"':''}>${k === 'cal' ? calHoy : IC[k]}</button>`).join('');
 }
 aplicarTema();
@@ -1889,7 +1914,7 @@ const Bloq = (() => {
   }
   document.addEventListener('visibilitychange', () => {
     if(document.hidden){ ocultaDesde = Date.now(); return; }
-    if(activo() && ocultaDesde && Date.now() - ocultaDesde > 60000 && !document.getElementById('bloqueo')){ abierta = false; mostrarEntrar(); }   /* si ya está la pantalla de entrada (p. ej. a medio recuperar), se queda como está */
+    if(activo() && ocultaDesde && Date.now() - ocultaDesde > 10 * 60000 && !document.getElementById('bloqueo')){ abierta = false; mostrarEntrar(); }   /* si ya está la pantalla de entrada (p. ej. a medio recuperar), se queda como está */
     ocultaDesde = 0; });
   return {
     iniciar(){ if(activo() && !abierta){ mostrarEntrar(); return; }
