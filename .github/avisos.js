@@ -22,8 +22,40 @@ const sinPrefijo = n => String(n || '').replace(/^Pagar |^Pago /, '');
   try {
     const desde = Date.now() - 6 * 3600 * 1000;
     const docs = await db.collection('compartidos').where('actualizado', '>', desde).get();
+    const subDe = async correo => {   // aviso push de la persona con ese correo (si lo activó en su iPhone)
+      if (!correo) return null;
+      const us = await db.collection('usuarios').where('correo', '==', String(correo).toLowerCase()).limit(1).get();
+      if (us.empty) return null;
+      const av = await db.collection('avisos').doc(us.docs[0].id).get();
+      return av.exists && av.data().sub ? av : null;
+    };
     for (const d of docs.docs) {
       const f = d.data(); let ro = null;
+      const nom0 = sinPrefijo(f.nombre);
+      // a) pago compartido NUEVO: aviso a quien lo recibe (antes solo llegaba al abrir la app)
+      if ((f.estado || '') === 'pendiente' && !f.pushInv) {
+        await d.ref.update({ pushInv: true });
+        const av = await subDe(f.otroCorreo);
+        if (av) {
+          const total = parseFloat(String(f.monto || '').replace(/[^0-9.]/g, '')) || 0;
+          const parte = total * (100 - (Number(f.parteCreador) || 50)) / 100;
+          await mandar(av.ref, av.data().sub, { title: `${f.creadorNombre || 'Alguien'} compartió un pago contigo`, body: `${nom0}${parte > 0 ? ': te toca $' + parte.toLocaleString('es-MX', { maximumFractionDigits: 2 }) : ''}. Ábrelo en Mis Pagos para aceptarlo.` });
+        }
+      }
+      // b) aceptado o rechazado: aviso a quien lo creó (solo para pagos que ya pasaron por (a), así no se repiten los viejos)
+      if (f.pushInv && (f.estado === 'aceptado' || f.estado === 'rechazado') && f.pushEst !== f.estado) {
+        await d.ref.update({ pushEst: f.estado });
+        const av = await subDe(f.creadorCorreo);
+        const otro = f.otroNombre || f.otroCorreo || 'La otra persona';
+        if (av) await mandar(av.ref, av.data().sub, f.estado === 'aceptado' ? { title: `${otro} aceptó el pago compartido`, body: `${nom0}: ya le toca su parte.` } : { title: `${otro} rechazó el pago compartido`, body: `Revisa ${nom0} en Mis Pagos.` });
+      }
+      // c) solicitud de cambio: aviso a quien lo creó
+      if (f.solicitud && f.solicitud !== (f.pushSol || '')) {
+        await d.ref.update({ pushSol: f.solicitud });
+        let so = {}; try { so = JSON.parse(f.solicitud); } catch (e) { }
+        const av = await subDe(f.creadorCorreo);
+        if (av) await mandar(av.ref, av.data().sub, { title: `${so.de || f.otroNombre || 'La otra persona'} pide un cambio en ${nom0}`, body: 'Ábrelo en Mis Pagos para aprobarlo o rechazarlo.' });
+      }
       try { ro = JSON.parse(f.recordatorio || 'null'); } catch (e) { }
       if (!ro || !ro.t || ro.t <= (f.pushT || 0)) continue;
       const para = (f.participantes || []).find(c => c && c.toLowerCase() !== String(ro.deCorreo || '').toLowerCase());
