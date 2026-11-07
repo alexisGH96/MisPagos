@@ -1,0 +1,11 @@
+{
+  "actualizado": "2026-11-07",
+  "pais": "MX",
+  "nota": "Precios mensuales oficiales en pesos. Solo se agregan precios verificados en la página oficial de cada servicio.",
+  "servicios": {
+    "Spotify": {
+      "fuente": "https://www.spotify.com/mx/premium/",
+      "planes": { "Individual (Estándar)": 139, "Dúo": 189, "Familiar": 239, "Estudiantes": 74 }
+    }
+  }
+}
