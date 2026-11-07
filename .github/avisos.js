@@ -75,6 +75,31 @@ const sinPrefijo = n => String(n || '').replace(/^Pagar |^Pago /, '');
   } catch (e) { console.log('Compartidos:', e.message); }
   // ---- 2) una vez al día: pagos por vencer ----
   if (diario) {
+    // 2a) recordatorio automático a quien comparte un pago contigo: 2 días antes, 1 día antes y el día límite
+    try {
+      const todos = await db.collection('compartidos').where('estado', '==', 'aceptado').get();
+      for (const d of todos.docs) {
+        const f = d.data();
+        if (!f.vence || f.autoRec === false || !f.otroCorreo) continue;
+        const dd = dia(f.vence) - dia(hoyISO); if (dd < 0 || dd > 2) continue;
+        const clave = f.vence + ':' + dd; if ((f.autoT || '') === clave) continue;
+        let ro = null; try { ro = JSON.parse(f.recordatorio || 'null'); } catch (e) { }
+        if (ro && (ro.tipo === 'pagueParte' || ro.tipo === 'parteOk') && ro.v === f.vence) continue;   // ya pagó su parte de este periodo
+        const total = parseFloat(String(f.monto || '').replace(/[^0-9.]/g, '')) || 0;
+        const fijo = parseFloat(String(f.fijoCreador || '').replace(/[^0-9.]/g, '')) || 0;
+        const otra = total > 0 ? (fijo > 0 ? Math.max(0, total - fijo) : total * (100 - (Number(f.parteCreador) || 50)) / 100) : 0;
+        const nom = sinPrefijo(f.nombre), quien = f.otroNombre || '';
+        const [yy, mm, dd0] = f.vence.split('-').map(Number);
+        const fecha = dd0 + ' ' + ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][mm - 1];
+        const msg = `${quien ? 'Hola ' + quien + ', ' : ''}${nom} ${dd === 0 ? 'vence hoy' : dd === 1 ? 'vence mañana' : 'vence en 2 días'} (${fecha}).${otra > 0 ? ' Te toca $' + otra.toLocaleString('es-MX', { maximumFractionDigits: 2 }) + '.' : ''}`;
+        const t = Date.now(), rec = { de: f.creadorNombre || 'Mis Pagos', deCorreo: f.creadorCorreo || '', msg, t, tipo: 'auto', v: f.vence };
+        await d.ref.update({ recordatorio: JSON.stringify(rec), autoT: clave, pushT: t, actualizado: t });   // en Android le llega al sincronizar
+        const us = await db.collection('usuarios').where('correo', '==', String(f.otroCorreo).toLowerCase()).limit(1).get();
+        if (us.empty) continue;
+        const av = await db.collection('avisos').doc(us.docs[0].id).get();
+        if (av.exists && av.data().sub) await mandar(av.ref, av.data().sub, { title: `${f.creadorNombre || 'Alguien'} te recuerda un pago`, body: msg });
+      }
+    } catch (e) { console.log('Recordatorios automáticos:', e.message); }
     const docs = await db.collection('avisos').get();
     for (const doc of docs.docs) {
       const a = doc.data();
