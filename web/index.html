@@ -363,7 +363,7 @@ function extHtml(cat, e, nombreEd){
   const cs = EXT[cat]; if(!cs) return '';
   return `<div class="gris chico b" style="margin:16px 4px 2px">${EXT_TIT[cat] || 'Detalles'}</div>` + cs.map(([k, n, t, o]) => {
     const v = esc((e || {})[k] || '');
-    if(k === 'plan'){ const pl = planesDe(nombreEd || ''); return `<label>${pl.serv ? 'Plan de ' + pl.serv : 'Plan'}</label><select name="x_plan"><option value="">Sin elegir</option>${pl.planes.map(x => `<option ${x[0] === (e||{}).plan ? 'selected' : ''}>${x[0]}</option>`).join('')}</select>`; }
+    if(k === 'plan'){ const pl = planesDe(nombreEd || ''); return `<label>${pl.serv ? 'Plan de ' + pl.serv : 'Plan'}</label><select name="x_plan" onchange="planSel(this)"><option value="">Sin elegir</option>${pl.planes.map(x => `<option ${x[0] === (e||{}).plan ? 'selected' : ''}>${x[0]}</option>`).join('')}</select>`; }
     if(t === 'o') return `<label>${n}</label><select name="x_${k}"><option value=""></option>${o.split('|').map(x => `<option ${x === (e||{})[k] ? 'selected' : ''}>${x}</option>`).join('')}</select>`;
     return `<label>${n}</label><input name="x_${k}" value="${v}" ${t === 'f' ? 'type="date"' : t === 'tel' ? 'type="tel" inputmode="tel"' : t === 'n' || t === 'd' ? 'inputmode="decimal"' : ''} ${t === 'd' ? 'placeholder="$0"' : ''}>`; }).join('');
 }
@@ -922,6 +922,7 @@ function imagenReporte(filtro){
 }
 /* ---- control de pagos de un pago compartido (quién te ha pagado su parte; lo que no pagó se suma al siguiente) ---- */
 function planesDe(nombre){ const n = String(nombre || '').toLowerCase(), P = (serv, l) => ({serv, planes:l});
+  { const sv = servicioDe(nombre), d = sv && catalogo()[sv]; if(d && d.planes && d.planes.length) return P(sv, d.planes.map(x => [x[0], x[1]])); }
   if(/spotify/.test(n)) return P('Spotify', [['Individual (Estándar)',1],['Dúo',2],['Familiar',6],['Estudiantes',1]]);
   if(/netflix/.test(n)) return P('Netflix', [['Estándar con anuncios',2],['Estándar',2],['Premium',4]]);
   if(/disney/.test(n)) return P('Disney+', [['Estándar con anuncios',2],['Estándar',2],['Premium',4]]);
@@ -935,9 +936,19 @@ function planesDe(nombre){ const n = String(nombre || '').toLowerCase(), P = (se
   if(/deezer/.test(n)) return P('Deezer', [['Individual',1],['Dúo',2],['Familiar',6],['Estudiantes',1]]);
   return P('', [['Individual',1],['Dúo',2],['Familiar',6],['Estudiante',1]]); }
 /* precios oficiales (precios.json, una vez al día): si cambian, aviso para actualizar */
-function precioOficial(p){ const pl = planesDe(p.nombre), s0 = ((D.preciosOf || {}).servicios || {})[pl.serv]; const v = s0 && s0.planes ? s0.planes[(p.ext || {}).plan] : null; return v ? +v : -1; }
+/* catálogo de suscripciones (precios.json v2): servicios con palabras clave, tipo, app y planes [nombre, cuentas, precio] */
+const catalogo = () => ((D.preciosOf || {}).version >= 2 ? D.preciosOf.servicios : null) || {};
+function servicioDe(nombre){ const n = String(nombre || '').toLowerCase(); let mejor = null, largo = 0;
+  Object.entries(catalogo()).forEach(([k, v]) => (v.claves || []).forEach(q => { if(q.length > largo && n.includes(q)){ mejor = k; largo = q.length; } })); return mejor; }
+function precioDe(serv, plan){ const d = catalogo()[serv]; const x = d && (d.planes || []).find(a => a[0] === plan); return x ? +x[2] || -1 : -1; }
+function precioOficial(p){ const pl = (p.ext || {}).plan; return pl ? precioDe(servicioDe(p.nombre), pl) : -1; }
+function nombreSug(f){   /* al escribir o elegir un servicio del catálogo: tipo de pago, planes y app */
+  const sv = servicioDe(f.nombre.value), d = sv && catalogo()[sv]; if(!d) return;
+  if(f.cat.value !== d.cat){ f.cat.value = d.cat; frecUpd(f); perUpd(f); }
+  extUpd(f); }
+function planSel(sel){ const f = sel.form, pr = precioDe(servicioDe(f.nombre.value), sel.value); if(pr > 0 && !num(f.monto.value || 0)){ f.monto.value = pr; if(navigator.vibrate) navigator.vibrate(12); f.monto.animate([{background:'rgba(34,166,104,.25)'},{background:'transparent'}], {duration:800}); } }
 async function revisarPrecios(){
-  try { if(Date.now() - (D.preciosRev || 0) > 12 * 3600000){ const r = await fetch('precios.json?t=' + Date.now(), {cache:'no-store'}); if(r.ok){ D.preciosOf = await r.json(); D.preciosRev = Date.now(); } }
+  try { if(Date.now() - (D.preciosRev || 0) > 12 * 3600000 || !D.preciosOf || (D.preciosOf.version || 1) < 2){ const r = await fetch('precios.json?t=' + Date.now(), {cache:'no-store'}); if(r.ok){ D.preciosOf = await r.json(); D.preciosRev = Date.now(); } }
     D.precioAv = D.precioAv || {}; let hay = false;
     D.pagos.forEach(p => { if(p.creadoPor) return; const of = precioOficial(p); if(of <= 0 || Math.abs(of - num(p.monto)) < .5 || D.precioAv[p.id] === of) return;
       D.precioAv[p.id] = of; hay = true; const pl = planesDe(p.nombre);
@@ -1270,7 +1281,7 @@ function editor(id){
   const cats = {tarjeta:'Tarjeta / banco', renta:'Renta / vivienda', streaming:'Streaming', internet:'Internet', luz:'Luz, agua o gas', telefono:'Teléfono', tienda:'Tienda', grupo:'Tanda o grupo', otro:'Otro'};
   const per = personas().map(x => `<option value="${esc(x.nombre)}">`).join('');
   abrirHoja(`<h1>${id ? 'Editar pago' : 'Nuevo pago'}</h1><form id="ed" data-id="${id || ''}">
-    <label>Nombre</label><input name="nombre" required value="${esc(p.nombre)}" placeholder="${ejemploNombre(catEd)}">
+    <label>Nombre</label><input name="nombre" required value="${esc(p.nombre)}" placeholder="${ejemploNombre(catEd)}" list="dlServ" autocomplete="off" oninput="nombreSug(this.form)"><datalist id="dlServ">${Object.keys(catalogo()).sort().map(k => `<option value="${esc(k)}">`).join('')}</datalist>
     <div class="dos"><div><label>Monto</label><input name="monto" inputmode="decimal" value="${esc(p.monto)}" placeholder="$0"></div><div><label>${id ? 'Calendarizado' : 'Calendarizar'}</label><input type="date" name="vence" value="${id ? p.vence : ''}"></div></div>
     <label>Tipo de pago</label><select name="cat" onchange="frecUpd(this.form); perUpd(this.form); extUpd(this.form)">${[...new Set(Object.values(GRUPO_CAT))].map(g => `<optgroup label="${g}">${Object.entries(CATS).filter(([k]) => GRUPO_CAT[k] === g).map(([k, v]) => `<option value="${k}" ${k === catEd ? 'selected' : ''}>${v[0]}  ${v[1]}</option>`).join('')}</optgroup>`).join('')}</select>
     <label>Se repite</label><select name="frec" onchange="perUpd(this.form)">${frecsDe(catEd).map(k => `<option value="${k}" ${k === (frecsDe(catEd).includes(p.frec) ? p.frec : 'M1') ? 'selected' : ''}>${FRECS[k].charAt(0).toUpperCase() + FRECS[k].slice(1)}</option>`).join('')}</select><div id="extCampos">${extHtml(catEd, p.ext || {}, p.nombre)}</div>
