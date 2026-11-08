@@ -1,11 +1,550 @@
 {
-  "actualizado": "2026-11-07",
-  "pais": "MX",
-  "nota": "Precios mensuales oficiales en pesos. Solo se agregan precios verificados en la página oficial de cada servicio.",
-  "servicios": {
-    "Spotify": {
-      "fuente": "https://www.spotify.com/mx/premium/",
-      "planes": { "Individual (Estándar)": 139, "Dúo": 189, "Familiar": 239, "Estudiantes": 74 }
-    }
+ "actualizado": "2026-11-07",
+ "pais": "MX",
+ "version": 2,
+ "nota": "Catálogo de suscripciones. Precios mensuales oficiales en pesos; 0 = aún sin precio verificado en la página oficial.",
+ "servicios": {
+  "Spotify": {
+   "cat": "streaming",
+   "claves": [
+    "spotify"
+   ],
+   "pkg": "com.spotify.music",
+   "fuente": "https://www.spotify.com/mx/premium/",
+   "planes": [
+    [
+     "Individual (Estándar)",
+     1,
+     139
+    ],
+    [
+     "Dúo",
+     2,
+     189
+    ],
+    [
+     "Familiar",
+     6,
+     239
+    ],
+    [
+     "Estudiantes",
+     1,
+     74
+    ]
+   ]
+  },
+  "Netflix": {
+   "cat": "streaming",
+   "claves": [
+    "netflix"
+   ],
+   "pkg": "com.netflix.mediaclient",
+   "fuente": "https://help.netflix.com/es-mx/node/24926/mx",
+   "planes": [
+    [
+     "Estándar con anuncios",
+     2,
+     139
+    ],
+    [
+     "Estándar",
+     2,
+     269
+    ],
+    [
+     "Premium",
+     4,
+     369
+    ]
+   ]
+  },
+  "Disney+": {
+   "cat": "streaming",
+   "claves": [
+    "disney"
+   ],
+   "pkg": "com.disney.disneyplus",
+   "planes": [
+    [
+     "Estándar con anuncios",
+     2,
+     0
+    ],
+    [
+     "Estándar",
+     2,
+     0
+    ],
+    [
+     "Premium",
+     4,
+     0
+    ]
+   ]
+  },
+  "Max": {
+   "cat": "streaming",
+   "claves": [
+    "hbo",
+    "max"
+   ],
+   "pkg": "com.wbd.stream",
+   "planes": [
+    [
+     "Básico con anuncios",
+     2,
+     0
+    ],
+    [
+     "Estándar",
+     2,
+     0
+    ],
+    [
+     "Platino",
+     4,
+     0
+    ]
+   ]
+  },
+  "Amazon Prime": {
+   "cat": "streaming",
+   "claves": [
+    "amazon",
+    "prime"
+   ],
+   "pkg": "com.amazon.avod.thirdpartyclient",
+   "planes": [
+    [
+     "Mensual",
+     3,
+     0
+    ],
+    [
+     "Anual",
+     3,
+     0
+    ],
+    [
+     "Estudiantes",
+     1,
+     0
+    ]
+   ]
+  },
+  "YouTube Premium": {
+   "cat": "streaming",
+   "claves": [
+    "youtube"
+   ],
+   "pkg": "com.google.android.youtube",
+   "planes": [
+    [
+     "Individual",
+     1,
+     0
+    ],
+    [
+     "Familiar",
+     6,
+     0
+    ],
+    [
+     "Estudiantes",
+     1,
+     0
+    ]
+   ]
+  },
+  "Apple Music": {
+   "cat": "streaming",
+   "claves": [
+    "apple music"
+   ],
+   "pkg": "com.apple.android.music",
+   "planes": [
+    [
+     "Individual",
+     1,
+     0
+    ],
+    [
+     "Familiar",
+     6,
+     0
+    ],
+    [
+     "Estudiantes",
+     1,
+     0
+    ]
+   ]
+  },
+  "Apple TV+": {
+   "cat": "streaming",
+   "claves": [
+    "apple tv"
+   ],
+   "pkg": "",
+   "planes": [
+    [
+     "Mensual",
+     6,
+     0
+    ]
+   ]
+  },
+  "Crunchyroll": {
+   "cat": "streaming",
+   "claves": [
+    "crunchyroll",
+    "crunchy"
+   ],
+   "pkg": "com.crunchyroll.crunchyroid",
+   "planes": [
+    [
+     "Fan",
+     1,
+     0
+    ],
+    [
+     "Mega Fan",
+     4,
+     0
+    ],
+    [
+     "Ultimate Fan",
+     6,
+     0
+    ]
+   ]
+  },
+  "Paramount+": {
+   "cat": "streaming",
+   "claves": [
+    "paramount"
+   ],
+   "pkg": "com.cbs.ca",
+   "planes": [
+    [
+     "Básico",
+     2,
+     0
+    ],
+    [
+     "Estándar",
+     3,
+     0
+    ]
+   ]
+  },
+  "ViX": {
+   "cat": "streaming",
+   "claves": [
+    "vix"
+   ],
+   "pkg": "com.univision.prendetv",
+   "planes": [
+    [
+     "Premium",
+     2,
+     0
+    ],
+    [
+     "Premium sin anuncios",
+     4,
+     0
+    ]
+   ]
+  },
+  "Deezer": {
+   "cat": "streaming",
+   "claves": [
+    "deezer"
+   ],
+   "pkg": "deezer.android.app",
+   "planes": [
+    [
+     "Individual",
+     1,
+     0
+    ],
+    [
+     "Dúo",
+     2,
+     0
+    ],
+    [
+     "Familiar",
+     6,
+     0
+    ],
+    [
+     "Estudiantes",
+     1,
+     0
+    ]
+   ]
+  },
+  "Claro video": {
+   "cat": "streaming",
+   "claves": [
+    "claro video",
+    "clarovideo"
+   ],
+   "pkg": "com.clarovideo.app",
+   "planes": [
+    [
+     "Mensual",
+     3,
+     0
+    ]
+   ]
+  },
+  "Xbox Game Pass": {
+   "cat": "streaming",
+   "claves": [
+    "xbox",
+    "game pass",
+    "gamepass"
+   ],
+   "pkg": "com.gamepass",
+   "planes": [
+    [
+     "Core",
+     1,
+     0
+    ],
+    [
+     "Standard",
+     1,
+     0
+    ],
+    [
+     "Ultimate",
+     1,
+     0
+    ]
+   ]
+  },
+  "PlayStation Plus": {
+   "cat": "streaming",
+   "claves": [
+    "playstation",
+    "ps plus",
+    "psn"
+   ],
+   "pkg": "com.scee.psxandroid",
+   "planes": [
+    [
+     "Essential",
+     1,
+     0
+    ],
+    [
+     "Extra",
+     1,
+     0
+    ],
+    [
+     "Premium",
+     1,
+     0
+    ]
+   ]
+  },
+  "Nintendo Switch Online": {
+   "cat": "streaming",
+   "claves": [
+    "nintendo"
+   ],
+   "pkg": "",
+   "planes": [
+    [
+     "Individual",
+     1,
+     0
+    ],
+    [
+     "Familiar",
+     8,
+     0
+    ]
+   ]
+  },
+  "Microsoft 365": {
+   "cat": "streaming",
+   "claves": [
+    "microsoft 365",
+    "office 365",
+    "office"
+   ],
+   "pkg": "com.microsoft.office.officehubrow",
+   "planes": [
+    [
+     "Personal",
+     1,
+     0
+    ],
+    [
+     "Familia",
+     6,
+     0
+    ]
+   ]
+  },
+  "Google One": {
+   "cat": "streaming",
+   "claves": [
+    "google one",
+    "google drive"
+   ],
+   "pkg": "com.google.android.apps.subscriptions.red",
+   "planes": [
+    [
+     "100 GB",
+     6,
+     0
+    ],
+    [
+     "2 TB",
+     6,
+     0
+    ],
+    [
+     "AI Pro",
+     6,
+     0
+    ]
+   ]
+  },
+  "iCloud+": {
+   "cat": "streaming",
+   "claves": [
+    "icloud"
+   ],
+   "pkg": "",
+   "planes": [
+    [
+     "50 GB",
+     6,
+     0
+    ],
+    [
+     "200 GB",
+     6,
+     0
+    ],
+    [
+     "2 TB",
+     6,
+     0
+    ]
+   ]
+  },
+  "ChatGPT": {
+   "cat": "streaming",
+   "claves": [
+    "chatgpt",
+    "openai"
+   ],
+   "pkg": "com.openai.chatgpt",
+   "planes": [
+    [
+     "Plus",
+     1,
+     0
+    ],
+    [
+     "Pro",
+     1,
+     0
+    ]
+   ]
+  },
+  "Claude": {
+   "cat": "streaming",
+   "claves": [
+    "claude",
+    "anthropic"
+   ],
+   "pkg": "com.anthropic.claude",
+   "planes": [
+    [
+     "Pro",
+     1,
+     0
+    ],
+    [
+     "Max",
+     1,
+     0
+    ]
+   ]
+  },
+  "Canva": {
+   "cat": "streaming",
+   "claves": [
+    "canva"
+   ],
+   "pkg": "com.canva.editor",
+   "planes": [
+    [
+     "Pro",
+     1,
+     0
+    ],
+    [
+     "Teams",
+     3,
+     0
+    ]
+   ]
+  },
+  "Duolingo": {
+   "cat": "streaming",
+   "claves": [
+    "duolingo"
+   ],
+   "pkg": "com.duolingo",
+   "planes": [
+    [
+     "Super",
+     1,
+     0
+    ],
+    [
+     "Super Familiar",
+     6,
+     0
+    ],
+    [
+     "Max",
+     1,
+     0
+    ]
+   ]
+  },
+  "Smart Fit": {
+   "cat": "streaming",
+   "claves": [
+    "smart fit",
+    "smartfit"
+   ],
+   "pkg": "com.smartfit.app",
+   "planes": [
+    [
+     "Smart",
+     1,
+     0
+    ],
+    [
+     "Black",
+     1,
+     0
+    ]
+   ]
   }
+ }
 }
