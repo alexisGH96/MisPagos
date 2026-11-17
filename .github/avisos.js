@@ -88,16 +88,19 @@ const sinPrefijo = n => String(n || '').replace(/^Pagar |^Pago /, '');
         const total = parseFloat(String(f.monto || '').replace(/[^0-9.]/g, '')) || 0;
         const fijo = parseFloat(String(f.fijoCreador || '').replace(/[^0-9.]/g, '')) || 0;
         const otra = total > 0 ? (fijo > 0 ? Math.max(0, total - fijo) : total * (100 - (Number(f.parteCreador) || 50)) / 100) : 0;
-        const nom = sinPrefijo(f.nombre), quien = f.otroNombre || '';
+        const nom = sinPrefijo(f.nombre);
         const [yy, mm, dd0] = f.vence.split('-').map(Number);
         const fecha = dd0 + ' ' + ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][mm - 1];
-        const msg = `${quien ? 'Hola ' + quien + ', ' : ''}${nom} ${dd === 0 ? 'vence hoy' : dd === 1 ? 'vence mañana' : 'vence en 2 días'} (${fecha}).${otra > 0 ? ' Te toca $' + otra.toLocaleString('es-MX', { maximumFractionDigits: 2 }) + '.' : ''}`;
-        const t = Date.now(), rec = { de: f.creadorNombre || 'Mis Pagos', deCorreo: f.creadorCorreo || '', msg, t, tipo: 'auto', v: f.vence };
+        // 13.5.1: es automático, así que NO se presenta como si lo mandara quien creó el pago (antes decía
+        // "Gabriela te recuerda un pago" y saludaba con el correo). Va firmado por Mis Pagos y sin saludo.
+        const vence = dd === 0 ? 'vence hoy' : dd === 1 ? 'vence mañana' : 'vence en 2 días';
+        const msg = `${nom} ${vence} (${fecha}).${otra > 0 ? ' Te toca $' + otra.toLocaleString('es-MX', { maximumFractionDigits: 2 }) + '.' : ''}${f.creadorNombre ? ' Pago compartido con ' + f.creadorNombre + '.' : ''}`;
+        const t = Date.now(), rec = { de: 'Mis Pagos', deNombre: f.creadorNombre || '', deCorreo: f.creadorCorreo || '', msg, t, tipo: 'auto', v: f.vence };
         await d.ref.update({ recordatorio: JSON.stringify(rec), autoT: clave, pushT: t, actualizado: t });   // en Android le llega al sincronizar
         const us = await db.collection('usuarios').where('correo', '==', String(f.otroCorreo).toLowerCase()).limit(1).get();
         if (us.empty) continue;
         const av = await db.collection('avisos').doc(us.docs[0].id).get();
-        if (av.exists && av.data().sub) await mandar(av.ref, av.data().sub, { title: `${f.creadorNombre || 'Alguien'} te recuerda un pago`, body: msg });
+        if (av.exists && av.data().sub) await mandar(av.ref, av.data().sub, { title: `Recordatorio: ${nom} ${vence}`, body: msg });
       }
     } catch (e) { console.log('Recordatorios automáticos:', e.message); }
     const docs = await db.collection('avisos').get();
