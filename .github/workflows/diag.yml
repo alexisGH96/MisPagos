@@ -1,6 +1,7 @@
 name: Diagnostico compartidos (temporal)
 on:
-  workflow_dispatch:
+  push:
+    paths: ['.github/diag.js', '.github/workflows/diag.yml']
 jobs:
   diag:
     runs-on: ubuntu-latest
