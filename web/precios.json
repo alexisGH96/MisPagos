@@ -1,5 +1,5 @@
 {
- "actualizado": "2026-11-07",
+ "actualizado": "2026-11-16",
  "pais": "MX",
  "version": 2,
  "nota": "Catálogo de suscripciones. Precios mensuales oficiales en pesos; 0 = aún sin precio verificado en la página oficial.",
@@ -65,6 +65,7 @@
     "disney"
    ],
    "pkg": "com.disney.disneyplus",
+   "fuente": "https://www.disneyplus.com/es-mx",
    "planes": [
     [
      "Estándar con anuncios",
@@ -90,6 +91,7 @@
     "max"
    ],
    "pkg": "com.wbd.stream",
+   "fuente": "https://www.max.com/mx/es",
    "planes": [
     [
      "Básico con anuncios",
@@ -115,6 +117,7 @@
     "prime"
    ],
    "pkg": "com.amazon.avod.thirdpartyclient",
+   "fuente": "https://www.amazon.com.mx/amazonprime",
    "planes": [
     [
      "Mensual",
@@ -139,6 +142,7 @@
     "youtube"
    ],
    "pkg": "com.google.android.youtube",
+   "fuente": "https://www.youtube.com/premium",
    "planes": [
     [
      "Individual",
@@ -163,6 +167,7 @@
     "apple music"
    ],
    "pkg": "com.apple.android.music",
+   "fuente": "https://www.apple.com/mx/apple-music/",
    "planes": [
     [
      "Individual",
@@ -187,6 +192,7 @@
     "apple tv"
    ],
    "pkg": "",
+   "fuente": "https://www.apple.com/mx/apple-tv-plus/",
    "planes": [
     [
      "Mensual",
@@ -202,6 +208,7 @@
     "crunchy"
    ],
    "pkg": "com.crunchyroll.crunchyroid",
+   "fuente": "https://www.crunchyroll.com/es-mx/premium",
    "planes": [
     [
      "Fan",
@@ -226,6 +233,7 @@
     "paramount"
    ],
    "pkg": "com.cbs.ca",
+   "fuente": "https://www.paramountplus.com/mx/",
    "planes": [
     [
      "Básico",
@@ -245,6 +253,7 @@
     "vix"
    ],
    "pkg": "com.univision.prendetv",
+   "fuente": "https://vix.com/",
    "planes": [
     [
      "Premium",
@@ -264,6 +273,7 @@
     "deezer"
    ],
    "pkg": "deezer.android.app",
+   "fuente": "https://www.deezer.com/mx/offers",
    "planes": [
     [
      "Individual",
@@ -294,6 +304,7 @@
     "clarovideo"
    ],
    "pkg": "com.clarovideo.app",
+   "fuente": "https://www.clarovideo.com/",
    "planes": [
     [
      "Mensual",
@@ -310,6 +321,7 @@
     "gamepass"
    ],
    "pkg": "com.gamepass",
+   "fuente": "https://www.xbox.com/es-MX/xbox-game-pass",
    "planes": [
     [
      "Core",
@@ -336,6 +348,7 @@
     "psn"
    ],
    "pkg": "com.scee.psxandroid",
+   "fuente": "https://www.playstation.com/es-mx/ps-plus/",
    "planes": [
     [
      "Essential",
@@ -360,6 +373,7 @@
     "nintendo"
    ],
    "pkg": "",
+   "fuente": "https://www.nintendo.com/es-mx/switch/online/",
    "planes": [
     [
      "Individual",
@@ -381,6 +395,7 @@
     "office"
    ],
    "pkg": "com.microsoft.office.officehubrow",
+   "fuente": "https://www.microsoft.com/es-mx/microsoft-365/buy/compare-all-microsoft-365-products",
    "planes": [
     [
      "Personal",
@@ -401,6 +416,7 @@
     "google drive"
    ],
    "pkg": "com.google.android.apps.subscriptions.red",
+   "fuente": "https://one.google.com/about/plans",
    "planes": [
     [
      "100 GB",
@@ -425,6 +441,7 @@
     "icloud"
    ],
    "pkg": "",
+   "fuente": "https://www.apple.com/mx/icloud/",
    "planes": [
     [
      "50 GB",
@@ -450,6 +467,7 @@
     "openai"
    ],
    "pkg": "com.openai.chatgpt",
+   "fuente": "https://openai.com/chatgpt/pricing/",
    "planes": [
     [
      "Plus",
@@ -470,6 +488,7 @@
     "anthropic"
    ],
    "pkg": "com.anthropic.claude",
+   "fuente": "https://claude.com/pricing",
    "planes": [
     [
      "Pro",
@@ -489,6 +508,7 @@
     "canva"
    ],
    "pkg": "com.canva.editor",
+   "fuente": "https://www.canva.com/es_mx/precios/",
    "planes": [
     [
      "Pro",
@@ -508,6 +528,7 @@
     "duolingo"
    ],
    "pkg": "com.duolingo",
+   "fuente": "https://www.duolingo.com/",
    "planes": [
     [
      "Super",
@@ -533,6 +554,7 @@
     "smartfit"
    ],
    "pkg": "com.smartfit.app",
+   "fuente": "https://www.smartfit.com.mx/",
    "planes": [
     [
      "Smart",
