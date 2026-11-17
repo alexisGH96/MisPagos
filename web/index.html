@@ -20,6 +20,7 @@
   --r-nar:#F08042; --r-ama:#E2AA14; --r-ver:#22A668; --r-azu:#3470D6; --r-roj:#DE4040;
   --tile:#FFFFFF; --hero1:#1C326E; --hero2:#2C58A8; --heroTxt:#FFFFFF;
   --sombra:0 10px 30px rgba(16,28,60,.12);
+  --espInicio:29px;   /* ronda 13.4.16, ítem 1: huecos entre secciones = 29 dp (medido por el coordinador en la foto real: puntos→"Próximos" y "Próximos"→cápsulas son 29 dp; el 38 px de la 13.4.15 se midió solo en web y NO es lo real). Escala web 1 px = 1 dp, como en la 13.4.15 (38 px = 38 dp) */
   color-scheme: light;
 }
 :root[data-tema="claro2"]{
@@ -49,7 +50,7 @@ h2{font-size:19px;margin:24px 4px 12px}
 .gris{color:var(--gr)}
 .chico{font-size:13px}
 .b{font-weight:700}
-.sec{display:flex;align-items:center;justify-content:space-between;margin:24px 4px 12px}
+.sec{display:flex;align-items:center;justify-content:space-between;margin:0 4px 12px}
 .sec h2{margin:0}
 .pildora{border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:100px;padding:7px 14px;font-size:14px}
 .btn{display:block;width:100%;border-radius:100px;padding:13px 16px;font-weight:700;text-align:center}
@@ -57,7 +58,7 @@ h2{font-size:19px;margin:24px 4px 12px}
 .btn.borde{border:1px solid var(--line);background:var(--card);color:var(--fg)}
 .caja{background:var(--surf);border:1px solid var(--line);border-radius:22px;padding:16px}
 /* encabezado */
-.hola{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.hola{display:flex;align-items:center;gap:14px;margin-bottom:var(--espInicio)}
 .ava{width:48px;height:48px;border-radius:50%;background:var(--acc);color:var(--accTxt);display:grid;place-items:center;font-weight:700;font-size:20px}
 .mas{width:48px;height:48px;border-radius:50%;background:var(--card);border:1px solid var(--line);color:#46464F;font-size:28px;line-height:1}
 .hero{background:linear-gradient(120deg,var(--hero1),var(--hero2));color:var(--heroTxt);border-radius:26px;padding:20px;box-shadow:var(--sombra)}
@@ -73,7 +74,7 @@ h2{font-size:19px;margin:24px 4px 12px}
 .pago .nom{font-weight:700;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .der{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:6px}
 .est-nar{background:var(--t-nar)} .est-ama{background:var(--t-ama)} .est-ver{background:var(--t-ver)} .est-azu{background:var(--t-azu)} .est-roj{background:var(--t-roj)}
-.prox{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:14px 24px 60px;margin:-14px -24px -40px !important;margin:0 -16px;padding-left:16px;scrollbar-width:none}
+.prox{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding:14px 24px 45px;margin:-14px -24px -40px !important;margin:0 -16px;padding-left:16px;scrollbar-width:none}   /* 13.4.16, ítem 1: hueco cápsulas→"Registro de pagos" = 29 px: 45 de padding − 40 de margen + 24 del margen superior del h2 = 29 (antes 78−40+24 = 62) */
 .prox::-webkit-scrollbar{display:none}
 .pc{flex:0 0 190px;scroll-snap-align:start;background:var(--surf);border:1px solid var(--line);border-radius:22px;padding:14px;text-align:left}
 /* barra de navegación */
@@ -296,12 +297,189 @@ button:active,.pago:active,.pc:active,a.btn:active{transform:scale(.97);transiti
 :root[data-tema="oscuro"] .tjFila,:root[data-tema="glassn"] .tjFila{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.08)}
 :root[data-tema="glass"] .tjFila{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
 :root[data-tema="glassb"] .tjFila{background:rgba(255,255,255,.15);border-color:rgba(0,0,0,.07)}
+
+/* ---- carrusel de la tarjeta principal (ítem 11): mismo tamaño en todas, una por deslizada ---- */
+.carPlacaCont{position:relative}
+.carPlaca{position:absolute;top:-11px;left:-11px;right:-11px;bottom:var(--espInicio);background:rgba(28,43,74,.06);border:1px solid rgba(0,0,0,.08);-webkit-backdrop-filter:blur(6px) saturate(130%);backdrop-filter:blur(6px) saturate(130%);border-radius:29px;opacity:0;pointer-events:none;transition:opacity .2s}   /* 13.4.16, ítem 3: placa pizarra del video (Smart Widgets), medida: #606FA1, 11 px por los lados y arriba, cubre los puntos abajo */
+.carPlacaCont.carPlacaOn .carPlaca{opacity:1}
+.carWrap{position:relative;overflow:hidden;touch-action:pan-y}   /* relative para quedar sobre la placa */
+.carTrack{display:flex;align-items:stretch;column-gap:8%;transition:transform .5s cubic-bezier(.22,.9,.28,1)}   /* 13.4.16, ítem 3: hueco ~8 % entre tarjetas (video: 7–10 %); el desplazamiento pasa a pasos de 108 % */
+.carSlide{flex:0 0 100%;min-width:0;display:flex;transition:transform .5s cubic-bezier(.22,.9,.28,1),border-radius .5s cubic-bezier(.22,.9,.28,1)}
+/* ítem 7 (ronda 13.4.15, estilo Samsung Smart Widgets) + 13.4.16, ítem 3: la tarjeta que entra llega
+   a 0.95 (medido del video, antes 0.92) con las esquinas redondeadas y crece hasta su tamaño al asentarse */
+.carSlide.carEntra{transform:scale(.95);border-radius:32px;overflow:hidden}
+.carSlide>*{flex:1;min-width:0}
+.carSlide .hero{display:flex;flex-direction:column;padding:20px}
+.carSlide:first-child .hero{padding-bottom:12px}   /* 13.5.2: la tarjeta de Inicio queda como estaba */
+.carTrack{align-items:flex-start}
+.carSlide:not(:first-child) .hero{height:var(--carH,auto);overflow:hidden}   /* las nuevas miden lo mismo que Inicio */
+.carSlide .hero.apretada{padding-top:10px;padding-bottom:10px;gap:2px}
+.carSlide .hero.apretada .cIco:not(.ch){width:20px;height:20px}
+.carSlide .hero.apretada .carTot{padding-top:2px}
+.carSlide .hero.apretada .heroIc{width:30px;height:30px}
+.carSlide .hero.apretada .carFila,.carSlide .hero.apretada .carBarraF .fila{line-height:1.15}
+.carSlide:not(:first-child) .hero{justify-content:space-between;gap:8px}   /* tarjetas nuevas: el aire que sobra se reparte parejo entre sus elementos (también arriba y abajo de cada línea) */
+.carSlide:not(:first-child) .hero>*{margin-top:0 !important;margin-bottom:0 !important}
+.carSlide:first-child .hero>*:last-child{margin-top:auto}   /* Inicio: 20 px arriba y abajo; si otra tarjeta es más alta, el pie se queda abajo */
+#fqZona,#fqChips,#fqMenuZ,#qCuerpo{display:flow-root}   /* 13.5.1: sin márgenes que colapsen: la altura animada termina exacta (sin brinquito final) */
+.carSlide .hero .heroLin{margin:14px 0 5px}   /* en flex no colapsa: 5px abajo + 5px de la barra = los 10px de antes */
+.carDots{display:flex;gap:5px;justify-content:center;margin:11px 0 var(--espInicio);opacity:0;transition:opacity .2s}   /* 13.4.16, ítem 3: en el video los puntos solo se ven mientras se desliza (con la placa) */
+.carPlacaCont.carPlacaOn .carDots{opacity:1}
+.carDots i{width:7px;height:7px;border-radius:50%;background:var(--gr);opacity:.45;cursor:pointer;transition:all .3s}
+.carDots i.on{background:var(--acc);opacity:1}   /* 13.4.16, ítem 3: en el video el punto activo no se estira, solo brilla más */
+.carMini{width:18px;height:18px;border-radius:6px;color:#fff;font-size:9px;font-weight:800;display:inline-grid;place-items:center;flex:none}
+.carBar{flex:1;height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.carBar i{display:block;height:100%;border-radius:99px}
+.carFila{display:flex;align-items:center;gap:8px;padding:5px 0;font-size:13.5px}
+.carBarra{height:14px;border-radius:99px;background:color-mix(in srgb, var(--fg) 10%, transparent);overflow:hidden;margin:8px 0 2px}
+.carBarra i{display:block;height:100%;border-radius:99px;transform-origin:left;transform:scaleX(0);animation:llena .9s cubic-bezier(.3,0,.15,1) forwards}
+.carFila .bn{font-weight:700;white-space:nowrap}
+.carFila .ba{font-weight:800;white-space:nowrap}
+.carDiv{height:1px;background:currentColor;opacity:.12;margin:4px 0}
+.carTot{border-top:1px solid var(--line);margin-top:2px;padding-top:5px;display:flex;justify-content:space-between;font-size:12px}
+.carTot b{font-size:13px}
+.carStrip{margin-top:10px;background:color-mix(in srgb, currentColor 8%, transparent);border-radius:99px;text-align:center;font-size:12.5px;font-weight:700;padding:9px 8px}
+/* ---- acordeón de Mi perfil (ítem 10; ronda 13.4.15 ítems 11-13: todas las secciones) ---- */
+.ajSec{margin-bottom:12px;overflow:hidden}
+.ajHead{display:flex;align-items:center;gap:10px;width:100%;padding:16px;text-align:left;font:inherit;color:inherit}
+.ajIco{width:34px;height:34px;border-radius:10px;background:color-mix(in srgb, var(--fg) 7%, transparent);display:grid;place-items:center;flex:none;color:var(--fg)}
+.ajIco svg{width:20px;height:20px}
+.ajHead .t{font-size:16.5px;font-weight:800;white-space:nowrap;flex:none}
+.ajHead .s{margin-left:auto;font-size:13px;color:var(--gr);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ajSec.abierto .ajHead .s{display:none}
+/* ítem 12: flecha ancha de patas, poco alta, siempre alineada a la derecha; apunta
+   abajo cerrada y arriba (^) abierta. 13.4.16, ítem 5: más chica, 12×6 (antes 16×7
+   en un cuadro de 24×24); el margin-left:auto la mantiene al final del cuadro
+   cerrada y abierta (verificado: mismo borde derecho que las ">" de las filas) */
+.ajFlecha{margin-left:auto;color:var(--gr);flex:none;display:grid;place-items:center;transition:transform .4s cubic-bezier(.3,0,.15,1)}
+.ajFlecha svg{display:block}
+.ajSec.abierto .ajFlecha{transform:rotate(180deg)}
+/* ítem 13: desplegado/compactado suave con altura, y el texto aparece con animación
+   (el cuerpo siempre está en el DOM, colapsado con max-height:0) */
+.ajCuerpo{border-top:1px solid var(--line);padding:0 16px;height:0;box-sizing:border-box;overflow:hidden;opacity:0;visibility:hidden;transition:opacity .3s cubic-bezier(.3,0,.15,1),visibility 0s .32s}   /* 13.5.1: la altura la anima JS (antes max-height: terminaba de golpe) */
+.ajSec.abierto .ajCuerpo{height:auto;opacity:1;visibility:visible;padding:2px 16px 8px;transition:opacity .3s cubic-bezier(.3,0,.15,1) .04s,visibility 0s}
+.ajCuerpo>*{opacity:0;transform:translateY(8px);transition:opacity .3s ease,transform .3s ease}
+.ajSec.abierto .ajCuerpo>*{opacity:1;transform:none}
+.ajSec.abierto .ajCuerpo>*:nth-child(1){transition-delay:.05s}
+.ajSec.abierto .ajCuerpo>*:nth-child(2){transition-delay:.09s}
+.ajSec.abierto .ajCuerpo>*:nth-child(3){transition-delay:.13s}
+.ajSec.abierto .ajCuerpo>*:nth-child(4){transition-delay:.17s}
+.ajSec.abierto .ajCuerpo>*:nth-child(5){transition-delay:.21s}
+.ajSec.abierto .ajCuerpo>*:nth-child(n+6){transition-delay:.25s}
+/* ---- filtro de Quincenas (ítem 9; ronda 13.4.15 ítems 1-3) ---- */
+.fqBtn{width:40px;height:40px;border-radius:50%;background:var(--surf);border:1px solid var(--line);display:grid;place-items:center;flex:none;align-self:center;box-shadow:var(--sombra);transition:transform .25s}
+.fqPanel{animation:entra .32s cubic-bezier(.3,0,.15,1) both}
+.fqFila{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.fqBtn.on{background:var(--acc);color:var(--accTxt)}
+.fqBtn svg{width:19px;height:19px}
+.fqChip{display:inline-flex;align-items:center;gap:7px;background:var(--acc);color:var(--accTxt);border-radius:99px;padding:8px 14px;font-size:14.5px;font-weight:700}
+.fqChip .av{width:20px;height:20px;border-radius:50%;background:var(--accTxt);color:var(--acc);font-size:12px;font-weight:800;display:grid;place-items:center}
+.fqMenu{background:var(--surf);border:1px solid var(--line);border-radius:16px;box-shadow:var(--sombra);margin-top:8px;padding:6px 8px;width:240px;animation:entra .28s cubic-bezier(.3,0,.15,1) both}
+.fqMenu .dh{font-size:11.5px;font-weight:700;letter-spacing:.4px;color:var(--gr);padding:6px 10px 2px}
+.fqMenu .di{display:flex;align-items:center;gap:10px;padding:9px 10px;font-size:15px;font-weight:600;width:100%;text-align:left;border-radius:10px}
+.fqMenu .di.sel{background:color-mix(in srgb, var(--acc) 12%, transparent);color:var(--acc)}   /* ítem 4c: la opción elegida se pinta de azul */
+.fqMenu .di .av{width:28px;height:28px;border-radius:50%;background:var(--acc);color:var(--accTxt);font-size:13px;font-weight:800;display:grid;place-items:center;flex:none}
+.fqTot{border-top:1px solid var(--line);margin-top:12px;padding-top:12px;display:flex;justify-content:space-between;align-items:center}
+/* ítem 10 (ronda 13.4.15): solo el anillo marca como pagado en la lista */
+.anilloBtn{display:grid;place-items:center;padding:2px;border-radius:50%;flex:none}
+.anilloBtn:active{transform:scale(.88)}
+/* pantalla de configuración del carrusel (ítem 14): la tarjeta real, con un velo
+   transparente encima para que el toque cambie su versión sin activar sus botones */
+.carPantTap{position:absolute;inset:0;border-radius:26px}
+/* ---- cápsulas de Inicio (ítem 5): icono grisáceo transparente ---- */
+.pc .ico{background:rgba(127,127,140,.16) !important;box-shadow:none !important;color:var(--fg) !important}
+.pcIco{background:none;border:0;padding:0;display:grid;place-items:center;flex:none;border-radius:12px}
+.pcIco:active{transform:scale(.9)}
+/* ---- flecha verde + registro de monto actualizado (ítem 3) ---- */
+.flechaVerde{color:#1FA463;font-weight:800;font-size:15px;animation:pop .4s cubic-bezier(.3,1.6,.5,1) both}
+.regMonto{font-size:12px;color:var(--gr);margin:6px 2px 0;line-height:1.4}
+.regMonto b{color:#1FA463}
+/* ---- Glass Dark (ítem 13): negro puro + un solo acento violeta ---- */
+:root[data-tema="glassd"]{
+  --bg:#030304; --fg:#FFFFFF; --gr:rgba(255,255,255,.45); --surf:rgba(255,255,255,.05); --line:rgba(255,255,255,.08);
+  --acc:#7B2FF7; --accTxt:#FFFFFF; --nav:rgba(255,255,255,.04); --pill:rgba(123,47,247,.38); --icoSel:#FFFFFF; --ico:rgba(255,255,255,.6);
+  --t-nar:rgba(255,255,255,.05); --t-ama:rgba(255,255,255,.05); --t-ver:rgba(255,255,255,.05); --t-azu:rgba(255,255,255,.05); --t-roj:rgba(255,255,255,.05);
+  --r-nar:#FFFFFF; --r-ama:rgba(255,255,255,.7); --r-ver:#FFFFFF; --r-azu:#A78BFA; --r-roj:#FFFFFF;
+  --tile:rgba(255,255,255,.06); --hero1:rgba(255,255,255,.06); --hero2:rgba(255,255,255,.02); --heroTxt:#FFFFFF;
+  --sombra:0 14px 30px rgba(0,0,0,.6); color-scheme:dark;
+}
+:root[data-tema="glassd"] body{background:radial-gradient(120% 40% at 50% 0%, rgba(123,47,247,.16), transparent 60%), #030304;background-attachment:fixed}
+:root[data-tema="glassd"] .caja,:root[data-tema="glassd"] .pago,:root[data-tema="glassd"] .pc,:root[data-tema="glassd"] .hero{position:relative;overflow:hidden}
+:root[data-tema="glassd"] .caja::before,:root[data-tema="glassd"] .pago::before,:root[data-tema="glassd"] .pc::before,:root[data-tema="glassd"] .hero::before{content:"";position:absolute;top:0;left:14%;right:14%;height:1px;background:linear-gradient(90deg,transparent,rgba(139,92,246,.7),transparent);pointer-events:none;z-index:1}
+:root[data-tema="glassd"] .caja,:root[data-tema="glassd"] .pago,:root[data-tema="glassd"] .pc,:root[data-tema="glassd"] .seg,:root[data-tema="glassd"] nav{-webkit-backdrop-filter:blur(5px) saturate(130%);backdrop-filter:blur(5px) saturate(130%)}
+:root[data-tema="glassd"] .seg button.sel{background:rgba(123,47,247,.38);color:#fff;box-shadow:none;border-color:rgba(123,47,247,.5)}
+:root[data-tema="glassd"] nav button.sel{background:rgba(123,47,247,.38);color:#fff}
+:root[data-tema="glassd"] .btn.lleno{background:#7B2FF7;color:#fff}
+:root[data-tema="glassd"] .ico{background:#16161a !important;box-shadow:none !important;color:#fff !important;filter:grayscale(1)}
+:root[data-tema="glassd"] .indIc{background:#1a1a1e !important;color:#fff !important}
+:root[data-tema="glassd"] .tjIcono{background:rgba(255,255,255,.08);color:#fff}
+:root[data-tema="glassd"] .aviso,:root[data-tema="glassd"] .alQ,:root[data-tema="glassd"] .interr{background:#fff !important;color:#000 !important}
+:root[data-tema="glassd"] .hola .mas span[style]{background:#fff !important;color:#000 !important}
+:root[data-tema="glassd"] .verde{color:#fff}
+:root[data-tema="glassd"] .rad{--radC:#7B2FF7}
+:root[data-tema="glassd"] .balChip{background:rgba(123,47,247,.38);color:#fff}
+:root[data-tema="glassd"] .hero .barra{background:rgba(255,255,255,.2)}
+:root[data-tema="glassd"] .hero .barra i{background:#fff}
+
+/* ---- extras carrusel (ítem 11) y acordeón (ítem 10) ---- */
+.ajSec{margin:22px 0 0 !important}
+.carFalta{font-size:17px;font-weight:800;margin:8px 0 2px}
+.carCirculo{width:34px;height:34px;border-radius:50%;border:2px solid var(--acc);color:var(--acc);display:grid;place-items:center;font-weight:800;font-size:13px;flex:none}
+.carDias{display:flex;align-items:flex-end;gap:8px;height:76px;padding:8px 2px 0}
+.carDia{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.carDia i{display:block;width:100%;max-width:22px;border-radius:4px 4px 0 0;background:var(--r-azu)}
+.carDia span{font-size:11px;color:var(--gr)}
+
+/* 13.5.0: placa del carrusel en vidrio translúcido según la apariencia (antes azul pizarra #606FA1) */
+:root[data-tema="oscuro"] .carPlaca{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.14)}
+:root[data-tema="glass"] .carPlaca{background:rgba(255,255,255,.28);border-color:rgba(255,255,255,.4)}
+:root[data-tema="glassb"] .carPlaca{background:rgba(255,255,255,.55);border-color:rgba(0,0,0,.08)}
+:root[data-tema="glassn"] .carPlaca,:root[data-tema="glassd"] .carPlaca{background:rgba(255,255,255,.14);border-color:rgba(255,255,255,.15)}
+/* 13.5.0: botón para subir (pantallas con "solo Atrás"): aparece al llegar al final */
+#arriba{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0));width:46px;height:46px;margin-left:-23px;border-radius:50%;background:var(--nav);box-shadow:var(--sombra);color:var(--ico);display:grid;place-items:center;z-index:40;opacity:0;transform:scale(.4);pointer-events:none;transition:opacity .2s,transform .32s cubic-bezier(.34,1.56,.64,1)}
+#arriba.ver{opacity:1;transform:none;pointer-events:auto}
+#arriba svg{width:22px;height:22px}
+:root[data-tema^="glass"] #arriba{-webkit-backdrop-filter:blur(5px) saturate(130%);backdrop-filter:blur(5px) saturate(130%);border:.5px solid rgba(255,255,255,.18)}
+
+/* 13.5.1: íconos en las tarjetas nuevas del carrusel */
+.cIco{flex:none;width:28px;height:28px;border-radius:9px;display:grid;place-items:center;color:var(--ic,currentColor);background:color-mix(in srgb, var(--ic,currentColor) 15%, transparent)}
+.cIco svg{width:16px;height:16px}
+.cIco.ch{width:14px;height:14px;background:none;border-radius:0}
+.cIco.ch svg{width:14px;height:14px}
+.carStrip{display:flex;align-items:center;justify-content:center;gap:6px}
+.carBarraF{display:flex;align-items:center;gap:10px;margin:5px 0}
+.carFila{gap:10px}
+
+/* 13.5.2: tarjetas nuevas compactas para caber en la altura de Inicio (sin agrandar el carrusel) */
+.carSlide:not(:first-child) .heroIc{width:32px;height:32px}
+.carSlide:not(:first-child) .heroIc svg{width:28px;height:28px}
+.carSlide:not(:first-child) .heroMes{font-size:15px}
+.carSlide:not(:first-child) .heroLin{margin:0}
+.carSlide:not(:first-child) .carFila{padding:0;font-size:13px;line-height:1.25}
+.carSlide:not(:first-child) .cIco{width:22px;height:22px;border-radius:7px}
+.carSlide:not(:first-child) .cIco svg{width:13px;height:13px}
+.carSlide:not(:first-child) .cIco.ch{width:13px;height:13px}
+.carSlide:not(:first-child) .carBarraF{margin:0}
+.carSlide:not(:first-child) .carBarraF .fila{font-size:13px !important;line-height:1.25}
+.carSlide:not(:first-child) .carBarra{height:8px;margin:3px 0 0}
+.carSlide:not(:first-child) .carStrip{padding:6px 8px;font-size:12px;margin:0}
+.carSlide:not(:first-child) .carDias{height:56px}
+.carSlide:not(:first-child) .carCirculo{width:26px;height:26px;font-size:12px}
+.carSlide:not(:first-child) .carFalta{font-size:15px;margin:0}
+.carSlide:not(:first-child) .carTot{padding-top:4px}
+
+.carF50{margin:8px 0}
+.carSlide:not(:first-child) .carF50{margin:0}
+.carSlide:not(:first-child) .carF50 .fila{line-height:1.2}
+.carSlide:not(:first-child) .balBarra{height:8px;margin:3px 0 0}
+.carSlide:not(:first-child) svg[width="100"]{width:78px;height:78px}
 </style>
 </head>
 <body>
 <div id="fondoGlass"></div>
 <main id="app"></main>
 <nav id="nav" aria-label="Secciones"></nav>
+<button id="arriba" data-act="irArriba" aria-label="Ir arriba"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button>
 <div id="capa"></div>
 <div class="toast" id="toast" role="status"></div>
 <div id="jalar" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path class="fl" d="M20 12a8 8 0 0 1-13.7 5.6M4 12a8 8 0 0 1 13.7-5.6"/><path class="fl" d="M17.7 2.8v3.8h-3.8M6.3 21.2v-3.8h3.8"/><path class="ok" d="M6 12.5l4 4 8-8"/></svg></div>
@@ -316,6 +494,7 @@ function cargar(){
 function guardar(){ try{ localStorage.setItem(LS, JSON.stringify(D)); }catch(e){ aviso('No se pudo guardar en este navegador'); } if(typeof programarAvisos === 'function') programarAvisos(); }
 
 const DIA = 86400000;
+const vibrar = p => { if(navigator.vibrate) navigator.vibrate(p); };   /* en iPhone la web no puede vibrar: se ignora sin error */
 function hoy(){ const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
 function iso(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function fecha(s){ const [y,m,d] = s.split('-').map(Number); return new Date(y, m-1, d); }
@@ -423,6 +602,48 @@ function sinCorteW(p){
   if(p.variable && !p.credito) return !(p.rec || []).some(r => r.v === p.vence);
   return false;
 }
+/* ---- ítem 3: monto actualizado tras el corte ---- */
+const horaCorta = () => new Date().toLocaleTimeString('es-MX', {hour:'numeric', minute:'2-digit'});
+/* clave del corte vigente: el último día de corte (tarjetas) o el vencimiento (variables). Al cambiar, el registro anterior deja de valer: se "borra" tras cada corte. */
+function corteActual(p){
+  if(p.credito && p.diaCorte > 0){ const v = fecha(p.vence); const cd = (y, m) => new Date(y, m, Math.min(p.diaCorte, new Date(y, m + 1, 0).getDate())); let c = cd(v.getFullYear(), v.getMonth()); if(c > v) c = cd(v.getFullYear(), v.getMonth() - 1); return iso(c); }
+  return p.vence;
+}
+const montoActualizado = p => !!(p.montoAct && p.montoAct.corte === corteActual(p) && num(p.montoAct.m) > 0);
+function regMontoHtml(p){
+  if(!montoActualizado(p)) return '';
+  return `<div class="regMonto"><b>✓ Actualizado:</b> ${dinero(num(p.montoAct.m))} · ${corto(p.montoAct.f)}${p.montoAct.h ? ', ' + esc(p.montoAct.h) : ''}</div>`;
+}
+/* botón "Actualizar monto a pagar" (tarjetas propias y variables): flecha verde junto a "monto" si ya se actualizó tras el corte */
+function actualizarMontoHtml(p){
+  if(p.creadoPor || p.pagado || !(p.credito || p.variable)) return '';
+  const act = montoActualizado(p);
+  return `<button class="btn ${act ? 'borde' : 'lleno'}" data-act="actMonto" data-id="${p.id}">Actualizar monto ${act ? '<span class="flechaVerde">↓</span>' : ''} a pagar</button>${regMontoHtml(p)}`;
+}
+/* botón "Notificar mi pago" (pagos que te compartieron): gris si no pediste la actualización; se habilita si la otra persona ya actualizó tras el corte aunque no se pidiera */
+function notificarHtml(p){
+  if(!p.creadoPor || p.pagado || !p.nubeId) return null;
+  if((D.parteAvisada || {})[p.nubeId] === p.vence) return `<button class="btn borde gris" data-act="pagueParte" data-id="${p.id}" data-n="1">Esperando confirmación…</button>`;
+  const solicitado = (D.solicitudMonto || {})[p.nubeId] === p.vence;
+  if(montoActualizado(p) || solicitado) return `<button class="btn borde" data-act="pagueParte" data-id="${p.id}">Notificar mi pago</button>`;
+  if(sinCorteW(p)) return `<button class="btn borde" style="opacity:.45" data-act="parteBloq" data-n="corte">Notificar mi pago</button>`;
+  return `<button class="btn borde" style="opacity:.45" data-act="parteBloq" data-n="solicitar">Notificar mi pago</button>`;
+}
+/* ---- ítem 6: borrar la notificación de un movimiento que ya se resolvió dentro de la app ---- */
+function limpiarAvisos(p){
+  const nom = sinPrefijo(p ? p.nombre : '').toLowerCase();
+  if(nom) D.historial = (D.historial || []).filter(a => !String(a.tx || '').toLowerCase().includes(nom));
+  if('serviceWorker' in navigator) navigator.serviceWorker.getRegistration().then(r => r && r.getNotifications().then(ns => ns.forEach(n => { if(!nom || (n.body || '').toLowerCase().includes(nom) || (n.title || '').toLowerCase().includes(nom)) n.close(); })).catch(() => {})).catch(() => {});
+  /* limitación: en iOS las notificaciones push que ya se mostraron fuera de la app no siempre se pueden cerrar desde la web; las de la lista de Avisos sí se borran siempre. */
+}
+const personaDe = p => p.creadoPor || p.conQuien || '';
+/* ítem 3 (ronda 13.4.15): avatar del botón "Compartido con": la foto de la persona
+   si la tiene guardada, si no su inicial. Hoy el modelo web no guarda fotos de las
+   personas (D.personas solo tiene nombre/tel/mail y la nube solo publica
+   nombre/correo/tel), así que se muestra la inicial; si algún día hay foto en
+   D.personas[].foto, se usa sola. */
+const fotoPersona = n => { const per = personas().find(z => z.nombre.toLowerCase() === String(n || '').toLowerCase()); return per && per.foto ? per.foto : ''; };
+const avatarPersona = n => { const f = fotoPersona(n); return f ? `<img src="${esc(f)}" alt="" style="width:100%;height:100%;border-radius:50%;object-fit:cover">` : esc(String(n || '?')[0].toUpperCase()); };
 const esCredito = c => c === 'tarjeta' || c === 'tienda';
 function frecsDe(c){
   if(esCredito(c)) return ['M1','U','M12']; if(c === 'streaming') return ['U','M1','M6','M12']; if(c === 'renta') return ['U','M1','M2','M6','M12'];
@@ -554,8 +775,9 @@ const IC = {
 const COLCAT = {renta:['#FFA26B','#F0674A'], grupo:['#B18CFF','#7C5CE6'], streaming:['#FF7A9A','#E0435F'], internet:['#6FC3FF','#3A86F0'], luz:['#FFD25A','#F5A623'], telefono:['#6EE0A6','#22B07D'], tienda:['#FF9AD2','#E05BB0'], tarjeta:['#5B7BE8','#2A3F9E'], otro:['#9EB1C9','#6A7F9C']};
 function icono(p){ const c = COLCAT[p.cat] || COLCAT.otro; return `<span class="ico" style="color:#fff;background:linear-gradient(135deg,${c[0]},${c[1]});box-shadow:0 4px 10px -3px ${c[1]}88">${IC[p.cat] || IC.otro}</span>`; }
 function anillo(p, tam=40){
-  const e = estado(p), d = dias(p.vence), r = tam/2 - 4, L = 2*Math.PI*r;
-  if(e === 'ver') return `<svg width="${tam}" height="${tam}" viewBox="0 0 ${tam} ${tam}" aria-label="Pagado"><circle cx="${tam/2}" cy="${tam/2}" r="${tam/2-1}" fill="var(--r-ver)"/><path d="M${tam*.3} ${tam*.52}l${tam*.13} ${tam*.13} ${tam*.26}-${tam*.28}" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const e = estado(p), d = dias(p.vence), r = tam/2 - 4, L = 2*Math.PI*r, gd = document.documentElement.dataset.tema === 'glassd';
+  if(e === 'ver') return `<svg width="${tam}" height="${tam}" viewBox="0 0 ${tam} ${tam}" aria-label="Pagado"><circle cx="${tam/2}" cy="${tam/2}" r="${tam/2-1}" fill="${gd ? '#fff' : 'var(--r-ver)'}"/><path d="M${tam*.3} ${tam*.52}l${tam*.13} ${tam*.13} ${tam*.26}-${tam*.28}" stroke="${gd ? '#000' : '#fff'}" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  if(gd) return `<svg width="${tam}" height="${tam}" viewBox="0 0 ${tam} ${tam}" aria-label="Faltan ${d} días"><circle cx="${tam/2}" cy="${tam/2}" r="${r}" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="4"/><circle cx="${tam/2}" cy="${tam/2}" r="${r}" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-dasharray="${L*(d <= 0 ? 1 : Math.max(.08, Math.min(1, 1 - d/30)))} ${L}" transform="rotate(-90 ${tam/2} ${tam/2})"/><text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" font-size="${tam <= 36 ? 14 : tam*.34}" font-weight="${tam <= 36 ? 500 : 700}" fill="#fff">${d < 0 ? '!' : d}</text></svg>`;
   const f = d <= 0 ? 1 : Math.max(.08, Math.min(1, 1 - d/30));
   const t = d < 0 ? '!' : d;
   return `<svg width="${tam}" height="${tam}" viewBox="0 0 ${tam} ${tam}" aria-label="Faltan ${d} días"><circle cx="${tam/2}" cy="${tam/2}" r="${r}" fill="none" stroke="var(--line)" stroke-width="4"/><circle cx="${tam/2}" cy="${tam/2}" r="${r}" fill="none" stroke="var(--r-${e})" stroke-width="4" stroke-linecap="round" stroke-dasharray="${L*f} ${L}" transform="rotate(-90 ${tam/2} ${tam/2})"/><text x="50%" y="54%" text-anchor="middle" dominant-baseline="middle" font-size="${tam <= 36 ? 14 : tam*.34}" font-weight="${tam <= 36 ? 500 : 700}" fill="var(--r-${e})">${t}</text></svg>`;
@@ -587,7 +809,65 @@ function tarjetaPago(p, incl){
   return `<button class="pago tp est-${estado(p)}" data-act="detalle" data-id="${p.id}">
     ${icono(p)}
     <div class="peso" style="min-width:0"><div class="nom">${esc(p.nombre)}</div><div class="renglones gris">${renglonesPago(p)}</div></div>
-    <div class="der">${p.monto ? (incl && p.pagoCon && !p.credito ? `<span class="incl" role="button" data-act="verIncl" data-m="${monto}">Incluido</span>` : `<span class="b">${monto}</span>`) : ''}${anillo(p, 33)}</div></button>`;
+    <div class="der">${p.monto ? (incl && p.pagoCon && !p.credito ? `<span class="incl" role="button" data-act="verIncl" data-m="${monto}">Incluido</span>` : `<span class="b">${monto}</span>`) : ''}<span class="anilloBtn" role="button" tabindex="0" aria-label="${p.pagado ? 'Marcar como pendiente' : 'Marcar como pagado'}" data-act="anilloPagar" data-id="${p.id}">${anillo(p, 33)}</span></div></button>`;
+}
+/* marcar como pagado (o pendiente) desde la lista o la cápsula: mismo cambio de estado */
+function alternarPagado(p){
+  limpiarAvisos(p);
+  if(!p.pagado){ p.pagado = true; (p.hist = p.hist||[]).push({f:iso(hoy()), v:p.vence, m:p.monto, per:p.periodo||''}); aviso('✓ Marcado como pagado');
+    (D.historial = D.historial || []).push({t:Date.now(), tx:'✅ Pagaste ' + p.nombre + (p.monto ? ' · ' + dinero(num(p.monto)) : '') + ' — marcado como pagado el ' + new Date().toLocaleString('es-MX', {day:'numeric', month:'long', year:'numeric', hour:'numeric', minute:'2-digit'}) + (p.periodo ? ' · periodo ' + perTexto(p.periodo) : ''), leido:true}); }
+  else { p.pagado = false; if(p.hist && p.hist.length && p.hist[p.hist.length-1].v === p.vence) p.hist.pop(); aviso('Marcado como pendiente'); }
+}
+/* ítems 9 y 10 (ronda 13.4.15): en la lista, SOLO el anillo marca como pagado; el
+   resto de la tarjeta abre el detalle. La animación es en su sitio (el anillo hace
+   pop y la tarjeta se encoge un poco) y solo después se repinta, sin brinquito. */
+function marcarPagadoSuave(p, elAnillo){
+  const card = elAnillo.closest('.pago');
+  elAnillo.animate([{transform:'scale(1)'},{transform:'scale(1.35)'},{transform:'scale(1)'}], {duration:320, easing:'cubic-bezier(.3,1.6,.5,1)'});
+  if(card) card.animate([{transform:'scale(1)'},{transform:'scale(.985)'},{transform:'scale(1)'}], {duration:320, easing:'cubic-bezier(.3,0,.15,1)'});
+  setTimeout(() => { alternarPagado(p); guardar(); actualizarPagoEnSitio(p); }, 320);   /* a los 320 ms, cuando la animación ya terminó: antes se repintaba a los 300 ms y la tarjeta saltaba a 1.0 a mitad de animación */
+}
+/* ítem 2 (ronda 13.4.16): tras marcar pagado, la tarjeta se actualiza EN SU SITIO, sin
+   pintar(). Antes pintar() rehacía toda la página y el scroll se restauraba a ciegas; y
+   como ordenados() pone los pagados al final, la tarjeta se teletransportaba al fondo de
+   la lista, y al perder la línea de "Periodo" y cambiar de alto, las de abajo saltaban.
+   Aquí cada tarjeta de ese pago se queda donde estaba y su altura nueva se desliza poco
+   a poco para que las de abajo no salten. */
+function actualizarPagoEnSitio(p){
+  document.querySelectorAll(`.pago.tp[data-id="${p.id}"]`).forEach(card => {
+    const h0 = card.offsetHeight;
+    const tmp = document.createElement('div'); tmp.innerHTML = tarjetaPago(p);
+    const nuevo = tmp.firstElementChild;
+    card.replaceWith(nuevo);
+    const h1 = nuevo.offsetHeight;
+    if(h0 > 0 && h1 !== h0){
+      const a = nuevo.animate([{height:h0 + 'px'},{height:h1 + 'px'}], {duration:280, easing:'cubic-bezier(.3,0,.15,1)', fill:'forwards'});
+      a.onfinish = () => a.cancel();   /* al terminar, la altura natural ya es h1 */
+    }
+  });
+  /* la cápsula de Próximos de ese pago sale sin repintar: se encoge y se desvanece */
+  document.querySelectorAll(`.prox .pc[data-id="${p.id}"]`).forEach(pc => {
+    const w = pc.offsetWidth;
+    pc.style.overflow = 'hidden'; pc.style.width = w + 'px';
+    const a = pc.animate([{width:w + 'px', opacity:1},{width:'0px', opacity:0}], {duration:260, easing:'cubic-bezier(.3,0,.15,1)', fill:'forwards'});
+    a.onfinish = () => pc.remove();
+  });
+  actualizarHeroEnSitio();   /* el héroe (monto, contadores y pie) también se pone al día en su sitio */
+}
+/* ítem 2 (ronda 13.4.16, integración): al marcar pagado, el héroe de Inicio se actualiza
+   en su sitio (monto, "X de Y pagos", indicadores y pie) con los mismos datos de inicio();
+   antes quedaba con los números viejos hasta el próximo pintar(). Solo se reemplaza #hero
+   dentro de su slide del carrusel, sin tocar la pista ni el scroll. */
+function actualizarHeroEnSitio(){
+  const hero = document.getElementById('hero');
+  if(!hero) return;
+  const mes = hoy().getMonth(), anio = hoy().getFullYear();
+  const delMes = D.pagos.filter(p => { const f = fecha(p.vence); return f.getMonth() === mes && f.getFullYear() === anio; });
+  const pend = delMes.filter(p => !p.pagado);
+  const tot = pend.reduce((s,p) => s + miMonto(p), 0);
+  const pag = delMes.length - pend.length;
+  const tmp = document.createElement('div'); tmp.innerHTML = heroNuevo(delMes, pag, tot);
+  hero.replaceWith(tmp.firstElementChild);
 }
 const SIMB = {cal:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><circle cx="9" cy="15" r="1.2" fill="currentColor"/><circle cx="15" cy="15" r="1.2" fill="currentColor"/></svg>',
   check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l5 4.5 9-9.5"/></svg>',
@@ -622,7 +902,7 @@ const SIMB2 = {alerta:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor
   cartera:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3.5" y="6" width="17" height="12.5" rx="3"/><rect x="13.5" y="10" width="7" height="4.5" rx="1.5"/></svg>',
   barras:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 19v-7M12 19V6M18 19v-9"/></svg>'};
 function tarjetaBalanceW(){
-  const lib = libreMes(), osc = ['oscuro','glassn'].includes(document.documentElement.dataset.tema);
+  const lib = libreMes(), osc = ['oscuro','glassn','glassd'].includes(document.documentElement.dataset.tema);
   let col, colT, ico, tit, monto, sub, pct = '—', bot = 'Ver mi balance y cómo repartir mis pagos';
   if(!lib){ col = 'var(--icoSel,var(--acc))'; colT = 'var(--fg)'; ico = 'cartera'; tit = '¿Te alcanza este mes?'; monto = 'Pon tu ingreso'; sub = 'Y te muestro tu balance con tus pagos.'; bot = 'Poner mis ingresos'; }
   else { pct = Math.round(lib[1] / lib[0] * 100) + ' %';
@@ -662,14 +942,14 @@ function pantallaBalance(){
     + (pend.length ? `<div class="fila" style="padding-top:10px;border-top:1px solid var(--line)"><b class="peso">${sobra >= 0 ? 'Te quedan libres' : 'Aún te faltan'}</b><b style="font-size:16px;color:${sobra >= 0 ? '#1FA463' : '#D9534F'}">${dinero(Math.abs(Math.round(sobra)))}</b></div>` : '') + `<p class="gris" style="font-size:12px;margin:10px 0 2px;line-height:1.4">Reporta el pago mínimo de tus tarjetas (en cada tarjeta, ✎ Editar → Pago mínimo) para que la distribución sea correcta.</p></div>`;
   if((D.ingresoFrec || 0) === 0 && pend.length){
     /* cada quincena con TODO lo del mes: lo ya pagado y lo que falta (antes solo lo pendiente: salía "bien repartido" aunque estuvieras en números rojos) */
-    let q1 = 0, q2 = 0; r.pag.forEach(x => { if(x.dia.getDate() <= 15) q1 += x.completo; else q2 += x.completo; });
-    pend.forEach(x => { if(x.vencido || x.dia.getDate() <= 15) q1 += x.pagar; else q2 += x.pagar; });
+    let q1 = 0, q2 = 0; r.pag.forEach(x => { if(x.dia.getDate() <= 14) q1 += x.completo; else q2 += x.completo; });
+    pend.forEach(x => { if(x.vencido || x.dia.getDate() <= 14) q1 += x.pagar; else q2 += x.pagar; });
     const porQ = (ing - otros) / 2, pasaQ = q1 + q2 - (ing - otros);
     const bq = (n, v) => `<div style="margin-bottom:12px"><div class="fila chico"><b class="peso">${n}</b><span style="color:${v > porQ ? '#D9534F' : 'var(--gr)'}">${dinero(Math.round(v))} de ${dinero(Math.round(Math.max(0, porQ)))}</span></div>${barraBal(porQ > 0 ? v / porQ : 1, v > porQ ? '#E5484D' : 'var(--r-azu)', 500)}</div>`;
-    const qt = (pasaQ > 0.5 ? `Entre las dos quincenas tus pagos pasan lo que te queda de tu ingreso por ${dinero(Math.round(pasaQ))}${q1 > porQ && q2 > porQ ? ', y las dos quincenas van cargadas' : q1 > porQ ? ', sobre todo en la primera quincena' : ', sobre todo en la segunda quincena'}. Sigue el plan de arriba para aligerarlas.` : q1 > porQ && q2 < porQ ? `Tu primera quincena está más cargada. Aparta ${dinero(Math.round(Math.min(q1 - porQ, porQ - q2)))} de tu pago de fin de mes para cubrir lo que vence del 1 al 15.`
+    const qt = (pasaQ > 0.5 ? `Entre las dos quincenas tus pagos pasan lo que te queda de tu ingreso por ${dinero(Math.round(pasaQ))}${q1 > porQ && q2 > porQ ? ', y las dos quincenas van cargadas' : q1 > porQ ? ', sobre todo en la primera quincena' : ', sobre todo en la segunda quincena'}. Sigue el plan de arriba para aligerarlas.` : q1 > porQ && q2 < porQ ? `Tu primera quincena está más cargada. Aparta ${dinero(Math.round(Math.min(q1 - porQ, porQ - q2)))} de tu pago de fin de mes para cubrir lo que vence del 1 al 14.`
       : q2 > porQ && q1 < porQ ? `Tu segunda quincena está más cargada. Aparta ${dinero(Math.round(Math.min(q2 - porQ, porQ - q1)))} de tu pago del día 15 para lo que vence después.`
       : q1 > porQ && q2 > porQ ? 'Las dos quincenas pasan de lo que te queda en cada una; sigue el plan de arriba para aligerarlas.' : 'Tus pagos están bien repartidos entre tus dos quincenas.') + ' Incluye lo que ya pagaste.';
-    h += `<h2 class="entra" style="animation-delay:200ms">Por quincena</h2><div class="caja entra" style="animation-delay:240ms">${bq('1ª quincena (día 1 al 15)', q1)}${bq('2ª quincena (día 16 en adelante)', q2)}<p class="${pasaQ > 0.5 ? '' : 'gris '}chico" style="margin:0;line-height:1.4${pasaQ > 0.5 ? ';color:#D9534F' : ''}">${qt}</p></div>`;
+    h += `<h2 class="entra" style="animation-delay:200ms">Por quincena</h2><div class="caja entra" style="animation-delay:240ms">${bq('1ª quincena (día 1 al 14)', q1)}${bq('2ª quincena (día 15 en adelante)', q2)}<p class="${pasaQ > 0.5 ? '' : 'gris '}chico" style="margin:0;line-height:1.4${pasaQ > 0.5 ? ';color:#D9534F' : ''}">${qt}</p></div>`;
   }
   const tips = [], ven = pend.filter(x => x.vencido), vencidos = ven.reduce((s,x) => s + x.completo, 0);
   if(ven.length) tips.push(`Tienes ${ven.length} ${ven.length === 1 ? 'pago vencido' : 'pagos vencidos'} por ${dinero(Math.round(vencidos))}. Dales prioridad para evitar recargos e intereses moratorios.`);
@@ -711,6 +991,213 @@ function heroNuevo(delMes, pag, tot){
     <div class="heroLin"></div>
     <div class="fila" style="align-items:stretch">${ind(1,'Pagados',g[1],'check','#1FA463',true)}<i class="heroSep"></i>${ind(2,'Pendientes',g[2],'reloj','currentColor',false)}<i class="heroSep"></i>${ind(3,'Vence pronto',g[3],'cal','#7C5CE6',false)}</div>
     <div class="heroPie"><span style="width:16px;height:16px;display:inline-block">${SIMB.reloj}</span> ${pie}</div></div>`;
+}
+/* ---- ítem 11: carrusel de la tarjeta principal (6 tarjetas, mismo tamaño, una por deslizada) ---- */
+const carCfg = () => Object.assign({quin:'v6', tj:'v6', est:'v6', aho:'v5', per:'v6'}, D.carrusel || {});
+const carLista = () => ['inicio', ...['quin','tj','est','aho','per'].filter(k => (carCfg()[k] || 'v6') !== 'no')];
+function dona(vals, cols, centro){
+  const tot = vals.reduce((a,b) => a + b, 0) || 1; let a0 = -90; const R = 40, ri = 26, cx = 50, cy = 50;
+  const seg = vals.map((v, i) => { const a1 = a0 + v / tot * 360, g = v / tot * 360 > 180 ? 1 : 0;
+    const pt = (r, a) => [cx + r * Math.cos(a * Math.PI / 180), cy + r * Math.sin(a * Math.PI / 180)];
+    const [x0, y0] = pt(R, a0), [x1, y1] = pt(R, a1), [x2, y2] = pt(ri, a1), [x3, y3] = pt(ri, a0); a0 = a1;
+    return v > 0 ? `<path d="M${x0.toFixed(1)} ${y0.toFixed(1)} A${R} ${R} 0 ${g} 1 ${x1.toFixed(1)} ${y1.toFixed(1)} L${x2.toFixed(1)} ${y2.toFixed(1)} A${ri} ${ri} 0 ${g} 0 ${x3.toFixed(1)} ${y3.toFixed(1)} Z" fill="${cols[i]}"/>` : ''; }).join('');
+  return `<svg width="100" height="100" viewBox="0 0 100 100" style="flex:none">${seg}<text x="50" y="47" text-anchor="middle" font-size="10.5" font-weight="800" fill="currentColor">${centro}</text><text x="50" y="60" text-anchor="middle" font-size="8" fill="var(--gr)">este mes</text></svg>`;
+}
+
+/* 13.5.1: íconos de los renglones de las tarjetas nuevas del carrusel (más visuales, mismos espacios) */
+const ICC = {cal:SIMB.cal, reloj:SIMB.reloj, bolsa:SIMB2.bolsa, recibo:SIMB3.recibo, tarjeta:SIMB3.tarjeta, barras:SIMB2.barras, alerta:SIMB2.alerta, personas:SIMB3.personas,
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l5 4.5 9-9.5"/></svg>',
+  candado:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+  tema:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg>',
+  tel:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M11 18.5h2"/></svg>',
+  nube:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18h10a4 4 0 0 0 .5-8 6 6 0 0 0-11.4 1.5A3.3 3.3 0 0 0 7 18z"/></svg>'};
+function icoCar(t, forzado, chico){
+  const x = String(t || '').toLowerCase().trim();
+  const k = forzado || (/^hoy/.test(x) ? 'reloj' : /no alcanza|te faltan/.test(x) ? 'alerta' : /ya pagados|alcanza para|puedes apartar|siempre/.test(x) ? 'check'
+    : /pendientes/.test(x) ? 'reloj' : /^actual|^siguiente|^\d/.test(x) ? 'cal' : /aparta|ingreso|fondo/.test(x) ? 'bolsa' : /pagos fijos/.test(x) ? 'recibo'
+    : /tarjeta/.test(x) ? 'tarjeta' : /^top|^total|de cada|pagos ·/.test(x) ? 'barras' : /^personas/.test(x) ? 'personas'
+    : /^cuenta/.test(x) ? 'nube' : /^entrar/.test(x) ? 'candado' : /^apariencia/.test(x) ? 'tema' : /^teléfono/.test(x) ? 'tel' : '');
+  const col = {cal:'#3B6FE0', reloj:'#FF6A00', check:'#1FA463', alerta:'#E5484D', bolsa:'#1FA463', recibo:'#7C5CE6', tarjeta:'#7C5CE6', barras:'#3B6FE0', personas:'#3B6FE0', nube:'#3B6FE0', candado:'#F2A600', tema:'#7C5CE6', tel:'#1FA463'}[k];
+  return k && ICC[k] ? `<span class="cIco${chico ? ' ch' : ''}" style="--ic:${col}">${ICC[k]}</span>` : '';
+}
+
+/* 13.5.2: el carrusel mide lo que mide Inicio (no se agranda); si una tarjeta nueva no cabe, su margen baja parejo */
+function carAltura(){
+  const tr = document.getElementById('carTrack'); if(!tr) return;
+  const ini = tr.querySelector('.carSlide:first-child .hero'); if(!ini) return;
+  tr.style.setProperty('--carH', ini.offsetHeight + 'px');
+  tr.querySelectorAll('.carSlide:not(:first-child) .hero').forEach(h => { h.classList.remove('apretada'); if(h.scrollHeight > h.clientHeight + 1) h.classList.add('apretada'); });
+}
+function carTarjeta(k){ return adornarStrips(carTarjeta0(k)); }
+function adornarStrips(h){ return String(h).replace(/<div class="carStrip">([\s\S]*?)<\/div>/g, (m, t) => `<div class="carStrip">${icoCar(t.replace(/<[^>]+>/g, ''), null, true)}<span>${t}</span></div>`); }
+function carTarjeta0(k){
+  const cfg = carCfg(), ver = cfg[k];
+  const cab = (ic, tit, sub, der) => `<div class="fila" style="align-items:center"><span class="heroIc">${ic}</span><div class="peso" style="padding-left:6px;min-width:0"><b class="heroMes">${tit}</b><div class="chico gris">${sub}</div></div>${der || ''}</div><div class="heroLin"></div>`;
+  const fila = (a, b) => `<div class="carFila">${icoCar(a)}<span class="bn peso">${a}</span><b class="ba">${b}</b></div>`;   /* 13.5.1: ícono por renglón */
+  const barra = (t, v, tot, col, ic) => `<div class="carBarraF">${icoCar(t, ic)}<div class="peso" style="min-width:0"><div class="fila" style="font-size:15px"><b class="peso" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t}</b><span style="font-weight:800">${typeof v === 'number' ? dinero(Math.round(v * 100) / 100) : v}</span></div><div class="carBarra"><i style="--w:${tot > 0 ? Math.max(0, Math.min(1, v / tot)) : 0};background:${col || 'var(--r-azu)'};animation-delay:300ms"></i></div></div></div>`;   /* 5px: en la columna flex los márgenes no colapsan y 5+5 deja el mismo hueco de 10px que antes */
+  const entrar = D.bloqueo && D.bloqueo.hash ? (D.bloqueo.cred ? 'Face ID y contraseña' : 'Contraseña') : 'Apagado';
+  const cuenta = D.nube && D.nube.correo ? (D.nube.verif ? 'Conectada' : 'Sin verificar') : 'Sin cuenta';
+  if(k === 'quin'){
+    const [a, b] = quincenaActual(), sigA = new Date(b.getTime() + DIA), sigB = finQ(sigA);
+    const lista = (x, y) => ordenados().filter(p => { const f = fecha(p.vence); return f >= x && f <= y; });
+    const q1 = lista(a, b), q2 = lista(sigA, sigB);
+    const t1 = q1.filter(p => !p.pagado).reduce((s0, p) => s0 + miMonto(p), 0), t2 = q2.filter(p => !p.pagado).reduce((s0, p) => s0 + miMonto(p), 0);
+    const porQ = D.ingreso > 0 ? Math.max(0, (D.ingreso - (D.otros || 0)) / 2) : 0;
+    if(ver === 'v5'){
+      const dias7 = [], h0 = hoy();
+      for(let i = 0; i < 7; i++){ const d = new Date(h0.getTime() + i * DIA); dias7.push([d, ordenados().filter(p => !p.pagado && fecha(p.vence).toDateString() === d.toDateString()).length]); }
+      const mx = Math.max(1, ...dias7.map(x => x[1]));
+      return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB.cal, 'Quincenas', 'Próximos 7 días por pagos', `<b>${dinero(t2)}</b>`)}
+        <div class="carDias">${dias7.map(([d, c]) => `<div class="carDia"><i style="height:${Math.max(8, c / mx * 100)}%"></i><span>${['D','L','M','M','J','V','S'][(d.getDay() + 6) % 7]}</span></div>`).join('')}</div>
+        <div class="carStrip">Siguiente quincena: ${dinero(t2)} · ${q2.filter(p => !p.pagado).length} pagos</div></div>`;
+    }
+    const n1 = q1.filter(p => !p.pagado).length, n2 = q2.filter(p => !p.pagado).length, pg12 = q1.filter(p => p.pagado).length + q2.filter(p => p.pagado).length;
+    return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB.cal, 'Quincenas', 'Cuánto apartar de cada nómina', '')}
+      ${barra('Actual · ' + n1 + ' pagos', t1, porQ, t1 > porQ ? '#E5484D' : 'var(--r-azu)')}${barra('Siguiente · ' + n2 + ' pagos', t2, porQ, t2 > porQ ? '#E5484D' : 'var(--r-azu)')}
+      ${(() => { const hs = ordenados().filter(p => !p.pagado && fecha(p.vence).toDateString() === hoy().toDateString()); return fila('Hoy · ' + (hs.length ? hs.slice(0, 2).map(p => esc(sinPrefijo(p.nombre))).join(' y ') : 'sin pagos'), dinero(Math.round(hs.reduce((s0, p) => s0 + miMonto(p), 0)))); })()}
+      <div class="carStrip">Aparta ${dinero(t1)} esta quincena · ${n1} ${n1 === 1 ? 'pago' : 'pagos'}</div></div>`;   /* 13.5.2: igual que en Android, para caber en la altura de Inicio */
+  }
+  if(k === 'tj'){
+    const tjs = D.pagos.filter(p => p.credito && !p.creadoPor && !p.pagado);
+    const tot = tjs.reduce((s0, p) => s0 + miMonto(p), 0);
+    if(ver === 'v5'){
+      return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB3.tarjeta, 'Mis tarjetas', 'Tu parte: ' + dinero(tot), '')}
+        ${tjs.slice(0, 3).map(p => `<div class="carFila"><span class="carCirculo">${p.diaCorte || '—'}</span><span class="bn peso" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(sinPrefijo(p.nombre))}</span><span class="chico gris">mín. ${p.minimo ? dinero(num(p.minimo)) : '—'}</span><b class="ba">${dinero(miMonto(p))}</b></div>`).join('') || '<p class="gris chico">Sin tarjetas por pagar.</p>'}
+        <div class="carStrip">${tjs.length} ${tjs.length === 1 ? 'tarjeta' : 'tarjetas'} por pagar · total ${dinero(tot)}</div></div>`;
+    }
+    return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB3.tarjeta, 'Mis tarjetas', 'Tu parte en tarjetas', `<b>${dinero(tot)}</b>`)}
+      ${tjs.slice(0, 3).map(p => barra(esc(sinPrefijo(p.nombre)), miMonto(p), tot, null, 'tarjeta')).join('') || '<p class="gris chico">Sin tarjetas por pagar.</p>'}
+      <div class="carStrip">${tjs.length} ${tjs.length === 1 ? 'tarjeta' : 'tarjetas'} por pagar · tu parte ${dinero(tot)}</div></div>`;
+  }
+  if(k === 'est'){
+    const r = pagosDelMes(), todos = [...r.pag, ...r.pen].sort((a, b) => b.completo - a.completo);
+    const totMes = todos.reduce((s0, x) => s0 + x.completo, 0);
+    if(ver === 'v5'){
+      const cat = x => x.p.credito ? 0 : (x.p.cat === 'renta' ? 1 : 2);
+      const vals = [0, 1, 2].map(c => todos.filter(x => cat(x) === c).reduce((s0, x) => s0 + x.completo, 0));
+      const cols = ['#7C5CE6', '#1FA463', '#F2A600'], noms = ['Tarjetas', 'Casa', 'Otros'];
+      const pct = totMes > 0 ? Math.round(vals[0] / totMes * 100) : 0;
+      return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB2.barras, 'Estadísticas', 'Este mes por categoría', `<b>${dinero(totMes)}</b>`)}
+        <div style="display:flex;align-items:center;gap:12px">${dona(vals, cols, dinero(Math.round(totMes)))}<div class="peso chico" style="line-height:1.7">${noms.map((c, i) => `<div><span class="punto" style="background:${cols[i]}"></span> ${c} ${totMes > 0 ? Math.round(vals[i] / totMes * 100) : 0} %</div>`).join('')}</div></div>
+        <div class="carStrip">${pct >= 50 ? pct + ' de cada 100 pesos van a tarjetas' : 'Tus tarjetas son el ' + pct + ' % del mes'}</div></div>`;
+    }
+    const top = todos.slice(0, 3), totTop = top.reduce((s0, x) => s0 + x.completo, 0);
+    return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB2.barras, 'Estadísticas', 'Top 3 de este mes', `<b>${dinero(totTop)}</b>`)}
+      ${top.map(x => barra(esc(sinPrefijo(x.p.nombre)), Math.round(x.completo), totMes, null, 'barras')).join('') || '<p class="gris chico">Sin pagos este mes.</p>'}
+      <div class="carStrip">Top 3: ${dinero(totTop)} de ${dinero(totMes)} este mes</div></div>`;
+  }
+  if(k === 'aho'){
+    const lib = libreMes(), ing = lib ? lib[0] : 0, tot = lib ? lib[1] : 0, libre = lib ? lib[2] : 0;
+    if(ver === 'v6'){
+      const f50 = (t, real, ideal) => `<div class="carF50"><div class="fila chico"><b class="peso">${t}</b><span>Real ${Math.round(real * 100)} % · Ideal ${Math.round(ideal * 100)} %</span></div>${barraBal(Math.min(1, Math.max(0, real)), 'var(--r-azu)', 300)}</div>`;
+      return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB2.bolsa, 'Ahorros', 'Real vs ideal 50/30/20', '')}
+        ${f50('Necesidades', ing > 0 ? tot / ing : 0, .5)}${f50('Ahorro', ing > 0 ? Math.max(0, libre) / ing : 0, .2)}${f50('Gustos', ing > 0 ? Math.max(0, 1 - tot / ing - Math.max(0, libre) / ing) : 0, .3)}
+        <div class="carStrip">Fondo de emergencia: ${dinero(Math.round(tot * 3))} (3 meses de pagos)</div></div>`;
+    }
+    const pct = ing > 0 ? Math.round(tot / ing * 100) : 0;
+    return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB2.bolsa, 'Ahorros', libre < 0 ? 'Este mes no alcanza para ahorrar' : 'Este mes sí alcanza para ahorrar', '')}
+      <div class="carFalta" style="color:${libre < 0 ? '#E5484D' : '#1FA463'}">${libre < 0 ? 'Te faltan ' + dinero(Math.abs(Math.round(libre))) : 'Te quedan ' + dinero(Math.round(libre))}</div>
+      <div class="carDiv"></div>
+      ${fila('Ingresos', dinero(Math.round(ing)))}${fila('Pagos fijos', pct + ' % · ' + dinero(Math.round(tot)))}
+      <div class="carStrip">${libre < 0 ? 'Este mes no alcanza para ahorrar' : 'Puedes apartar ' + dinero(Math.round(libre)) + ' para ahorrar'}</div></div>`;
+  }
+  if(k === 'per'){
+    if(ver === 'v5'){
+      return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB3.personas, 'Mi perfil', 'Cuenta y seguridad', '')}
+        ${fila('Cuenta', cuenta)}${fila('Personas', personas().length + ' personas')}${fila('Entrar', entrar)}
+        <div class="carStrip">${D.pagos.length} pagos · ${personas().length} personas · ${nombreTema(document.documentElement.dataset.tema)}</div></div>`;
+    }
+    return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB3.personas, 'Mi perfil', esc(D.nombre || 'Tu nombre'), '')}
+      ${fila('Personas', personas().length)}${fila('Apariencia', nombreTema(document.documentElement.dataset.tema))}${fila('Entrar', entrar)}${fila('Teléfono', esc(D.miTel || '—'))}
+      <div class="carTot"><span>Ingreso</span><b>${D.ingreso > 0 ? dinero(Math.round(D.ingreso)) + ' al mes' : 'sin registrar'}</b></div></div>`;
+  }
+  return '';
+}
+function carruselHtml(delMes, pag, tot){
+  const lista = carLista();
+  if(window._carIdx == null) window._carIdx = 0;
+  if(window._carIdx >= lista.length) window._carIdx = 0;
+  const slides = lista.map(k => k === 'inicio' ? heroNuevo(delMes, pag, tot) : carTarjeta(k));
+  return `<div class="carPlacaCont"><div class="carPlaca"></div><div class="carWrap"><div class="carTrack" id="carTrack" style="transform:translateX(-${window._carIdx * 108}%)">${slides.map((s0, i) => `<div class="carSlide" data-act="carIr" data-n="${i}" role="button" tabindex="0" aria-label="Tarjeta ${i + 1} de ${lista.length}">${s0}</div>`).join('')}</div><div class="carDots">${lista.map((k, i) => `<i data-act="carDot" data-n="${i}" class="${i === window._carIdx ? 'on' : ''}"></i>`).join('')}</div></div></div>`;
+}
+/* 13.4.16, ítem 3: placa pizarra + puntos del video: aparecen al deslizar y se desvanecen 500 ms después (al asentarse). */
+function carPlaca(on){
+  const c = document.querySelector('.carPlacaCont'); if(!c) return;
+  clearTimeout(window._carPlacaT);
+  if(on){ c.classList.add('carPlacaOn'); }
+  else { window._carPlacaT = setTimeout(() => { const c2 = document.querySelector('.carPlacaCont'); if(c2) c2.classList.remove('carPlacaOn'); }, 500); }
+}
+function carPintar(animar, saliente){
+  const tr = document.getElementById('carTrack'); if(!tr) return;
+  tr.style.transition = ''; tr.style.transform = `translateX(-${window._carIdx * 108}%)`;
+  tr.querySelectorAll('.carSlide').forEach(s => { s.style.transform = ''; s.style.borderRadius = ''; s.style.overflow = ''; });
+  document.querySelectorAll('.carDots i').forEach((d, i) => d.classList.toggle('on', i === window._carIdx));
+  if(saliente != null && saliente >= 0 && saliente < tr.children.length && saliente !== window._carIdx){ const o = tr.children[saliente]; o.style.transform = 'scale(.96)'; }   /* 13.4.16, ítem 3: la saliente se achica a 0.96 mientras sale (video) */
+  if(animar && !matchMedia('(prefers-reduced-motion: reduce)').matches){   /* ítem 7: la entrante llega a 0.95 y crece a 1.0 al asentarse */
+    const s = tr.children[window._carIdx]; if(!s) return;
+    carPlaca(true);   /* la placa aparece con el cambio... */
+    carPlaca(false);  /* ...y se desvanece 500 ms después, al asentarse */
+    s.style.transition = 'none'; s.classList.add('carEntra'); void s.offsetWidth; s.style.transition = '';
+    requestAnimationFrame(() => requestAnimationFrame(() => s.classList.remove('carEntra')));
+  }
+}
+let _carTimer = null;
+function carTimer(){
+  if(_carTimer){ clearInterval(_carTimer); _carTimer = null; }
+  if(tab !== 0) return;
+  _carTimer = setInterval(() => { const lista = carLista(); if(lista.length < 2) return; const tr = document.getElementById('carTrack'); if(!tr) return; const ant = window._carIdx || 0; window._carIdx = (ant + 1) % lista.length; vibrar([10]); carPintar(true, ant); }, 6000);
+}
+/* ítems 6 y 7 (ronda 13.4.15) + 13.4.16, ítem 3: el deslizamiento responde en toda la superficie de
+   la tarjeta (eventos de puntero en el contenedor, no solo en el fondo) y sigue al
+   dedo: la saliente se va hacia un lado achicándose a 0.96 y la entrante viene desde el otro
+   a 0.95 (~0.95 + 0.05·p³) y crece a 1.0 al asentarse, con un hueco del 8 % entre ambas por
+   donde se ve la placa pizarra, como los Smart Widgets de Samsung. El punto cambia a mitad
+   del recorrido. Una tarjeta por deslizada; el auto-avance sigue en 5 s. */
+function carSwipe(){
+  const wrap = document.querySelector('.carWrap'); if(!wrap) return;
+  const tr = document.getElementById('carTrack'); if(!tr) return;
+  let x0 = null, y0 = null, dx = 0, arr = false, pid = null;
+  const W = () => wrap.clientWidth || 1;
+  const entrante = () => { const i = window._carIdx || 0; return dx < 0 ? i + 1 : i - 1; };
+  wrap.addEventListener('pointerdown', e => { if(e.pointerType === 'mouse' && e.button !== 0) return; x0 = e.clientX; y0 = e.clientY; dx = 0; arr = false; pid = e.pointerId; window._carArr = true;
+    clearTimeout(window._carArrT); window._carArrT = setTimeout(() => { if(window._carArr){ window._carArr = false; if(window._pintarPend){ const a = window._pintarPend; window._pintarPend = null; pintar(...a); } } }, 3000); });   /* _carArr: mientras dura el gesto, pintar() se aplaza (ver pintar); el temporizador cubre un puntero soltado fuera de la tarjeta */
+  wrap.addEventListener('pointermove', e => {
+    if(x0 === null || (pid !== null && e.pointerId !== pid)) return;
+    const nx = e.clientX - x0, ny = e.clientY - y0;
+    if(!arr){ if(Math.abs(nx) < 12 || Math.abs(nx) < Math.abs(ny) * 1.4) return; arr = true; try{ wrap.setPointerCapture(e.pointerId); }catch(_){} }
+    dx = nx;
+    const i = window._carIdx || 0, t = entrante(), lista = carLista();
+    if(t < 0 || t >= lista.length) dx = nx * .3;   /* en los extremos, resistencia */
+    const W8 = W() * 1.08;
+    if(dx > W8) dx = W8; if(dx < -W8) dx = -W8;
+    carPlaca(true);   /* la placa (y los puntos) aparecen al empezar a deslizar */
+    tr.style.transition = 'none';
+    tr.style.transform = `translateX(calc(${-i * 108}% + ${dx}px))`;
+    const k = Math.min(1, Math.abs(dx) / W());
+    const s = tr.children[t];
+    if(s && t >= 0 && t < lista.length){ s.style.transform = `scale(${(0.95 + 0.05 * Math.pow(k, 3)).toFixed(3)})`; s.style.borderRadius = '32px'; s.style.overflow = 'hidden'; }
+    const sal = tr.children[i];   /* la saliente se achica a 0.96 nada más empezar */
+    if(sal) sal.style.transform = `scale(${(1 - 0.04 * Math.min(1, k / 0.25)).toFixed(3)})`;
+    const obj = (Math.abs(dx) > W() * .5 && t >= 0 && t < lista.length) ? t : i;   /* el punto cambia a mitad del recorrido */
+    document.querySelectorAll('.carDots i').forEach((d, di) => d.classList.toggle('on', di === obj));
+  });
+  const fin = () => {
+    if(x0 === null) return;
+    const movido = arr; x0 = null; pid = null;
+    window._carArr = false; clearTimeout(window._carArrT);
+    const pendiente = () => { if(window._pintarPend){ const a = window._pintarPend; window._pintarPend = null; pintar(...a); } };   /* repintado aplazado durante el gesto */
+    if(!movido){ pendiente(); return; }
+    window._carSwiped = Date.now();   /* que el toque al soltar no abra la tarjeta */
+    const i = window._carIdx || 0, t = entrante(), lista = carLista();
+    const cambia = Math.abs(dx) > Math.max(60, W() * .18) && t >= 0 && t < lista.length;
+    if(cambia){ window._carIdx = t; vibrar([12]); }
+    dx = 0; carPintar(false, cambia ? i : -1);
+    carPlaca(false);   /* la placa se desvanece 500 ms después, al asentarse */
+    pendiente();
+  };
+  wrap.addEventListener('pointerup', fin);
+  wrap.addEventListener('pointercancel', () => { if(x0 === null) return; x0 = null; pid = null; dx = 0; carPintar(false); carPlaca(false); window._carArr = false; clearTimeout(window._carArrT);
+    if(window._pintarPend){ const a = window._pintarPend; window._pintarPend = null; pintar(...a); } });
 }
 function listaFiltro(){
   const t = ['','Pagados','Pendientes','Vence pronto'][filtroIni], sub = ['','Lo que ya pagaste este mes','Todo lo que te falta pagar este mes','Vencen en 7 días o menos, o ya vencieron'][filtroIni];
@@ -795,13 +1282,13 @@ function inicio(){
     ${(D.invitaciones || []).map(x => `<button class="pago est-ama" style="display:block" data-act="invitacion" data-i="${x.id}"><b>✉ ${esc(x.de)} compartió ${esc(sinPrefijo(x.nombre))} contigo</b><div class="gris chico">Toca para aceptarlo o rechazarlo</div></button>`).join('')}
     ${D.pagos.filter(p => p.nubeSolVista && !p.creadoPor).map(p => `<button class="pago est-ama" style="display:block" data-act="solicitud" data-id="${p.id}"><b>✎ Piden un cambio en ${esc(sinPrefijo(p.nombre))}</b><div class="gris chico">Toca para revisarlo</div></button>`).join('')}
     ${(D.avisosNube || []).length ? `<button class="pago est-azu" style="display:block" data-act="avisoNubeOk">${D.avisosNube.map(esc).join('<br>')}<div class="gris chico">Toca para ocultar</div></button>` : ''}
-    ${heroNuevo(delMes, pag, tot)}`;
+    ${carruselHtml(delMes, pag, tot)}`;
   if(!D.pagos.length) return h + `<div class="vacio"><p>Agrega tu primer pago con el botón +.</p><button class="btn lleno" data-act="nuevo">Agregar pago</button></div>`;
   h += `<div class="sec"><h2>Próximos</h2><button class="pildora" data-act="tab" data-n="1">Ver todos ›</button></div><div class="prox">`;
   prox.forEach(p => { const dd = dias(p.vence);
-    h += `<button class="pc" data-act="detalle" data-id="${p.id}"><div class="fila">${icono(p)}<div class="peso" style="min-width:0"><div class="b" style="white-space:nowrap">${p.monto ? dinero(p.compartido ? Math.round(miParteMonto(p)*100)/100 : num(p.monto)) : ''}</div><div class="gris chico" style="white-space:nowrap">${dd < 0 ? 'Vencido hace ' + (-dd) + (dd === -1 ? ' día' : ' días') : dd === 0 ? 'Vence hoy' : dd === 1 ? 'En 1 día' : 'En ' + dd + ' días'}</div></div></div>
+    h += `<div class="pc" data-act="capsula" data-id="${p.id}"><div class="fila"><button class="pcIco" data-act="detalle" data-id="${p.id}" aria-label="Ver detalle de ${esc(sinPrefijo(p.nombre))}">${icono(p)}</button><div class="peso" style="min-width:0"><div class="b" style="white-space:nowrap">${p.monto ? dinero(p.compartido ? Math.round(miParteMonto(p)*100)/100 : num(p.monto)) : ''}</div><div class="gris chico" style="white-space:nowrap">${dd < 0 ? 'Vencido hace ' + (-dd) + (dd === -1 ? ' día' : ' días') : dd === 0 ? 'Vence hoy' : dd === 1 ? 'En 1 día' : 'En ' + dd + ' días'}</div></div></div>
       <div class="fila" style="margin-top:12px;align-items:center"><div class="b peso" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(sinPrefijo(p.nombre))}</div>${anillo(p,30)}</div>
-      <div class="fila" style="align-items:center"><div class="gris chico peso">Vence ${corto(p.vence)}</div><span class="gris" style="font-size:18px;padding-right:6px">›</span></div></button>`; });
+      <div class="fila" style="align-items:center"><div class="gris chico peso">Vence ${corto(p.vence)}</div><span class="gris" style="font-size:18px;padding-right:6px">›</span></div></div>`; });
   const lt = ordenados().filter(p => filtroPagos === 1 ? !p.compartido : filtroPagos === 2 ? p.compartido : true);
   const listaHtml = listaRegistro();
   h += `</div><div class="fila" style="justify-content:space-between;align-items:center"><h2>Registro de pagos</h2><button class="mas lupa" data-act="lupa" data-n="bn" aria-label="Buscar">${LUPA}</button></div><input id="bn" class="buscar" placeholder="Buscar por nombre…" value="${esc(window._bn||'')}" oninput="window._bn=this.value; document.getElementById('listaPagos').innerHTML = listaRegistro()" style="font-size:16px;margin-bottom:12px;${window._bnA ? '' : 'display:none'}"><div class="seg" id="segPagos">${['Todos','Propios','Compartidos'].map((x,i) => `<button class="${filtroPagos===i?'sel':''}" data-act="filtroPagos" data-n="${i}">${x}</button>`).join('')}</div><div id="listaPagos">`
@@ -848,12 +1335,15 @@ function cambiarDia(){
     det.animate([{opacity:0, transform:'translateY(10px)'},{opacity:1, transform:'none'}], {duration:260, easing:'cubic-bezier(.3,0,.15,1)'});
   };
 }
+/* quincenas fijas: 1-14 y 15-fin de mes (el 15 pertenece a la segunda). D.quincena es solo el día de pago, no el corte. */
 function quincenaActual(){
-  const h0 = hoy(), q = D.quincena || 15, y = h0.getFullYear(), m = h0.getMonth();
+  const h0 = hoy(), y = h0.getFullYear(), m = h0.getMonth();
   const fin = new Date(y, m+1, 0).getDate();
-  if(h0.getDate() <= q) return [new Date(y, m, 1), new Date(y, m, q)];
-  return [new Date(y, m, q+1), new Date(y, m, fin)];
+  if(h0.getDate() <= 14) return [new Date(y, m, 1), new Date(y, m, 14)];
+  return [new Date(y, m, 15), new Date(y, m, fin)];
 }
+/* fin de la quincena que empieza en sigA: 14 si es la primera del mes, fin de mes si es la segunda */
+function finQ(sigA){ return sigA.getDate() === 1 ? new Date(sigA.getFullYear(), sigA.getMonth(), 14) : new Date(sigA.getFullYear(), sigA.getMonth()+1, 0); }
 function carteraV(){
   const fc = window._fc || 0;
   let h = `<h1 style="margin:0 0 12px;font-size:28px;text-align:left">Tarjetas</h1>${tarjetasLista('compra')}`;
@@ -894,7 +1384,7 @@ function tarjetasLista(parte){
 }
 /* reporte quincenal en texto: 0 todos, 1 solo propios, 2 solo compartidos */
 function reporteQ(filtro){
-  const [a, b] = quincenaActual(), sigA = new Date(b.getTime() + DIA), sigB = sigA.getDate() === 1 ? new Date(sigA.getFullYear(), sigA.getMonth(), D.quincena||15) : new Date(sigA.getFullYear(), sigA.getMonth()+1, 0);
+  const [a, b] = quincenaActual(), sigA = new Date(b.getTime() + DIA), sigB = finQ(sigA);
   const ok = p => { const comp = !!(p.compartido || p.creadoPor); return filtro === 1 ? !comp : filtro === 2 ? comp : true; };
   let t = `📊 Reporte quincenal · Mis Pagos\n${['Todos los pagos','Solo pagos propios','Solo pagos compartidos'][filtro]}\n`, varia = false;
   [['Quincena actual', a, b], ['Siguiente quincena', sigA, sigB]].forEach(([nom, x, y]) => {
@@ -909,7 +1399,7 @@ function reporteQ(filtro){
 /* el reporte como imagen: tarjetas con la apariencia actual (html2canvas desde cdnjs) */
 function cargarH2C(){ return window.html2canvas ? Promise.resolve() : new Promise((ok, no) => { const sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'; sc.onload = ok; sc.onerror = no; document.head.appendChild(sc); }); }
 function imagenReporte(filtro){
-  const [a, b] = quincenaActual(), sigA = new Date(b.getTime() + DIA), sigB = sigA.getDate() === 1 ? new Date(sigA.getFullYear(), sigA.getMonth(), D.quincena||15) : new Date(sigA.getFullYear(), sigA.getMonth()+1, 0);
+  const [a, b] = quincenaActual(), sigA = new Date(b.getTime() + DIA), sigB = finQ(sigA);
   const ok = p => { const comp = !!(p.compartido || p.creadoPor); return filtro === 1 ? !comp : filtro === 2 ? comp : true; };
   const blq = (t, x, y) => { const ps = ordenados().filter(p => { const f = fecha(p.vence); return f >= x && f <= y && ok(p); });
     return `<div class="caja" style="margin-bottom:14px"><div class="gris chico b">${t} · ${x.getDate()} – ${y.getDate()} ${MESES[y.getMonth()]}</div><div style="font-size:30px;font-weight:800;margin:6px 0 2px">${dinero(ps.filter(p => !p.pagado).reduce((s0, p) => s0 + miMonto(p), 0))}</div><div class="gris chico" style="margin-bottom:8px">Pendientes de pago: ${ps.filter(p => !p.pagado).length} · Pagos realizados: ${ps.filter(p => p.pagado).length}</div>${ps.map(p => tarjetaPago(p)).join('') || '<span class="gris chico">Sin pagos en esta quincena.</span>'}</div>`; };
@@ -941,7 +1431,7 @@ const catalogo = () => ((D.preciosOf || {}).version >= 2 ? D.preciosOf.servicios
 function servicioDe(nombre){ const n = String(nombre || '').toLowerCase(); let mejor = null, largo = 0;
   Object.entries(catalogo()).forEach(([k, v]) => (v.claves || []).forEach(q => { if(q.length > largo && n.includes(q)){ mejor = k; largo = q.length; } })); return mejor; }
 function precioDe(serv, plan){ const d = catalogo()[serv]; const x = d && (d.planes || []).find(a => a[0] === plan); return x ? +x[2] || -1 : -1; }
-function precioOficial(p){ const pl = (p.ext || {}).plan; return pl ? precioDe(servicioDe(p.nombre), pl) : -1; }
+function precioOficial(p){ const ex = p.ext || {}; if(num(ex.precioOf) > 0) return num(ex.precioOf); const pl = ex.plan; return pl ? precioDe(servicioDe(p.nombre), pl) : -1; }   /* manual (con enlace de referencia) primero; catálogo después */
 function nombreSug(f){   /* al escribir o elegir un servicio del catálogo: tipo de pago, planes y app */
   const sv = servicioDe(f.nombre.value), d = sv && catalogo()[sv]; if(!d) return;
   if(f.cat.value !== d.cat){ f.cat.value = d.cat; frecUpd(f); perUpd(f); }
@@ -965,14 +1455,20 @@ function planDetalle(p){
   const pr = ((p.ctl || {}).precios || []).slice().sort((a0, b0) => a0.d < b0.d ? -1 : 1);
   let h = `<h2>${pl.serv ? 'Plan de ' + pl.serv : 'Plan y precio'}</h2><div class="caja"><button class="dato" style="width:100%;padding:4px 0" data-act="ctlPlan" data-id="${p.id}" data-volver="detalle"><span class="b peso" style="text-align:left">Plan</span><span class="${ip >= 0 ? 'b' : 'gris'}">${ip >= 0 ? pl.planes[ip][0] : 'Elegir'} ›</span></button>`;
   if(ip >= 0) h += `<div class="gris chico" style="margin:2px 0 6px">Hasta ${pl.planes[ip][1]} ${pl.planes[ip][1] === 1 ? 'cuenta o pantalla' : 'cuentas o pantallas'}${p.compartido ? ' · lo compartes con ' + esc(nombreVisible(p.conQuien)) : ''}</div>`;
-  if(of > 0){ const dif = Math.abs(of - tot) >= .5; h += `<div class="chico b" style="margin:4px 0 6px;color:${dif ? '#C27A00' : '#1F9D5C'}">Precio oficial: ${dinero(of)} al mes${D.preciosOf && D.preciosOf.actualizado ? ' · revisado el ' + corto(D.preciosOf.actualizado) : ''}</div>${dif && !p.creadoPor ? `<button class="btn borde" data-act="usarPrecio" data-id="${p.id}" data-m="${of}">Usar ${dinero(of)} desde este periodo</button>` : ''}`; }
+  if(of > 0){ const dif = Math.abs(of - tot) >= .5; h += `<div class="chico b" style="margin:4px 0 6px;color:${dif ? '#C27A00' : '#1F9D5C'}">${dif ? '⚠ Precio oficial: ' + dinero(of) + ' al mes' : '✓ Precio oficial verificado: ' + dinero(of) + ' al mes'}${D.preciosOf && D.preciosOf.actualizado ? ' · revisado el ' + corto(D.preciosOf.actualizado) : ''}</div>${dif && !p.creadoPor ? `<div class="fila" style="gap:8px"><button class="btn borde" data-act="usarPrecio" data-id="${p.id}" data-m="${of}">Usar ${dinero(of)} desde este periodo</button><button class="btn borde" data-act="mantenerPrecio" data-id="${p.id}">Mantener mi monto</button></div>` : ''}`; }
   else if(ip >= 0) h += `<div class="gris chico" style="margin:4px 0 6px">Aún no tengo el precio oficial de este plan.</div>`;
+  if(!p.creadoPor) h += `<form id="frmOf" data-id="${p.id}" onsubmit="return guardarOf(event)"><label style="margin-top:12px">Precio oficial</label><input name="of" inputmode="decimal" placeholder="$0" value="${esc((p.ext || {}).precioOf || '')}"><label>Enlace de la página oficial</label><input name="fuente" inputmode="url" placeholder="https://…" value="${esc((p.ext || {}).fuenteOf || '')}">${(p.ext || {}).fuenteOf ? `<a class="gris chico" style="display:block;margin:4px 0 0" href="${esc(p.ext.fuenteOf)}" target="_blank" rel="noopener">Ver la página oficial ↗</a>` : ''}<p class="gris chico" style="margin:4px 0 10px">Precio oficial de la página del servicio. La verificación automática por servidor aún no existe: lo revisas tú desde el enlace.</p><button class="btn borde" type="submit">Guardar precio oficial</button></form>`;
   if(p.compartido && tot) h += `<div style="height:1px;background:var(--line);margin:10px 0"></div><div class="b">Tú pagas ${dinero(tuya)} de ${dinero(tot)} (${Math.round(tuya / tot * 100)} %)</div><div class="b chico" style="color:#1F9D5C;margin-top:4px">Compartir te ahorra ${dinero(Math.round((tot - tuya) * Math.max(1, anio)))}${anio > 1 ? ' al año' : ''}</div>`;
   h += `<div style="height:1px;background:var(--line);margin:10px 0 4px"></div><div class="fila" style="align-items:center"><b class="peso">Historial de precios</b>${!p.creadoPor ? `<button class="pildora" data-act="ctlPrecio" data-id="${p.id}" data-volver="detalle">Registrar</button>` : ''}</div>`;
   h += pr.length ? pr.map((o, i) => ({o, dif: i ? num(o.m) - num(pr[i - 1].m) : null})).reverse().map(x => `<div class="dato" style="padding:6px 0"><div class="peso"><div>${x.o.d.startsWith('2000') ? 'Precio inicial' : 'Desde el periodo del ' + corto(x.o.d)}</div>${x.dif !== null ? `<div class="chico b" style="color:${x.dif >= 0 ? '#E5484D' : '#1F9D5C'}">${x.dif >= 0 ? 'Subió' : 'Bajó'} ${dinero(Math.abs(x.dif))}</div>` : ''}</div><b>${dinero(num(x.o.m))}</b></div>`).join('')
     : `<p class="gris chico" style="margin:4px 0 0">Precio actual: ${dinero(tot)}. Si cambia, se guarda aquí y lo pagado antes queda igual.</p>`;
   return h + `</div>`;
 }
+function guardarOf(ev){ ev.preventDefault(); const f = ev.target, p = D.pagos.find(x => x.id === +f.dataset.id); if(!p) return false;
+  p.ext = p.ext || {}; const v = num(f.of.value);
+  if(v > 0){ p.ext.precioOf = String(v); p.ext.fuenteOf = f.fuente.value.trim(); } else { delete p.ext.precioOf; delete p.ext.fuenteOf; }
+  if(D.precioAv) delete D.precioAv[p.id];
+  vibrar([12]); guardar(); detalle(p.id); return false; }
 function registrarPrecio(p, viejo, nuevo, desde){ if(num(viejo) === num(nuevo)) return; p.ctl = p.ctl || {}; const pr = p.ctl.precios || [];
   if(!pr.length && viejo) pr.push({d:'2000-01-01', m:String(viejo)}); p.ctl.precios = pr.filter(o => o.d !== desde).concat([{d:desde, m:String(nuevo)}]); }
 function precioEn(p, v){ let m = num(p.monto), mejor = ''; ((p.ctl || {}).precios || []).forEach(o => { if(o.d <= v && o.d >= mejor){ mejor = o.d; m = num(o.m); } }); return m; }
@@ -1042,16 +1538,52 @@ function ctlPersonaPintar(p, x){ const hj = document.querySelector('#capa .hoja'
 function ctlFecha(el){ const p = D.pagos.find(z => z.id === +el.dataset.id), x = el.dataset.pe; if(!p || !el.value) return;
   p.ctl.pagos = p.ctl.pagos || {}; p.ctl.pagos[x] = p.ctl.pagos[x] || {}; p.ctl.pagos[x][el.dataset.v] = el.value; guardar(); if(navigator.vibrate) navigator.vibrate(15); ctlPersonaPintar(p, x); }
 function ctlPintar(p){ const hj = document.querySelector('#capa .hoja'); if(hj){ const y = hj.scrollTop; hj.innerHTML = '<div class="asa"></div>' + controlHtml(p); hj.scrollTop = y; hj.querySelectorAll('.pastel').forEach(e => e.classList.add('ver')); } }
+/* ---- ítem 9: filtro de Quincenas por persona (Opción A v5) ---- */
+let fqAbierto = false, fqModo = 0, fqPersona = '', fqMenu = false, fqDir = 0, fqDirMenu = false;   /* fqDir: 0 todos, 1 me compartió (creado por la otra persona), 2 compartiste (creado por mí) */
+function fqPersonas(){
+  const [a, b] = quincenaActual(), sigA = new Date(b.getTime() + DIA), sigB = finQ(sigA);
+  const nombres = new Set();
+  ordenados().forEach(p => { const f = fecha(p.vence); if(f < a || f > sigB) return; if((p.compartido || p.creadoPor) && personaDe(p)) nombres.add(personaDe(p)); });
+  return personas().filter(x => nombres.has(x.nombre)).map(x => x.nombre);
+}
+function fqOk(p){
+  if(fqModo === 1) return !p.compartido && !p.creadoPor;
+  if(fqModo === 2){ if(!p.compartido && !p.creadoPor) return false; if(fqPersona && personaDe(p).toLowerCase() !== fqPersona.toLowerCase()) return false;
+    if(fqDir === 1 && !p.creadoPor) return false;   /* me compartió: lo creó la otra persona */
+    if(fqDir === 2 && p.creadoPor) return false;   /* compartiste: lo creé yo */
+    return true; }
+  return true;
+}
 function quincenasV(){
   const [a, b] = quincenaActual();
-  const sigA = new Date(b.getTime() + DIA), sigB = sigA.getDate() === 1 ? new Date(sigA.getFullYear(), sigA.getMonth(), D.quincena||15) : new Date(sigA.getFullYear(), sigA.getMonth()+1, 0);
+  const sigA = new Date(b.getTime() + DIA), sigB = finQ(sigA);
+  const filtroActivo = fqModo !== 0;
   const bloque = (t, x, y, act) => {
     const ps = ordenados().filter(p => { const f = fecha(p.vence); return f >= x && f <= y; });
+    const lista = ps.filter(fqOk);
     const pend = ps.filter(p => !p.pagado).reduce((s,p) => s + miMonto(p), 0);
+    const pendF = lista.filter(p => !p.pagado);
+    const totF = pendF.reduce((s0, p) => s0 + miMonto(p), 0);
+    const vacio = fqModo === 2 ? (fqDir === 1 ? `Sin pagos que te compartió ${fqPersona ? nombreVisible(fqPersona) : 'esta persona'} en esta quincena` : fqDir === 2 ? `Sin pagos que compartiste con ${fqPersona ? nombreVisible(fqPersona) : 'esta persona'} en esta quincena` : `Sin pagos con ${fqPersona ? nombreVisible(fqPersona) : 'esta persona'} en esta quincena`) : fqModo === 1 ? 'Sin pagos propios en esta quincena' : 'Sin pagos en esta quincena.';
     return `<div class="caja" style="margin-bottom:14px"><div class="gris chico b">${t} · ${x.getDate()} – ${y.getDate()} ${MESES[y.getMonth()]}</div><div style="font-size:32px;font-weight:800;margin:6px 0 2px;display:flex;align-items:center;gap:11px">${dinero(pend)}${(() => { const porQ = D.ingreso > 0 ? Math.max(0, (D.ingreso - (D.otros || 0)) / 2) : 0, totQ = ps.reduce((s0, p) => s0 + miMonto(p), 0);
-      return porQ > 0 && totQ > porQ + .5 ? `<span class="alQ" role="button" data-act="alertaQ" data-m="${dinero(Math.round(totQ))}" data-q="${dinero(Math.round(porQ))}" data-d="${dinero(Math.round(totQ - porQ))}" style="background:#E5484D">!</span>` : ''; })()}<span class="peso"></span>${act ? `<button class="pildora btnIco" data-act="compartirQ" aria-label="Compartir reporte quincenal"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M22 2L2 9.7l8.8 3.5L14.4 22z"/><path d="M10.8 13.2L22 2"/></svg></button>` : ''}</div>${act ? `<div class="filaQ"><span>Pendientes de pago: ${ps.filter(p=>!p.pagado).length}</span><button class="filaQb" data-act="irHist">Pagos realizados: ${ps.filter(p=>p.pagado).length}<b class="flechaQ">›</b></button></div>` : `<div class="gris chico">${ps.filter(p=>!p.pagado).length} pagos</div>`}<div style="margin-top:12px">${ps.map(p => sinCorteW(p) ? tarjetaPago(p, true).replace('<div class="renglones gris">', '<div class="renglones gris"><span class="varia">⏳ Aún sin corte · puede variar</span>') : tarjetaPago(p, true)).join('') || '<span class="gris chico">Sin pagos en esta quincena.</span>'}</div></div>`;
+      return porQ > 0 && totQ > porQ + .5 ? `<span class="alQ" role="button" data-act="alertaQ" data-m="${dinero(Math.round(totQ))}" data-q="${dinero(Math.round(porQ))}" data-d="${dinero(Math.round(totQ - porQ))}" data-pg="${totQ - pend > .5 ? dinero(Math.round(totQ - pend)) : ''}" data-f="${dinero(Math.round(pend))}" style="background:#E5484D">!</span>` : ''; })()}<span class="peso"></span>${act ? `<button class="pildora btnIco" data-act="compartirQ" aria-label="Compartir reporte quincenal"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"><path d="M22 2L2 9.7l8.8 3.5L14.4 22z"/><path d="M10.8 13.2L22 2"/></svg></button>` : ''}</div>${act ? `<div class="filaQ"><span>Pendientes de pago: ${ps.filter(p=>!p.pagado).length}</span><button class="filaQb" data-act="irHist">Pagos realizados: ${ps.filter(p=>p.pagado).length}<b class="flechaQ">›</b></button></div>` : `<div class="gris chico">${ps.filter(p=>!p.pagado).length} pagos</div>`}<div style="margin-top:12px">${lista.map(p => sinCorteW(p) ? tarjetaPago(p, true).replace('<div class="renglones gris">', '<div class="renglones gris"><span class="varia">⏳ Aún sin corte · puede variar</span>') : tarjetaPago(p, true)).join('') || `<span class="gris chico">${vacio}</span>`}</div>${filtroActivo ? `<div class="fqTot"><div><div class="b" style="color:var(--acc)">Total ${fqModo === 1 ? 'propios' : 'con ' + esc(nombreVisible(fqPersona))}</div><div class="gris chico">${pendF.length} ${pendF.length === 1 ? 'pago' : 'pagos'} · suma de lo filtrado</div></div><b style="font-size:19px">${dinero(totF)}</b></div>` : ''}</div>`;
   };
-  return `<p class="gris chico" style="margin:0 4px 10px">Cuánto apartar de cada pago de nómina</p>` + bloque('Quincena actual', a, b, true) + bloque('Siguiente', sigA, sigB, false);
+  let filtroHtml = `<div class="fila" style="margin:0 4px 10px;gap:10px;align-items:center"><span class="gris chico peso">Cuánto apartar de cada pago de nómina</span><button class="fqBtn${fqAbierto ? ' on' : ''}" data-act="filtroQ" aria-label="Filtrar pagos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 5h18l-7 8.2V19l-4 2.2v-8L3 5z"/></svg></button></div>`;
+  filtroHtml += `<div id="fqZona">`;   /* 13.5.1: zonas que cambian en su sitio (fqActualizar), sin repintar la pantalla */
+  if(fqAbierto){
+    filtroHtml += `<div class="fqPanel"><div class="seg">${['Todos','Propios','Compartidos'].map((x,i) => `<button class="${fqModo===i?'sel':''}" data-act="fqSeg" data-n="${i}">${x}</button>`).join('')}</div>`;
+    filtroHtml += `<div id="fqChips">`;
+    if(fqModo === 2){
+      const dirNom = ['Todos', 'Me compartió', 'Compartiste'][fqDir];
+      filtroHtml += `<div class="fqFila"><button class="fqChip" data-act="fqPersona">${fqPersona ? `<span class="av">${avatarPersona(fqPersona)}</span>Con ${esc(nombreVisible(fqPersona))} ▾` : 'Compartido con ▾'}</button>`
+        + `<button class="fqChip" data-act="fqDir">${dirNom} ▾</button></div><div id="fqMenuZ">`
+        + (fqMenu ? `<div class="fqMenu" style="margin-top:0"><div class="dh">FILTRAR POR PERSONA</div>${fqPersonas().map(n => `<button class="di${fqPersona === n ? ' sel' : ''}" data-act="fqPersonaSel" data-n="${esc(n)}"><span class="av">${avatarPersona(n)}</span>${esc(n)}</button>`).join('') || '<div class="gris chico" style="padding:8px 10px">Aún no tienes pagos compartidos.</div>'}${fqPersona ? `<button class="di" data-act="fqPersonaSel" data-n=""><span class="av">✕</span>Todas las personas</button>` : ''}</div>` : '')
+        + (fqDirMenu ? `<div class="fqMenu" style="margin-top:0"><div class="dh">DIRECCIÓN DEL PAGO</div>${[['', 'Todos'], ['1', 'Me compartió'], ['2', 'Compartiste']].map(([v, t]) => `<button class="di${+v === fqDir ? ' sel' : ''}" data-act="fqDirSel" data-n="${v}"><span class="av">${+v === fqDir ? '✓' : ''}</span>${t}</button>`).join('')}</div>` : '') + `</div>`;
+    }
+    filtroHtml += `</div></div>`;
+  }
+  filtroHtml += `</div>`;
+  return filtroHtml + `<div id="qCuerpo">` + bloque('Quincena actual', a, b, true) + bloque('Siguiente', sigA, sigB, false) + `</div>`;
 }
 /* ---- gráfica de pastel: sectores separados, esquinas redondeadas, líneas guía con punto ---- */
 function pastel(vals, cols, total, centro, sub){
@@ -1178,10 +1710,29 @@ function portadaCSS(){
   return FONDOS[Math.max(0, Math.min(FONDOS.length - 1, pf))][1];
 }
 function grupo(titulo, filas){
-  return `<div class="gris chico b" style="margin:22px 8px 8px">${titulo}</div><div class="caja" style="padding:4px 16px">${filas.map(([n, extra, act]) => `<button class="dato" style="width:100%;padding:14px 0" data-act="${act}"><span>${n}</span><span class="gris" style="max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${extra} ›</span></button>`).join('')}</div>`;
+  return `<div class="gris chico b" style="margin:22px 8px 8px">${titulo}</div><div class="caja" style="padding:4px 16px">${filasHtml(filas)}</div>`;
+}
+/* ---- ítem 10: secciones desplegables en Mi perfil ---- */
+let _ajSec = {};   /* sección abierta del acordeón de Mi perfil */
+let verCar = false;   /* ítem 14 (ronda 13.4.15): pantalla de configuración visual del carrusel */
+const ICONO_AJ = {
+  pers: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg>',
+  esc: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.5-7 10-4-1.5-7-5.5-7-10V6l7-3z"/></svg>',
+  apa: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor" stroke="none"/></svg>',
+  bell: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 16v-5a6 6 0 0 1 12 0v5l1.5 2h-15z"/><path d="M10 19a2 2 0 0 0 4 0"/></svg>',
+  ayuda: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M9.5 9.2a2.6 2.6 0 0 1 5 .9c0 1.7-2.5 2-2.5 3.4"/><circle cx="12" cy="7.6" r="1.1" fill="currentColor" stroke="none"/></svg>',
+  datos: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18a4.5 4.5 0 0 1-.4-9A6 6 0 0 1 18.3 11 3.5 3.5 0 0 1 17.5 18z"/></svg>',
+  info: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5"/><circle cx="12" cy="7.6" r="1.1" fill="currentColor" stroke="none"/></svg>'
+};
+const nombreTema = t => ({auto:'Auto', claro1:'Claro', claro2:'Claro', oscuro:'Oscuro', glass:'Glass', glassb:'Glass blanco', glasso:'Glass oscuro', glassd:'Glass Dark', liquid:'Glass'})[t] || t;
+const filasHtml = filas => filas.map(([n, extra, act, dn]) => `<button class="dato" style="width:100%;padding:14px 0" data-act="${act}"${dn ? ` data-n="${dn}"` : ''}><span>${n}</span><span class="gris" style="max-width:55%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${extra} ›</span></button>`).join('');
+function acordeon(key, titulo, icono, resumen, contenido){
+  const abierto = !!_ajSec[key];
+  const flecha = '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9 L12 15 L18 9"/></svg>';   /* 13.4.16, ítem 5: chevron 12×6, antes 16×7 en 24×24 */
+  return `<div class="caja ajSec${abierto ? ' abierto' : ''}" style="padding:0"><button class="ajHead" data-act="ajSec" data-n="${key}"><span class="ajIco">${icono}</span><span class="t">${titulo}</span><span class="s">${resumen}</span><span class="ajFlecha">${flecha}</span></button><div class="ajCuerpo">${contenido}</div></div>`;
 }
 function ajustes(){
-  const temas = [['auto','Auto'],['claro1','Claro'],['oscuro','Oscuro'],['glass','Glass'],['glassb','Glass blanco'],['glasso','Glass oscuro']];   /* Liquid Glass: pendiente */
+  const temas = [['auto','Auto'],['claro1','Claro'],['oscuro','Oscuro'],['glass','Glass'],['glassb','Glass blanco'],['glasso','Glass oscuro']];   /* Liquid Glass: pendiente; Glass Dark no va en la web principal (ronda 13.4.15, ítem 15) */
   const correo = D.nube && D.nube.correo ? D.nube.correo : '';
   const ini = esc((D.nombre || '?')[0].toUpperCase());
   return `<div style="position:relative;height:232px">
@@ -1192,18 +1743,47 @@ function ajustes(){
       </button></div>
     <button data-act="nombre" style="display:block;margin:6px auto 0;font-size:24px;font-weight:800">${esc(D.nombre || 'Tu nombre')}</button>
     <div class="gris" style="text-align:center;margin:4px 0">${correo ? esc(correo) : 'Sin cuenta'} · ${D.pagos.length} ${D.pagos.length === 1 ? 'pago' : 'pagos'}</div>
-    ${grupo('Datos personales', [['Nombre', esc(D.nombre || 'Agregar'), 'nombre'], ['Correo', correo ? esc(correo) : 'Sin cuenta', 'cuenta'], ['Teléfono', esc(D.miTel || 'Agregar'), 'tel'], ['Días de pago', ({15:'Día 15 y fin de mes', 14:'Día 14 y fin de mes', 10:'Día 10 y día 25'})[D.quincena||15] || ('Día ' + D.quincena + ' y fin de mes'), 'quincena'], ['Ingreso', D.ingreso > 0 ? dinero(Math.round(D.ingreso)) + ' al mes' : 'Agregar', 'presupuesto']])}
-    ${grupo('Avisos', [['Avisos de pagos en este celular', D.avisos ? 'Activados' : 'Activar', 'avisos'], ['Recordar a quien compartes', D.autoRec === false ? 'No' : 'Sí', 'autoRecAj']])}
-    ${grupo('Cuenta y seguridad', [['Cuenta y pagos compartidos', correo ? (D.nube.verif ? 'Conectada' : 'Sin verificar') : 'Sin cuenta', 'cuenta'], ['Personas con las que pagas', personas().length + ' personas', 'personas'], ['Entrar con contraseña', D.bloqueo && D.bloqueo.hash ? (D.bloqueo.cred ? 'Face ID y contraseña' : 'Contraseña') : 'Apagado', 'bloqueo']])}
-    <div class="gris chico b" style="margin:22px 8px 8px">Apariencia y diseño</div><div class="caja" style="padding-bottom:4px">${[temas.slice(0,3), temas.slice(3)].map((fila,f) => `<div class="seg" style="margin:${f ? '8px' : '0'} 0 0">${fila.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div>`).join('')}<p class="gris chico" style="margin-bottom:12px">Auto cambia entre Claro y Oscuro según tu celular. Glass blanco es blanco con toques de color. Glass oscuro es cristal ahumado siempre.</p>
+    ${acordeon('datos', 'Datos personales', ICONO_AJ.pers, D.ingreso > 0 ? dinero(Math.round(D.ingreso)) + ' al mes' : 'Agregar', filasHtml([['Nombre', esc(D.nombre || 'Agregar'), 'nombre'], ['Correo', correo ? esc(correo) : 'Sin cuenta', 'cuenta'], ['Teléfono', esc(D.miTel || 'Agregar'), 'tel'], ['Días de pago', ({15:'Día 15 y fin de mes', 14:'Día 14 y fin de mes', 10:'Día 10 y día 25'})[D.quincena||15] || ('Día ' + D.quincena + ' y fin de mes'), 'quincena'], ['Ingreso', D.ingreso > 0 ? dinero(Math.round(D.ingreso)) + ' al mes' : 'Agregar', 'presupuesto']]))}
+    ${acordeon('avisos', 'Pagos y avisos', ICONO_AJ.bell, D.avisos ? 'Activados' : 'Activar', filasHtml([['Avisos de pagos en este celular', D.avisos ? 'Activados' : 'Activar', 'avisos'], ['Recordar a quien compartes', D.autoRec === false ? 'No' : 'Sí', 'autoRecAj']]))}
+    ${acordeon('cuenta', 'Cuenta y seguridad', ICONO_AJ.esc, personas().length + ' personas', filasHtml([['Cuenta y pagos compartidos', correo ? (D.nube.verif ? 'Conectada' : 'Sin verificar') : 'Sin cuenta', 'cuenta'], ['Personas con las que pagas', personas().length + ' personas', 'personas'], ['Entrar con contraseña', D.bloqueo && D.bloqueo.hash ? (D.bloqueo.cred ? 'Face ID y contraseña' : 'Contraseña') : 'Apagado', 'bloqueo']]))}
+    ${acordeon('apariencia', 'Apariencia y diseño', ICONO_AJ.apa, nombreTema(document.documentElement.dataset.tema), `<div style="padding-bottom:4px">${[temas.slice(0,3), temas.slice(3)].map((fila,f) => `<div class="seg" style="margin:${f ? '8px' : '0'} 0 0">${fila.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div>`).join('')}<p class="gris chico" style="margin-bottom:12px">Auto cambia entre Claro y Oscuro según tu celular. Glass blanco es blanco con toques de color. Glass oscuro es cristal ahumado siempre.</p>
       ${(() => { const f = (n, extra, act) => `<button class="dato" style="width:100%;padding:14px 0;border-top:1px solid var(--line)" data-act="${act}"><span style="text-align:left;flex:1">${n}</span><span class="gris" style="max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${extra} ›</span></button>`;
-        return f('Diseño de tarjeta principal', listaHero()[selHero()][0], 'colores') + f('Fondo del modo Glass', D.fondoGlass ? 'Tu foto' : 'Predeterminado', 'fondoGlass')
+        const vis = ['quin','tj','est','aho','per'].filter(k => (carCfg()[k] || 'v6') !== 'no').length;
+        return f('Diseño de tarjeta principal', listaHero()[selHero()][0], 'colores') + f('Carrusel de Inicio', vis + ' de 5 tarjetas', 'carPantalla') + f('Fondo del modo Glass', D.fondoGlass ? 'Tu foto' : 'Predeterminado', 'fondoGlass')
           + (D.tema === 'glass' || D.tema === 'glassb' ? f('De noche, pasar a Glass oscuro', D.glassNoche ? 'Sí' : 'No', 'glassNoche') : '')
-          + (document.documentElement.dataset.tema === 'glass' ? f('Desenfoque del fondo', ['Normal','30 % más','50 % más','80 % más'][D.glassBlur || 0], 'glassBlur') : ''); })()}</div>
-    ${grupo('Ayuda', [['Ver tutorial', '', 'tutorial']])}
-    ${grupo('Tus datos', [['Respaldo en la nube', D.respaldoNube ? 'Guardado' : 'Guardar', 'respNube'], ['Guardar respaldo en archivo', 'archivo', 'exportar'], ['Cargar respaldo de archivo', 'archivo', 'importar']])}
+          + (document.documentElement.dataset.tema === 'glass' ? f('Desenfoque del fondo', ['Normal','30 % más','50 % más','80 % más'][D.glassBlur || 0], 'glassBlur') : ''); })()}</div>`)}
+    ${acordeon('ayuda', 'Ayuda', ICONO_AJ.ayuda, 'Ver tutorial', filasHtml([['Ver tutorial', '', 'tutorial']]))}
+    ${acordeon('tusdatos', 'Tus datos', ICONO_AJ.datos, D.respaldoNube ? 'Guardado' : 'Guardar', filasHtml([['Respaldo en la nube', D.respaldoNube ? 'Guardado' : 'Guardar', 'respNube'], ['Guardar respaldo en archivo', 'archivo', 'exportar'], ['Cargar respaldo de archivo', 'archivo', 'importar']]))}
     <input type="file" id="imp" accept="application/json" data-act="importar" hidden>
-    <div class="gris chico b" style="margin:22px 8px 8px">Acerca de</div><div class="caja"><p class="chico" style="margin-top:0"><b>Ponla en tu iPhone como app:</b> en Safari toca Compartir y luego "Agregar a pantalla de inicio".</p><p class="gris chico" style="margin-bottom:0">Los avisos de pagos por vencer llegan cada mañana a las 9:00 y los de pagos compartidos en unos minutos (necesitas cuenta y activarlos en "Avisos"). El iPhone no permite que una web vibre por su cuenta. Tus pagos se guardan en este navegador; usa "Guardar respaldo" de vez en cuando.</p></div>`;
+    ${acordeon('acerca', 'Acerca de', ICONO_AJ.info, 'Instalar como app', `<p class="chico" style="margin-top:0"><b>Ponla en tu iPhone como app:</b> en Safari toca Compartir y luego "Agregar a pantalla de inicio".</p><p class="gris chico" style="margin-bottom:0">Los avisos de pagos por vencer llegan cada mañana a las 9:00 y los de pagos compartidos en unos minutos (necesitas cuenta y activarlos en "Avisos"). El iPhone no permite que una web vibre por su cuenta. Tus pagos se guardan en este navegador; usa "Guardar respaldo" de vez en cuando.</p>`)}`;
+}
+/* ítem 14 (ronda 13.4.15): pantalla para elegir las tarjetas del carrusel VIÉNDOLAS:
+   las tarjetas reales, en vertical, cada una con su segmentado Elegida / Alternativa /
+   No mostrar (la misma animación de deslizamiento del segmentado Calendario/Quincenas).
+   Tocar la tarjeta también cambia su versión. Inicio siempre aparece. */
+function pantallaCarrusel(){
+  const mes = hoy().getMonth(), anio = hoy().getFullYear();
+  const delMes = D.pagos.filter(p => { const f = fecha(p.vence); return f.getMonth() === mes && f.getFullYear() === anio; });
+  const pend = delMes.filter(p => !p.pagado);
+  const tot = pend.reduce((s, p) => s + miMonto(p), 0);
+  const pag = delMes.length - pend.length;
+  const cfg = carCfg();
+  const slots = [['inicio','Inicio',null],['quin','Quincenas','quin'],['tj','Mis tarjetas','tj'],['est','Estadísticas','est'],['aho','Ahorros','aho'],['per','Mi perfil','per']];
+  let h = `<div class="fila" style="align-items:center;margin-bottom:16px"><div class="peso" style="padding-left:4px"><div class="b" style="font-size:22px">Carrusel de Inicio</div><div class="gris chico">Toca una tarjeta para cambiar su versión</div></div></div>`;
+  slots.forEach(([k, nom, ck]) => {
+    const card = k === 'inicio' ? heroNuevo(delMes, pag, tot) : carTarjeta(k);
+    const ver = ck ? (cfg[ck] || 'v6') : null;
+    h += `<div class="entra" style="margin-bottom:20px"><div style="position:relative">${card}`
+      + `<button class="carPantTap" data-act="${ck ? 'carCiclo' : 'carFijo'}" data-n="${ck || ''}" aria-label="Cambiar versión de ${nom}"></button></div>`;
+    if(ck){
+      const eig = k === 'aho' ? 'v5' : 'v6', alt = k === 'aho' ? 'v6' : 'v5';
+      h += `<div class="seg" style="margin:10px 0 0">${[[eig,'Elegida'],[alt,'Alternativa'],['no','No mostrar']].map(([vv, lab]) => `<button class="${ver === vv ? 'sel' : ''}" data-act="carVer" data-n="${ck}" data-v="${vv}">${lab}</button>`).join('')}</div>`;
+    } else {
+      h += `<div class="gris chico" style="margin:10px 4px 0">Inicio siempre aparece en el carrusel.</div>`;
+    }
+    h += `</div>`;
+  });
+  return h;
 }
 /* reduce una imagen y la devuelve como dataURL */
 function reducir(archivo, max, recorte){
@@ -1227,6 +1807,7 @@ function abrirHoja(html){
   capa.innerHTML = `<div class="velo" data-act="cerrar"></div><div class="hoja" role="dialog" aria-modal="true"><div class="asa"></div>${html}</div>`;
   requestAnimationFrame(() => { capa.querySelector('.velo').classList.add('ver'); capa.querySelector('.hoja').classList.add('ver'); });
   setTimeout(() => capa.querySelectorAll('.pastel').forEach(e => e.classList.add('ver')), 250);   /* gráficas dentro de la hoja */
+  setTimeout(guiaHojaWeb, 1100);   /* 13.5.1: tutorial de la novedad del detalle compartido */
 }
 function cerrarHoja(){
   const capa = document.getElementById('capa'); const h = capa.querySelector('.hoja'); if(!h) return;
@@ -1234,44 +1815,60 @@ function cerrarHoja(){
   document.documentElement.classList.remove('conHoja');
   hojaT = setTimeout(() => { capa.innerHTML = ''; }, 300);
 }
-function detalle(id){
+function detalle(id, enSitio){
   const p = D.pagos.find(x => x.id === id); if(!p) return;
   const d = dias(p.vence);
   let h = `<div class="pago est-${estado(p)}" style="display:block"><div class="fila">${icono(p)}<div class="peso"><div class="nom">${esc(p.nombre)}</div><div class="gris chico">${p.monto ? dinero(num(p.monto)) + ' · ' : ''}${FRECS[p.frec]}</div></div>${anillo(p,44)}</div>
     ${p.creadoPor ? `<div class="gris chico b" style="margin-top:10px">☁ Creado por ${esc(p.creadoPor)}</div>` : ''}
     <div class="b" style="margin:14px 0">Vence ${corto(p.vence)} · ${p.pagado ? 'pagado ✓' : d < 0 ? 'venció hace ' + (-d) + ' días' : d === 0 ? 'vence hoy' : d === 1 ? 'vence mañana' : 'faltan ' + d + ' días'}</div>
-    ${p.creadoPor && !p.pagado && p.nubeId ? ((D.parteAvisada || {})[p.nubeId] === p.vence ? `<button class="btn borde gris" data-act="pagueParte" data-id="${p.id}" data-n="1">Esperando confirmación…</button>` : (sinCorteW(p) ? `<button class="btn borde" style="opacity:.45" data-act="parteBloq">Notificar mi pago</button>` : `<button class="btn borde" data-act="pagueParte" data-id="${p.id}">Notificar mi pago</button>`)) : p.creadoPor && p.pagado ? `<button class="btn borde" disabled>Pagado <span class="verde">✓</span></button>` : `<button class="btn borde" data-act="pagar" data-id="${p.id}">${p.pagado ? 'Pagado <span class="verde">✓</span>' : 'Confirmar pago'}</button>`}</div>`;
+    ${(() => { const nb = notificarHtml(p); if(nb !== null) return nb; return p.creadoPor && p.pagado ? `<button class="btn borde" disabled>Pagado <span class="verde">✓</span></button>` : `<button class="btn borde" data-act="pagar" data-id="${p.id}">${p.pagado ? 'Pagado <span class="verde">✓</span>' : 'Confirmar pago'}</button>`; })()}</div>`;
   { const pide = (D.partePide || {})[p.nubeId];   // creaste el pago y la otra persona dice que ya te pagó su parte
     if(!p.creadoPor && p.nubeId && pide && pide.v === p.vence){ const ok = (D.parteOk || {})[p.nubeId] === p.vence;
       h += `<div class="caja est-${ok ? 'ver' : 'azu'} entra" style="margin-top:12px"><div class="fila" style="align-items:center"><span style="font-size:22px">${ok ? '✅' : '💸'}</span><div class="peso" style="padding-left:12px"><b style="display:block">${ok ? 'Confirmaste el pago de ' + esc(pide.de) : esc(pide.de) + ' dice que ya te pagó'}</b><span class="gris chico">${ok ? 'Ya le aparece como pagado.' : 'Su parte' + (num(pide.monto) ? ' de ' + dinero(num(pide.monto)) : '') + '. Confírmalo cuando lo veas en tu cuenta.'}</span></div></div>${ok ? '' : `<button class="btn lleno" style="margin-top:12px" data-act="confParte" data-id="${p.id}">Confirmar que lo recibí</button>`}</div>`; } }
+  h += (p.variable && !p.credito && actualizarMontoHtml(p)) ? `<div class="caja" style="margin-top:12px">${actualizarMontoHtml(p)}</div>` : '';   /* variables sin tarjeta: el botón va aquí; en tarjetas va dentro de su sección */
   h += extDetalle(p) + planDetalle(p);
   if(p.tieneDatos || p.numServicio){
     h += `<h2>Datos para pagar</h2><div class="caja">` + (p.numServicio ? `<div class="dato"><span class="gris">No. de servicio</span><span class="fila"><b>${esc(p.numServicio)}</b><button class="pildora" data-act="copiarSrv" data-t="${esc(p.numServicio)}">Copiar</button></span></div>` : '') + [['Tarjeta',p.tarjetaUlt,'numTarjeta'],['Vencimiento',p.tarjetaUlt ? '••/••' : '','expira'],['CVV',p.tarjetaUlt ? '•••' : '','cvv'],['Cuenta',p.cuentaUlt,'cuenta'],['Referencia',p.refUlt,'referencia'],['Titular',p.titularVis,'']].filter(x => x[1]).map(([a,b,k]) => `<div class="dato"><span class="gris">${a}</span><span class="fila"><b id="dv-${k}">${esc(b)}</b>${k ? `<button class="pildora" data-act="verDato" data-id="${p.id}" data-k="${k}">Ver</button><button class="pildora" data-act="copiarDato" data-id="${p.id}" data-k="${k}">Copiar</button>` : ''}</span></div>`).join('') + `</div>`;
   }
   if(p.credito){
-    h += `<h2>${p.tipoCred==='departamental'?'Crédito departamental':'Tarjeta de crédito'}</h2><div class="caja"><div class="dato"><span class="gris">Corte</span><b>${p.diaCorte ? 'Día ' + p.diaCorte : '—'}</b></div><div class="dato"><span class="gris">Límite de pago</span><b>${corto(p.vence)}</b></div><div class="dato"><span class="gris">Sin intereses</span><b>${p.monto ? dinero(num(p.monto)) : '—'}</b></div><div class="dato"><span class="gris">Pago mínimo</span><b>${p.minimo ? dinero(num(p.minimo)) : '—'}</b></div><p class="gris chico">${p.creadoPor ? `El día de corte cierra el periodo y se calcula cuánto se debe. Este pago lo registra ${esc(p.creadoPor)}: pídele que actualice el monto a pagar.` : 'El día de corte cierra tu periodo y se calcula cuánto debes; al día siguiente actualiza aquí el monto a pagar.'}</p>${p.creadoPor ? (() => {
-      /* te lo compartieron: no puedes cambiar el monto, pero puedes pedirlo por Mis Pagos, WhatsApp u otra app */
+    h += `<h2>${p.tipoCred==='departamental'?'Crédito departamental':'Tarjeta de crédito'}</h2><div class="caja"><div class="dato"><span class="gris">Corte</span><b>${p.diaCorte ? 'Día ' + p.diaCorte : '—'}</b></div><div class="dato"><span class="gris">Límite de pago</span><b>${corto(p.vence)}</b></div><div class="dato"><span class="gris">Sin intereses</span><b>${p.monto ? dinero(num(p.monto)) : '—'}</b></div><div class="dato"><span class="gris">Pago mínimo</span><b>${p.minimo ? dinero(num(p.minimo)) : '—'}</b></div><p class="gris chico">${p.creadoPor ? `El día de corte cierra el periodo y se calcula cuánto se debe. Este pago lo registra ${esc(p.creadoPor)}: pídele que actualice el monto a pagar.` : 'El día de corte cierra tu periodo y se calcula cuánto debes; al día siguiente actualiza aquí el monto a pagar.'}</p>${!p.creadoPor ? `<div style="margin-top:12px">${actualizarMontoHtml(p)}</div>` : ''}</div>`;
+  }
+  { /* ítem 4: "Solicitar actualización de montos" y "Recordatorio" en la misma sección */
+    let sol = '';
+    if(p.credito && p.creadoPor){
       const per = personas().find(x => x.nombre.toLowerCase() === String(p.creadoPor).toLowerCase()); const tel = per && per.tel ? per.tel.replace(/\D/g,'') : ''; const telI = tel.length === 10 ? '52' + tel : tel;
       const m = `Hola ${p.creadoPor}, ${sinPrefijo(p.nombre)} ya hizo su corte. ¿Me ayudas a actualizar en Mis Pagos el monto a pagar (sin intereses y mínimo)? Vence el ${corto(p.vence)}. ¡Gracias!`;
-      return `<div class="gris chico b" style="margin:14px 0 8px">Solicitar actualización de montos</div>`
-        + (p.nubeId && D.nube && D.nube.verif ? `<button class="btn lleno" data-act="recordar" data-id="${p.id}" data-m="${esc(m)}">Por Mis Pagos (le llega una notificación)</button>` : '')
+      const act = montoActualizado(p);
+      sol += `<div class="gris chico b" style="margin:4px 0 8px">Solicitar actualización de montos</div>`
+        + (p.nubeId && D.nube && D.nube.verif ? `<button class="btn lleno" data-act="pedirAct" data-id="${p.id}" data-m="${esc(m)}">Solicitar actualización de montos ${act ? '<span class="flechaVerde">↓</span>' : ''}</button>` : `<p class="gris chico" style="margin:0">Inicia sesión en Mi perfil → Cuenta para pedirlo por Mis Pagos.</p>`)
+        + (act ? `<div class="regMonto"><b>✓ ${esc(p.creadoPor)} actualizó el monto:</b> ${dinero(num(p.montoAct.m))} · ${corto(p.montoAct.f)}${p.montoAct.h ? ', ' + esc(p.montoAct.h) : ''}</div>` : '')
         + `<a class="btn borde" style="margin-top:10px;text-decoration:none" href="https://wa.me/${telI}?text=${encodeURIComponent(m)}" target="_blank" rel="noopener">Por WhatsApp</a>`
-        + `<button class="btn borde" style="margin-top:10px" data-act="compartirTxt" data-m="${esc(m)}">Por otra app (mensajes, correo…)</button>`; })() : ''}</div>`;
+        + `<button class="btn borde" style="margin-top:10px" data-act="compartirTxt" data-m="${esc(m)}">Por otra app (mensajes, correo…)</button>`;
+    }
+    if(p.compartido){
+      const mi2 = miParteMonto(p), otra2 = num(p.monto) - mi2, quien2 = p.conQuien || 'La otra persona';
+      const per2 = personas().find(x => x.nombre.toLowerCase() === quien2.toLowerCase());
+      const msg2 = `Hola, el pago de ${sinPrefijo(p.nombre)} vence el ${corto(p.vence)}. Te toca ${dinero(Math.round(otra2))}.`;
+      const tel2 = per2 && per2.tel ? per2.tel.replace(/\D/g,'') : ''; const telI2 = tel2.length === 10 ? '52' + tel2 : tel2;
+      sol += `<div class="gris chico b" style="margin:${sol ? '18px' : '4px'} 0 8px">Recordatorio</div>`
+        + (p.nubeId && D.nube && D.nube.verif ? `<button class="btn lleno" data-act="recordar" data-id="${p.id}" data-m="${esc(msg2)}">Enviar recordatorio por Mis Pagos</button>` : '')
+        + (!p.creadoPor && D.nube && D.nube.verif ? `<button class="btn borde" style="margin-top:10px" data-act="enviarAct" data-id="${p.id}">Enviar actualización a ${esc(nombreVisible(p.conQuien))} por Mis Pagos</button>` : '')
+        + `<a class="btn borde" style="margin-top:10px;text-decoration:none" href="https://wa.me/${telI2}?text=${encodeURIComponent(msg2)}" target="_blank" rel="noopener">Enviar recordatorio por WhatsApp</a>`;
+    }
+    if(sol) h += `<h2>Solicitudes y recordatorios</h2><div class="caja">${sol}</div>`;
   }
   if(p.compartido){
     const mi = miParteMonto(p), otra = num(p.monto) - mi, quien = p.conQuien || 'La otra persona';
     const per = personas().find(x => x.nombre.toLowerCase() === quien.toLowerCase());
     const msg = `Hola, el pago de ${sinPrefijo(p.nombre)} vence el ${corto(p.vence)}. Te toca ${dinero(Math.round(otra))}.`;
     const tel = per && per.tel ? per.tel.replace(/\D/g,'') : ''; const telI = tel.length === 10 ? '52' + tel : tel;
-    h += `<h2>¿Quién paga?</h2><div class="caja"><div class="dato"><span>Tú · ${p.miParte||50} %</span><b>${dinero(Math.round(mi))}</b></div><div class="dato"><span>${esc(nombreVisible(quien))} · ${100-(p.miParte||50)} %</span><b>${dinero(Math.round(otra))}</b></div>
-      ${p.nubeId && D.nube && D.nube.verif ? `<button class="btn lleno" style="margin-top:12px" data-act="recordar" data-id="${p.id}" data-m="${esc(msg)}">Enviar recordatorio por Mis Pagos</button>` : ''}
-      ${!p.creadoPor && D.nube && D.nube.verif ? `<button class="btn borde" style="margin-top:10px" data-act="enviarAct" data-id="${p.id}">Enviar actualización a ${esc(nombreVisible(p.conQuien))} por Mis Pagos</button>` : ''}
-      <a class="btn ${p.nubeId && D.nube && D.nube.verif ? 'borde' : 'lleno'}" style="margin-top:10px;text-decoration:none" href="https://wa.me/${telI}?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">Enviar recordatorio por WhatsApp</a>${!p.creadoPor ? `<button class="btn borde" style="margin-top:10px" data-act="control" data-id="${p.id}">Control de pagos</button>` : ''}</div>`;
+    h += `<h2>¿Quién paga?</h2><div class="caja"><div class="dato"><span>Tú · ${p.miParte||50} %</span><b>${dinero(Math.round(mi))}</b></div><div class="dato"><span>${esc(nombreVisible(quien))} · ${100-(p.miParte||50)} %</span><b>${dinero(Math.round(otra))}</b></div>${!p.creadoPor ? `<button class="btn borde" style="margin-top:10px" data-act="control" data-id="${p.id}">Control de pagos</button>` : ''}</div>`;
   }
   if((p.hist||[]).length){
     h += `<h2>Historial</h2><div class="caja">` + p.hist.slice().reverse().slice(0, 12).map(r => { const t = Math.round((fecha(r.f) - fecha(r.v))/DIA); return `<div class="dato"><span>${corto(r.f)} · ${t <= 0 ? 'a tiempo' : t + (t === 1 ? ' día tarde' : ' días tarde')}</span><b>${r.m ? dinero(num(r.m)) : ''}</b></div>`; }).join('') + `</div>`;
   }
   h += `<div class="dos" style="margin-top:20px"><button class="btn borde" data-act="cerrar">Cerrar</button><button class="btn borde" data-act="editar" data-id="${p.id}">Editar</button></div>`;
+  if(enSitio){ const hj = document.querySelector('#capa .hoja'); if(hj){ hj.innerHTML = '<div class="asa"></div>' + h; return; } }   /* ítem 9: actualizar la hoja en su sitio, sin volver a deslizarla desde abajo */
   abrirHoja(h);
 }
 function editor(id){
@@ -1282,7 +1879,7 @@ function editor(id){
   const per = personas().map(x => `<option value="${esc(x.nombre)}">`).join('');
   abrirHoja(`<h1>${id ? 'Editar pago' : 'Nuevo pago'}</h1><form id="ed" data-id="${id || ''}">
     <label>Nombre</label><input name="nombre" required value="${esc(p.nombre)}" placeholder="${ejemploNombre(catEd)}" list="dlServ" autocomplete="off" oninput="nombreSug(this.form)"><datalist id="dlServ">${Object.keys(catalogo()).sort().map(k => `<option value="${esc(k)}">`).join('')}</datalist>
-    <div class="dos"><div><label>Monto</label><input name="monto" inputmode="decimal" value="${esc(p.monto)}" placeholder="$0"></div><div><label>${id ? 'Calendarizado' : 'Calendarizar'}</label><input type="date" name="vence" value="${id ? p.vence : ''}"></div></div>
+    <div class="dos"><div><label>Monto</label><input name="monto" inputmode="decimal" value="${esc(p.monto)}" placeholder="$0"></div><div><label>${id ? 'Calendarizado' : 'Calendarizar'}</label><input type="date" name="vence" value="${p.vence}"></div></div>
     <label>Tipo de pago</label><select name="cat" onchange="frecUpd(this.form); perUpd(this.form); extUpd(this.form)">${[...new Set(Object.values(GRUPO_CAT))].map(g => `<optgroup label="${g}">${Object.entries(CATS).filter(([k]) => GRUPO_CAT[k] === g).map(([k, v]) => `<option value="${k}" ${k === catEd ? 'selected' : ''}>${v[0]}  ${v[1]}</option>`).join('')}</optgroup>`).join('')}</select>
     <label>Se repite</label><select name="frec" onchange="perUpd(this.form)">${frecsDe(catEd).map(k => `<option value="${k}" ${k === (frecsDe(catEd).includes(p.frec) ? p.frec : 'M1') ? 'selected' : ''}>${FRECS[k].charAt(0).toUpperCase() + FRECS[k].slice(1)}</option>`).join('')}</select><div id="extCampos">${extHtml(catEd, p.ext || {}, p.nombre)}</div>
     <div id="perBox">${perHtml(p, frecsDe(catEd).includes(p.frec) ? p.frec : 'M1', catEd)}</div>
@@ -1348,6 +1945,8 @@ function editor(id){
         if(antesMov.frec !== x.frec) cam.push('frecuencia');
         if(x.compartido && x.ctl && x.ctl.desde && antesMov.monto !== x.monto) registrarPrecio(x, antesMov.monto, x.monto, x.vence);   /* control de pagos: el precio nuevo aplica desde este periodo */
         if(cam.length) movimiento('✏️ Editaste ' + sinPrefijo(x.nombre) + ' — ' + cam.join(', ')); } } catch(e){}
+    if(id && (x.credito || x.variable) && (window._actMonto === x.id || antesMov.monto !== x.monto)) x.montoAct = {m: x.monto, f: iso(hoy()), h: horaCorta(), corte: corteActual(x)};
+    window._actMonto = null;
     if(!id) D.pagos.push(x);
     if(x.conQuien && !personas().some(z => z.nombre.toLowerCase() === x.conQuien.toLowerCase())) D.personas.push({nombre:x.conQuien, tel:'', mail:''});
     guardar(); cerrarHoja(); pintar(); aviso('✓ Guardado');
@@ -1434,7 +2033,7 @@ async function sincronizar(){
   const yo = D.nube.correo, uid = D.nube.uid; let sub = 0, nue = 0, cam = 0, qui = 0;
   await publicarPerfil();
   for(const p of D.pagos){ const q = (p.conQuien || '').trim(); if(q.includes('@') && !(D.nomCorreo || {})[q.toLowerCase()]) await nombreDeCorreo(q); }
-  for(const p of D.pagos){
+  for(const p of D.pagos){ try {   /* 13.5.0: si un pago falla al subir, los demás y las invitaciones siguen */
     if(p.creadoPor || !p.compartido || !p.conQuien) continue;
     const per = personas().find(z => z.nombre.toLowerCase() === p.conQuien.toLowerCase());
     let otro = per && per.mail ? per.mail.trim().toLowerCase() : '';
@@ -1460,14 +2059,15 @@ async function sincronizar(){
     if(!p.nubeId){ fields.estado = sv('pendiente'); fields.solicitud = sv(''); const r = await pedir('POST', DOCS + '/compartidos', {fields}, await token()); p.nubeId = r.name.split('/').pop(); p.nubeEstado = 'pendiente'; }
     else await pedir('PATCH', DOCS + '/compartidos/' + p.nubeId + '?' + Object.keys(fields).map(k => 'updateMask.fieldPaths=' + k).join('&'), {fields}, await token());
     p.nubeFirma = firma; sub++;
-  }
+  } catch(e){ console.warn('sincronizar: subir', e); } }
   const res = await pedir('POST', DOCS + ':runQuery', {structuredQuery:{from:[{collectionId:'compartidos'}], where:{fieldFilter:{field:{fieldPath:'participantes'}, op:'ARRAY_CONTAINS', value:sv(yo)}}}}, await token());
   const vistos = new Set();
-  (Array.isArray(res) ? res : []).forEach(x => {
+  (Array.isArray(res) ? res : []).forEach(x => { try {   /* 13.5.0: un documento raro ya no bloquea los demás */
     const d = x.document; if(!d) return; const id = d.name.split('/').pop(), f = d.fields; vistos.add(id);
     try{ const ro = JSON.parse(gs(f,'recordatorio') || 'null'); D.recVisto = D.recVisto || {};
       if(ro && ro.deCorreo !== yo && ro.t > (D.recVisto[id] || 0)){ D.recVisto[id] = ro.t;
         if(ro.tipo === 'pagueParte'){ (D.partePide = D.partePide || {})[id] = {v:ro.v, monto:ro.monto || '', de:ro.de}; avisoNube(`💸 ${ro.de} dice que ya te pagó su parte de ${gs(f,'nombre')}${ro.monto ? ' (' + dinero(num(ro.monto)) + ')' : ''}. Ábrelo para confirmarlo.`); }
+        else if(ro.tipo === 'auto') avisoNube(`⏰ Recordatorio automático: ${String(ro.msg || '').replace(/^Hola [^,]*, /, '')}`);   /* 13.5.1: ya no dice que la otra persona te lo mandó */
         else if(ro.tipo !== 'parteOk') avisoNube(ro.tipo === 'confirmar' ? `✅ ${ro.de} te pide confirmar un pago: ${ro.msg}` : `🔔 ${ro.de} te recuerda: ${ro.msg}`); } }catch(e){}
     const estado = gs(f,'estado') || 'aceptado', sol = gs(f,'solicitud');
     let p = D.pagos.find(z => z.nubeId === id);
@@ -1484,14 +2084,16 @@ async function sincronizar(){
     }
     D.invitaciones = (D.invitaciones || []).filter(z => z.id !== id);
     if(estado !== 'aceptado'){
-      if(estado === 'pendiente' && !p) D.invitaciones.push({id, nombre:gs(f,'nombre'), monto:gs(f,'monto'), vence:gs(f,'vence'), parte:100 - gi(f,'parteCreador',50), de:gs(f,'creadorNombre')});
+      if(estado === 'pendiente' && !p){ D.invitaciones.push({id, nombre:gs(f,'nombre'), monto:gs(f,'monto'), vence:gs(f,'vence'), parte:100 - gi(f,'parteCreador',50), de:gs(f,'creadorNombre')});
+        D.invAvisada = D.invAvisada || {};   /* 13.5.0: aviso de invitación nueva también en la web (una vez; luego queda el aviso en Inicio) */
+        if(!D.invAvisada[id]){ D.invAvisada[id] = Date.now(); avisoNube(`✉ ${gs(f,'creadorNombre') || 'Alguien'} compartió ${sinPrefijo(gs(f,'nombre'))} contigo. Ábrelo en Inicio para aceptarlo o rechazarlo.`); } }
       return;
     }
     if(p && p.solicitudEnviada && !sol){
       let ok = false; try{ const q = JSON.parse(p.solicitudEnviada); ok = (q.monto == null || q.monto === gs(f,'monto')) && (q.vence == null || q.vence === gs(f,'vence')); }catch(e){}
       avisoNube(`${gs(f,'creadorNombre')} ${ok ? 'aprobó' : 'no aprobó'} tu cambio en ${sinPrefijo(p.nombre)}.`); p.solicitudEnviada = '';
     }
-    const nuevo = !p;
+    const nuevo = !p, montoAntes = p ? p.monto : '';
     if(nuevo) p = {id: Date.now() + Math.floor(Math.random()*1000), nubeId:id, pagado:false, hist:[]};
     const firma = [gs(f,'pagadoV'), gs(f,'parteOk'), gs(f,'nombre'), gs(f,'monto'), gs(f,'vence'), gs(f,'frec'), gi(f,'parteCreador',50), gs(f,'fijoCreador'), gs(f,'credito'), gi(f,'diaCorte',0), gs(f,'minimo'), gs(f,'datos')].join('|');
     if(!nuevo && firma === p.nubeFirma) return;
@@ -1499,6 +2101,7 @@ async function sincronizar(){
     Object.assign(p, {nombre:gs(f,'nombre'), monto:gs(f,'monto'), vence:gs(f,'vence'), frec:gs(f,'frec') || 'M1', cat:gs(f,'cat') || adivinarCat(gs(f,'nombre')),
       compartido:true, miParte:100 - gi(f,'parteCreador',50), miFijo: gs(f,'fijoCreador') ? String(Math.max(0, num(gs(f,'monto')) - num(gs(f,'fijoCreador'))).toFixed(2)) : '', conQuien:nomCreador(f), creadoPor:nomCreador(f), nubeFirma:firma,
       credito:!!gs(f,'credito'), tipoCred:gs(f,'credito') || 'tarjeta', diaCorte:gi(f,'diaCorte',0), minimo:gs(f,'minimo')});
+    if(!nuevo && montoAntes && montoAntes !== p.monto && (p.credito || p.variable)) p.montoAct = {m: p.monto, f: iso(hoy()), h: horaCorta(), corte: corteActual(p)};   /* el creador actualizó el monto tras el corte: flecha verde + registro */
     { const pv = gs(f,'pagadoV'), po = gs(f,'parteOk');   // quien lo creó confirmó el pago (o que recibió tu parte): aquí queda pagado
       const parte = po && po === p.vence;
       if(((pv && pv === p.vence) || parte) && !p.pagado){ p.pagado = true; (p.hist = p.hist||[]).push({f:iso(hoy()), v:p.vence, m:p.monto, per:p.periodo||''}); if(!nuevo) avisoNube(`✅ ${nomCreador(f)} confirmó tu pago de ${sinPrefijo(p.nombre)}${parte ? ' (recibió tu parte)' : ''}.`); }
@@ -1515,7 +2118,7 @@ async function sincronizar(){
         Boveda.guardar(pp.id, o).catch(() => {}); } }
     p.ancla = fecha(p.vence).getDate();
     if(nuevo){ D.pagos.push(p); nue++; } else cam++;
-  });
+  } catch(e){ console.warn('sincronizar: documento', e); } });
   D.invitaciones = (D.invitaciones || []).filter(z => vistos.has(z.id));
   const antes = D.pagos.length; D.pagos = D.pagos.filter(p => !(p.creadoPor && p.nubeId && !vistos.has(p.nubeId))); qui = antes - D.pagos.length;
   D.nube.ultima = Date.now(); guardar();
@@ -1663,18 +2266,91 @@ function ajustarFoto(src){
     g.drawImage(im, st.x * e, st.y * e, im.naturalWidth * st.b * st.k * e, im.naturalHeight * st.b * st.k * e);
     D.foto = cv.toDataURL('image/jpeg', .88); guardar(); cerrarHoja(); pintar(); };
 }
-/* la pastilla del selector se desliza a la opción elegida */
+/* ítem 4b (ronda 13.4.16): elegir persona o dirección anima como el segmentado:
+   las tarjetas de quincena salen deslizándose y las nuevas entran escalonadas;
+   antes el cambio era instantáneo, sin animación. */
+
+/* 13.5.1: transición en su sitio. Lo viejo se desvanece con una curva que frena al final, la altura se desliza
+   de la vieja a la nueva y lo nuevo entra escalonado (de lado si viene del segmentado, hacia abajo si es un
+   desplegado). No se repinta la pantalla: sin brinquito al inicio ni al final. */
+const CURVA = 'cubic-bezier(.3,0,.15,1)', SALIDA = 'cubic-bezier(.4,0,.6,1)';
+function salidaZona(el, dir){
+  if(!el) return; el.dataset.salio = '1';
+  [...el.children].forEach(k => k.animate([{opacity:1, transform:'none'},{opacity:0, transform: dir ? `translateX(${-dir*6}%)` : 'translateY(-4px)'}], {duration:170, easing:SALIDA, fill:'forwards'}));
+}
+function transZona(el, html, dir){
+  if(!el) return;
+  el.getAnimations().forEach(a => a.cancel()); clearTimeout(el._t);
+  const h0 = el.getBoundingClientRect().height;
+  const fin = () => {
+    delete el.dataset.salio;
+    el.innerHTML = html;
+    el.style.height = 'auto'; const h1 = el.getBoundingClientRect().height, kids = [...el.children];   /* la altura real final, medida igual que al terminar */
+    el.style.height = h0 + 'px'; el.style.overflow = 'clip'; el.style.overflowClipMargin = '24px';
+    kids.forEach(k => { k.style.opacity = 0; });
+    requestAnimationFrame(() => {   // arranca en el siguiente cuadro, ya con lo nuevo puesto
+      const an = el.animate([{height:h0 + 'px'},{height:h1 + 'px'}], {duration:Math.max(220, Math.min(380, 220 + Math.abs(h1 - h0) / 4)), easing:CURVA});
+      el.style.height = h1 + 'px';
+      an.onfinish = () => { el.style.height = ''; el.style.overflow = ''; el.style.overflowClipMargin = ''; };
+      kids.forEach((k, i) => { k.style.opacity = ''; k.animate([{opacity:0, transform: dir ? `translateX(${dir*6}%)` : 'translateY(-8px)'},{opacity:1, transform:'none'}], {duration:340, delay:60 + Math.min(i, 5) * 40, easing:CURVA, fill:'backwards'}); });
+    });
+  };
+  if(!el.children.length || el.dataset.salio){ fin(); return; }
+  salidaZona(el, dir); el._t = setTimeout(fin, 175);
+}
+function pulsoChip(b){ if(b) b.animate([{transform:'scale(1)'},{transform:'scale(.94)', offset:.3},{transform:'scale(1)'}], {duration:340, easing:CURVA}); }
+function fqActualizar(ids, dir){
+  const tmp = document.createElement('div'); tmp.innerHTML = quincenasV();
+  ids.forEach(id => { const el = document.getElementById(id), nu = tmp.querySelector('#' + id); if(el && nu) transZona(el, nu.innerHTML, dir || 0); });
+  const bt = document.querySelector('#app .fqBtn'); if(bt) bt.classList.toggle('on', fqAbierto);
+}
+function fqSubCambiar(aplicar){
+  const panel = document.querySelector('.fqPanel');
+  const resto = []; let m = panel ? panel.nextElementSibling : null; while(m){ resto.push(m); m = m.nextElementSibling; }
+  resto.forEach(e => e.animate([{transform:'none', opacity:1},{transform:'translateX(-20%)', opacity:0}], {duration:160, easing:'cubic-bezier(.4,0,.6,1)', fill:'forwards'}));
+  setTimeout(() => { aplicar();
+    document.querySelectorAll('#app .fqPanel, #app .caja').forEach((e, i) => e.animate([{transform:'translateX(20%)', opacity:0},{transform:'none', opacity:1}], {duration:300, delay:i * 30, easing:'cubic-bezier(.3,0,.15,1)'})); }, 200);
+}
+/* ítem 4 (ronda 13.4.15): el segmentado de Quincenas usa la misma animación de
+   deslizamiento que el de Calendario/Quincenas, pero dejando terminar el
+   deslizamiento de la pastilla (420 ms) antes de repintar; antes se repintaba a
+   los 140 ms y la pastilla brincaba a su sitio de golpe. */
+function fqSegCambiar(b, n){
+  const seg = b.parentElement, act = seg.querySelector('.sel');
+  if(!act || act === b) return;
+  vibrar([10]);
+  const dx = b.offsetLeft - act.offsetLeft, d = dx > 0 ? 1 : -1;
+  /* 13.5.1: la pastilla se mueve y, al mismo tiempo, lo de abajo empieza a salir hacia el lado contrario;
+     al llegar la pastilla, solo cambian en su sitio los chips y las tarjetas (sin repintar la pantalla) */
+  act.style.color = 'var(--fg)'; b.style.color = 'var(--accTxt)'; b.style.position = 'relative'; b.style.zIndex = 1; act.style.zIndex = 0;
+  const mov = act.animate([{transform:'translateX(0)'},{transform:`translateX(${dx}px)`}], {duration:300, easing:CURVA, fill:'forwards'});
+  salidaZona(document.getElementById('fqChips'), d); salidaZona(document.getElementById('qCuerpo'), d);
+  fqModo = n; if(n !== 2){ fqPersona = ''; fqMenu = false; fqDir = 0; fqDirMenu = false; }
+  mov.onfinish = () => {
+    act.classList.remove('sel'); b.classList.add('sel'); mov.cancel();
+    [act, b].forEach(x => { x.style.color = ''; x.style.position = ''; x.style.zIndex = ''; });
+    fqActualizar(['fqChips', 'qCuerpo'], d);
+  };
+}
+/* la pastilla del selector se desliza a la opción elegida; el repintado espera los 420 ms
+   completos a que la pastilla llegue (igual que fqSegCambiar): antes se repintaba a los
+   140 ms y la pastilla nueva aparecía en su sitio final mientras la vieja aún se movía:
+   el brinquito al final de la animación */
 function deslizar(b, fin){
   const seg = b.parentElement, act = seg.querySelector('.sel');
   if(!act || act === b){ fin(); return; }
   const dx = b.offsetLeft - act.offsetLeft;
   act.style.color = 'var(--fg)';
-  const p = act.animate([{transform:'translateX(0)'},{transform:`translateX(${dx}px)`}], {duration:420, easing:'cubic-bezier(.3,0,.15,1)', fill:'forwards'});
+  const p = act.animate([{transform:'translateX(0)'},{transform:`translateX(${dx}px)`}], {duration:300, easing:CURVA, fill:'forwards'});
   b.style.color = 'var(--accTxt)'; b.style.position = 'relative'; b.style.zIndex = 1; act.style.zIndex = 0;
+  /* 13.5.1: sale con una curva que frena (antes se cortaba a toda velocidad y quedaba un hueco vacío) y lo nuevo
+     entra en el cuadro siguiente al repintar, con el mismo recorrido: sin brinquito al inicio ni al final */
   const d = dx > 0 ? 1 : -1, sale = []; let n = seg.nextElementSibling; while(n){ sale.push(n); n = n.nextElementSibling; }
-  sale.forEach(e => e.animate([{transform:'none', opacity:1},{transform:`translateX(${-d*20}%)`, opacity:0}], {duration:140, easing:'cubic-bezier(.4,0,1,1)', fill:'forwards'}));
-  setTimeout(() => { fin(); const s2 = document.querySelector('.seg'); let m = s2 && s2.nextElementSibling;
-    while(m){ m.animate([{transform:`translateX(${d*20}%)`, opacity:0},{transform:'none', opacity:1}], {duration:280, easing:'cubic-bezier(.3,0,.15,1)'}); m = m.nextElementSibling; } }, 140);
+  sale.forEach(e => e.animate([{transform:'none', opacity:1},{transform:`translateX(${-d*12}%)`, opacity:0}], {duration:220, easing:SALIDA, fill:'forwards'}));
+  p.onfinish = () => { const y = scrollY; fin(); if(Math.abs(scrollY - y) > 1) window.scrollTo(0, y);
+    const s2 = document.querySelector('.seg'); const ent = []; let m = s2 && s2.nextElementSibling;
+    while(m){ m.style.opacity = 0; ent.push(m); m = m.nextElementSibling; }
+    requestAnimationFrame(() => ent.forEach((e, i) => { e.style.opacity = ''; e.animate([{transform:`translateX(${d*12}%)`, opacity:0},{transform:'none', opacity:1}], {duration:340, delay:Math.min(i, 4) * 30, easing:CURVA, fill:'backwards'}); })); };
 }
 /* ===== Bóveda: los datos para pagar se guardan cifrados (AES-256-GCM) con una llave que el navegador
    genera y marca como NO extraíble; ni la propia página puede leer la llave, solo usarla. ===== */
@@ -1751,10 +2427,62 @@ document.addEventListener('click', (ev) => {
       const p = D.pagos.find(x => x.id === id);
       if(!b.dataset.ok){ if(!p.pagado) b.innerHTML = 'Pagado <span class="verde">✓</span>'; if(navigator.vibrate) navigator.vibrate(25);
         b.dataset.ok = 1; b.animate([{transform:'scale(1)'},{transform:'scale(1.06)'},{transform:'scale(1)'}], {duration:380, easing:'cubic-bezier(.3,0,.15,1)'}).onfinish = () => b.click(); break; }
+      limpiarAvisos(p);   /* ítem 6: la notificación de este movimiento ya se resolvió */
       if(!p.pagado){ p.pagado = true; (p.hist = p.hist||[]).push({f:iso(hoy()), v:p.vence, m:p.monto, per:p.periodo||''}); aviso('✓ Marcado como pagado');
         (D.historial = D.historial || []).push({t:Date.now(), tx:'✅ Pagaste ' + p.nombre + (p.monto ? ' · ' + dinero(num(p.monto)) : '') + ' — marcado como pagado el ' + new Date().toLocaleString('es-MX', {day:'numeric', month:'long', year:'numeric', hour:'numeric', minute:'2-digit'}) + (p.periodo ? ' · periodo ' + perTexto(p.periodo) : ''), leido:true}); }
       else { p.pagado = false; if(p.hist && p.hist.length && p.hist[p.hist.length-1].v === p.vence) p.hist.pop(); aviso('Marcado como pendiente'); }
-      guardar(); pintar(); detalle(id); break; }
+      guardar(); pintar(); detalle(id, true); break; }
+    case 'capsula': { const p = D.pagos.find(x => x.id === id); if(!p) break; vibrar([20]);   /* ítem 5: tocar el cuerpo marca como pagado con 1 vibración */
+      alternarPagado(p);
+      guardar(); actualizarPagoEnSitio(p); break; }   /* ítem 2 (13.4.16): en su sitio, sin pintar(): la cápsula sale y la fila del Registro se actualiza donde estaba */
+    case 'anilloPagar': { const p = D.pagos.find(x => x.id === id); if(!p) break; vibrar([20]); marcarPagadoSuave(p, b); break; }
+    case 'carDot': { if(!document.querySelector('.carPlacaCont.carPlacaOn')) break;   /* 13.4.16, ítem 3: en el video los puntos solo existen mientras se desliza */ if(+n === (window._carIdx || 0)) break; const ant = window._carIdx || 0; vibrar([10]); window._carIdx = +n; carPintar(true, ant); break; }
+    case 'carIr': { if(window._carSwiped && Date.now() - window._carSwiped < 350) break;   /* justo después de deslizar, el toque no abre */
+      const k = carLista()[+n]; vibrar([12]);
+      if(k === 'quin'){ tab = 1; calSeg = 1; } else if(k === 'tj'){ tab = 2; } else if(k === 'est'){ tab = 3; estad = 0; verBalance = false; } else if(k === 'aho'){ tab = 3; estad = 1; verBalance = false; } else if(k === 'per'){ tab = 4; } else break;
+      pintar(true); window.scrollTo({top:0}); break; }
+    case 'filtroQ': vibrar([12]); b.animate([{transform:'scale(1)'},{transform:'scale(.88)'},{transform:'scale(1)'}], {duration:300, easing:CURVA});
+      if(!fqAbierto){ fqAbierto = true; fqActualizar(['fqZona'], 0); break; }
+      /* 13.5.0: al cerrar el filtro se quita (vuelve a Todos) · 13.5.1: se compacta en su sitio */
+      { const habia = fqModo !== 0 || fqPersona || fqDir; fqAbierto = false; fqMenu = false; fqDirMenu = false; fqModo = 0; fqPersona = ''; fqDir = 0;
+        fqActualizar(habia ? ['fqZona', 'qCuerpo'] : ['fqZona'], 0); }
+      break;
+    case 'fqSeg': fqSegCambiar(b, +n); break;
+    case 'fqPersona': fqMenu = !fqMenu; fqDirMenu = false; vibrar([10]); pulsoChip(b); fqActualizar(['fqMenuZ'], 0); break;
+    case 'fqPersonaSel': vibrar([10]); fqPersona = n; fqMenu = false; fqActualizar(['fqChips', 'qCuerpo'], 0); break;
+    case 'fqDir': fqDirMenu = !fqDirMenu; fqMenu = false; vibrar([10]); pulsoChip(b); fqActualizar(['fqMenuZ'], 0); break;
+    case 'fqDirSel': vibrar([10]); fqDir = +n; fqDirMenu = false; fqActualizar(['fqChips', 'qCuerpo'], 0); break;
+    case 'ajSec': { vibrar([12]); _ajSec[n] = !_ajSec[n]; const sec = b.closest('.ajSec'); if(!sec) break;
+      const cu = sec.querySelector('.ajCuerpo'), abrir = !!_ajSec[n];
+      if(!cu){ sec.classList.toggle('abierto', abrir); break; }
+      cu.getAnimations().filter(a => a.effect && a.effect.getKeyframes().some(k => 'height' in k)).forEach(a => a.cancel());
+      const h0 = cu.getBoundingClientRect().height;
+      sec.classList.toggle('abierto', abrir);
+      cu.style.height = 'auto'; const h1 = abrir ? cu.getBoundingClientRect().height : 0; cu.style.height = '';
+      /* 13.5.1: la altura real se desliza con la curva de la app: arranca y termina suave, y lo de abajo baja parejo */
+      const an = cu.animate([{height:h0 + 'px'},{height:h1 + 'px'}], {duration:Math.max(240, Math.min(420, 240 + Math.abs(h1 - h0) / 4)), easing:CURVA});
+      if(!abrir){ cu.style.visibility = 'visible'; an.onfinish = () => { cu.style.visibility = ''; }; }
+      break; }   /* ítem 13: se abre/cierra en su sitio, con la animación del CSS, sin repintar */
+    case 'pedirAct': { const p = D.pagos.find(x => x.id === id); if(!p) break; vibrar([12]);   /* ítem 2: Aceptar junto a Cancelar, sin la pregunta "¿Cómo quieres enviarlo?" */
+      abrirHoja(`<h1>Solicitar actualización de montos</h1><div class="caja"><p style="margin:0;line-height:1.5">Se le pedirá a <b>${esc(nombreVisible(p.creadoPor))}</b> que actualice el monto a pagar de <b>${esc(sinPrefijo(p.nombre))}</b> (sin intereses y mínimo).</p><p class="gris chico" style="margin:10px 0 0;line-height:1.4">Le llegará una notificación por Mis Pagos. No es instantánea: el aviso lo envía el robot de GitHub, que en la práctica corre aproximadamente cada hora.</p></div><div class="dos" style="margin-top:16px"><button class="btn borde" data-act="cerrar">Cancelar</button><button class="btn lleno" data-act="pedirActOk" data-id="${p.id}" data-m="${esc(b.dataset.m)}">Aceptar</button></div>`); break; }
+    case 'pedirActOk': { const p = D.pagos.find(x => x.id === id); if(!p) break; cerrarHoja(); vibrar([15]);
+      D.solicitudMonto = D.solicitudMonto || {}; D.solicitudMonto[p.nubeId] = p.vence; guardar();
+      tarea(async () => {
+      await pedir('PATCH', DOCS + '/compartidos/' + p.nubeId + '?updateMask.fieldPaths=recordatorio&updateMask.fieldPaths=actualizado', {fields:{recordatorio:sv(JSON.stringify({de:D.nombre || D.nube.correo, deCorreo:D.nube.correo, msg:b.dataset.m, t:Date.now()})), actualizado:iv(Date.now())}}, await token());
+      movimiento('📩 Pediste a ' + nombreVisible(p.creadoPor) + ' actualizar el monto de ' + sinPrefijo(p.nombre)); guardar(); detalle(p.id);
+      return 'Solicitud enviada. Le llegará una notificación de Mis Pagos.'; }); break; }
+    case 'actMonto': vibrar([12]); window._actMonto = id; cerrarHoja(); setTimeout(() => editor(id), 320); break;
+    case 'mantenerPrecio': { const p = D.pagos.find(z => z.id === id); if(!p) break; D.precioAv = D.precioAv || {}; D.precioAv[id] = precioOficial(p); guardar(); vibrar([12]); detalle(id); break; }
+    /* ítem 14 (ronda 13.4.15): la configuración del carrusel vive en Apariencia y se
+       elige en una pantalla nueva, viendo las tarjetas reales en vertical. */
+    case 'carPantalla': vibrar([12]); verCar = true; _ajSec.apariencia = true; pintar(true); window.scrollTo(0, 0); break;
+    case 'carVolver': vibrar([12]); verCar = false; pintar(true); window.scrollTo(0, 0); break;
+    case 'irArriba': vibrar([10]); window.scrollTo({top:0, behavior:'smooth'}); break;
+    case 'carFijo': aviso('Inicio siempre aparece en el carrusel.'); break;
+    case 'carCiclo': { const k = n, eig = k === 'aho' ? 'v5' : 'v6', alt = k === 'aho' ? 'v6' : 'v5', cfg = carCfg();
+      const sig = cfg[k] === eig ? alt : cfg[k] === alt ? 'no' : eig;
+      D.carrusel = D.carrusel || {}; D.carrusel[k] = sig; guardar(); vibrar([12]); window._carIdx = 0; pintar(); break; }
+    case 'carVer': deslizar(b, () => { D.carrusel = D.carrusel || {}; D.carrusel[n] = b.dataset.v; guardar(); vibrar([12]); window._carIdx = 0; pintar(); }); break;
     case 'copiarSrv': navigator.clipboard && navigator.clipboard.writeText(b.dataset.t).then(() => aviso('✓ Número de servicio copiado')); break;
     case 'copiar': navigator.clipboard && navigator.clipboard.writeText(b.dataset.t).then(() => aviso('✓ Copiado')); break;
     case 'verDato': case 'copiarDato': {
@@ -1768,7 +2496,7 @@ document.addEventListener('click', (ev) => {
       const ir = () => { calMes = new Date(calMes.getFullYear(), calMes.getMonth() + d, 1); pintar();
         resto().forEach(e => e.animate([{transform:`translateX(${d*25}%)`, opacity:0},{transform:'none', opacity:1}], {duration:420, easing:'cubic-bezier(.3,0,.15,1)'})); };
       const vs = resto(); if(!vs.length){ ir(); break; }
-      vs.forEach((e,i) => { const a = e.animate([{transform:'none', opacity:1},{transform:`translateX(${-d*25}%)`, opacity:0}], {duration:200, easing:'cubic-bezier(.4,0,1,1)', fill:'forwards'}); if(i === 0) a.onfinish = ir; }); break; }
+      vs.forEach((e,i) => { const a = e.animate([{transform:'none', opacity:1},{transform:`translateX(${-d*25}%)`, opacity:0}], {duration:200, easing:'cubic-bezier(.4,0,.6,1)', fill:'forwards'}); if(i === 0) a.onfinish = ir; }); break; }
     case 'dia': if(calSel === b.dataset.d) break; calSel = b.dataset.d; cambiarDia(); break;
     case 'cartera': deslizar(b, () => { cartera = +n; pintar(); }); break;
     case 'estad': deslizar(b, () => { estad = +n; pintar(); }); break;
@@ -1807,14 +2535,14 @@ document.addEventListener('click', (ev) => {
       const d = [...sg.children].indexOf(b) > [...sg.children].indexOf(act) ? 1 : -1, y = window.scrollY;
       act.animate([{transform:'none'},{transform:`translateX(${b.offsetLeft - act.offsetLeft}px)`}], {duration:420, easing:'cubic-bezier(.3,0,.15,1)', fill:'forwards'}); b.style.color = 'var(--accTxt)'; b.style.position = 'relative'; b.style.zIndex = 1;
       if(navigator.vibrate) navigator.vibrate(20);
-      document.getElementById('listaTj').animate([{transform:'none', opacity:1},{transform:`translateX(${-d*20}%)`, opacity:0}], {duration:140, easing:'cubic-bezier(.4,0,1,1)', fill:'forwards'});
-      setTimeout(() => { window._fc = +n; pintar(); window.scrollTo(0, y); const sp = document.getElementById('segTj'); if(sp) window.scrollTo({top: sp.getBoundingClientRect().top + window.scrollY - 70, behavior:'smooth'}); const l2 = document.getElementById('listaTj'); if(l2) l2.animate([{transform:`translateX(${d*20}%)`, opacity:0},{transform:'none', opacity:1}], {duration:280, easing:'cubic-bezier(.3,0,.15,1)'}); }, 150); break; }
+      document.getElementById('listaTj').animate([{transform:'none', opacity:1},{transform:`translateX(${-d*20}%)`, opacity:0}], {duration:140, easing:'cubic-bezier(.4,0,.6,1)', fill:'forwards'});
+      setTimeout(() => { window._fc = +n; pintar(); window.scrollTo(0, y); const sp = document.getElementById('segTj'); if(sp) window.scrollTo({top: sp.getBoundingClientRect().top + window.scrollY - 70, behavior:'smooth'}); const l2 = document.getElementById('listaTj'); if(l2) l2.animate([{transform:`translateX(${d*20}%)`, opacity:0},{transform:'none', opacity:1}], {duration:280, easing:'cubic-bezier(.3,0,.15,1)'}); }, 420); break; }   /* 420 ms: la pastilla llega antes de repintar (ítem 4a) */
     case 'filtroPagos': { const sg = b.parentElement, act = sg.querySelector('.sel'); if(act === b) break;
       const d = [...sg.children].indexOf(b) > [...sg.children].indexOf(act) ? 1 : -1, y = window.scrollY;
       act.animate([{transform:'none'},{transform:`translateX(${b.offsetLeft - act.offsetLeft}px)`}], {duration:420, easing:'cubic-bezier(.3,0,.15,1)', fill:'forwards'}); b.style.color = 'var(--accTxt)'; b.style.position = 'relative'; b.style.zIndex = 1;
       if(navigator.vibrate) navigator.vibrate(20);
-      document.getElementById('listaPagos').animate([{transform:'none', opacity:1},{transform:`translateX(${-d*20}%)`, opacity:0}], {duration:140, easing:'cubic-bezier(.4,0,1,1)', fill:'forwards'});
-      setTimeout(() => { filtroPagos = +n; pintar(); window.scrollTo(0, y); const sp = document.getElementById('segPagos'); if(sp) window.scrollTo({top: sp.getBoundingClientRect().top + window.scrollY - 70, behavior:'smooth'}); const l2 = document.getElementById('listaPagos'); if(l2) l2.animate([{transform:`translateX(${d*20}%)`, opacity:0},{transform:'none', opacity:1}], {duration:280, easing:'cubic-bezier(.3,0,.15,1)'}); }, 140); break; }
+      document.getElementById('listaPagos').animate([{transform:'none', opacity:1},{transform:`translateX(${-d*20}%)`, opacity:0}], {duration:140, easing:'cubic-bezier(.4,0,.6,1)', fill:'forwards'});
+      setTimeout(() => { filtroPagos = +n; pintar(); window.scrollTo(0, y); const sp = document.getElementById('segPagos'); if(sp) window.scrollTo({top: sp.getBoundingClientRect().top + window.scrollY - 70, behavior:'smooth'}); const l2 = document.getElementById('listaPagos'); if(l2) l2.animate([{transform:`translateX(${d*20}%)`, opacity:0},{transform:'none', opacity:1}], {duration:280, easing:'cubic-bezier(.3,0,.15,1)'}); }, 420); break; }   /* 420 ms: la pastilla llega antes de repintar (ítem 4a) */
     case 'enviarAct': { const p = D.pagos.find(x => x.id === id); if(!p) break; p.nubeFirma = ''; p.e2eCambio = Date.now(); guardar();
       tarea(async () => { await sincronizar(); return p.compartirDatos ? 'Listo: se enviaron los cambios y los datos para pagar.' : 'Listo: se enviaron los cambios. (Para enviar los datos de la tarjeta, activa "Permitir que vea y copie los datos para pagar" al editar.)'; }); break; }
     case 'calSeg': deslizar(b, () => { calSeg = +n; pintar(); }); break;
@@ -1860,12 +2588,12 @@ document.addEventListener('click', (ev) => {
       if(!x) break; const m = num(x.monto) * x.parte / 100;
       abrirHoja(`<h1>${esc(x.de)} compartió un pago contigo</h1><div class="caja"><div class="b">${esc(sinPrefijo(x.nombre))}</div><div class="gris">Vence ${corto(x.vence)} · te toca ${x.parte} %${m ? ': ' + dinero(Math.round(m)) : ''}</div></div>
         <button class="btn lleno" style="margin-top:16px" data-act="invSi" data-i="${x.id}">Aceptar</button><button class="btn borde" style="margin-top:10px" data-act="invNo" data-i="${x.id}">Rechazar</button>`); break; }
-    case 'invSi': cerrarHoja(); tarea(() => responderInvitacion(b.dataset.i, true)); break;
+    case 'invSi': { const x = (D.invitaciones || []).find(z => z.id === b.dataset.i); if(x) limpiarAvisos({nombre:x.nombre}); cerrarHoja(); tarea(() => responderInvitacion(b.dataset.i, true)); break; }
     case 'invNo': cerrarHoja(); tarea(() => responderInvitacion(b.dataset.i, false)); break;
     case 'solicitud': { const p = D.pagos.find(z => z.id === id); if(!p || !p.nubeSolVista) break; let q = {}; try{ q = JSON.parse(p.nubeSolVista); }catch(e){}
       abrirHoja(`<h1>${esc(q.de || 'La otra persona')} pide un cambio</h1><div class="caja"><div class="b">${esc(sinPrefijo(p.nombre))}</div><div class="gris">Ahora: ${p.monto ? '$' + esc(p.monto) + ' · ' : ''}${corto(p.vence)}</div><div style="margin-top:6px">Pide: ${esc(describir(p.nubeSolVista))}</div></div>
         <button class="btn lleno" style="margin-top:16px" data-act="solSi" data-id="${p.id}">Aprobar</button><button class="btn borde" style="margin-top:10px" data-act="solNo" data-id="${p.id}">Rechazar</button>`); break; }
-    case 'solSi': { const p = D.pagos.find(z => z.id === id); cerrarHoja(); tarea(() => responderSolicitud(p, true)); break; }
+    case 'solSi': { const p = D.pagos.find(z => z.id === id); limpiarAvisos(p); cerrarHoja(); tarea(() => responderSolicitud(p, true)); break; }
     case 'solNo': { const p = D.pagos.find(z => z.id === id); cerrarHoja(); tarea(() => responderSolicitud(p, false)); break; }
     case 'avisoNubeOk': D.avisosNube = []; guardar(); pintar(); break;
     case 'pagueParte': { const p = D.pagos.find(z => z.id === id); if(!p) break; const quien = nombreVisible(p.creadoPor), yaAv = n === '1';
@@ -1876,7 +2604,7 @@ document.addEventListener('click', (ev) => {
       return 'Listo: le avisaste a ' + quien + '. Cuando confirme que lo recibió, aparecerá como pagado.'; }); break; }
     case 'confParte': { const p = D.pagos.find(z => z.id === id); if(!p) break; const pide = (D.partePide || {})[p.nubeId] || {v:p.vence, de:''};
       b.animate([{transform:'scale(1)'},{transform:'scale(1.05)'},{transform:'scale(1)'}], {duration:360, easing:'cubic-bezier(.3,0,.15,1)'}); if(navigator.vibrate) navigator.vibrate([20, 40, 20]);
-      tarea(async () => {
+      tarea(async () => { limpiarAvisos(p);
       await pedir('PATCH', DOCS + '/compartidos/' + p.nubeId + '?updateMask.fieldPaths=parteOk&updateMask.fieldPaths=recordatorio&updateMask.fieldPaths=actualizado', {fields:{parteOk:sv(pide.v), recordatorio:sv(JSON.stringify({de:D.nombre || D.nube.correo, deCorreo:D.nube.correo, tipo:'parteOk', v:pide.v, msg:`Confirmé que recibí tu parte de ${sinPrefijo(p.nombre)}.`, t:Date.now()})), actualizado:iv(Date.now())}}, await token());
       (D.parteOk = D.parteOk || {})[p.nubeId] = pide.v; avisoNube(`✅ Confirmaste el pago${pide.de ? ' de ' + pide.de : ''} en ${sinPrefijo(p.nombre)}.`); guardar(); setTimeout(() => detalle(p.id), 50);
       return 'Listo: le confirmaste el pago. Le llegará un aviso y le aparecerá como pagado.'; }); break; }
@@ -1922,8 +2650,8 @@ document.addEventListener('click', (ev) => {
     case 'compartirQSel': { const fl = +n, tx = reporteQ(fl); cerrarHoja(); if(navigator.vibrate) navigator.vibrate(15);
       imagenReporte(fl).then(f => { if(f && navigator.canShare && navigator.canShare({files:[f]})) return navigator.share({files:[f], title:'Reporte quincenal', text:'📊 Reporte quincenal · Mis Pagos'});
         if(navigator.share) return navigator.share({title:'Reporte quincenal', text:tx}); return navigator.clipboard.writeText(tx).then(() => aviso('✓ Reporte copiado')); }).catch(() => {}); break; }
-    case 'alertaQ': if(navigator.vibrate) navigator.vibrate(20); b.animate([{transform:'scale(1)'},{transform:'scale(1.25)'},{transform:'scale(1)'}], {duration:300}); aviso(`Esta quincena tus pagos (${b.dataset.m}) pasan lo que recibes (${b.dataset.q}) por ${b.dataset.d}`); break;
-    case 'parteBloq': if(navigator.vibrate) navigator.vibrate([10,40,10]); b.animate([{transform:'translateX(0)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}], {duration:220}); aviso('Aún no hace corte: cuando se actualice el monto podrás pagar tu parte'); break;
+    case 'alertaQ': if(navigator.vibrate) navigator.vibrate(20); b.animate([{transform:'scale(1)'},{transform:'scale(1.25)'},{transform:'scale(1)'}], {duration:300}); aviso(`Esta quincena tus pagos suman ${b.dataset.m}${b.dataset.pg ? ` (ya pagaste ${b.dataset.pg} y te faltan ${b.dataset.f})` : ''} y pasan lo que recibes (${b.dataset.q}) por ${b.dataset.d}.`); break;
+    case 'parteBloq': if(navigator.vibrate) navigator.vibrate([10,40,10]); b.animate([{transform:'translateX(0)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}], {duration:220}); aviso(n === 'solicitar' ? 'Primero pide la actualización del monto (en "Solicitudes y recordatorios"). Si la otra persona ya lo actualizó, este botón se habilita solo.' : 'Aún no hace corte: cuando se actualice el monto podrás pagar tu parte'); break;
     case 'compartirTxt': { const m = b.dataset.m; if(navigator.share) navigator.share({text:m}).catch(() => {}); else navigator.clipboard.writeText(m).then(() => aviso('✓ Mensaje copiado')); break; }
     case 'recordar': { const p = D.pagos.find(z => z.id === id); tarea(async () => {
       await pedir('PATCH', DOCS + '/compartidos/' + p.nubeId + '?updateMask.fieldPaths=recordatorio&updateMask.fieldPaths=actualizado', {fields:{recordatorio:sv(JSON.stringify({de:D.nombre || D.nube.correo, deCorreo:D.nube.correo, msg:b.dataset.m, t:Date.now()})), actualizado:iv(Date.now())}}, await token());
@@ -1967,20 +2695,34 @@ function aplicarTema(){
 }
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => { aplicarTema(); pintar(); });
 function pintar(anim){
+  if(window._carArr){ window._pintarPend = [anim]; return; }   /* un repintado a mitad de arrastre del carrusel mataría el gesto: se aplaza al soltar */
   avanzar();
   const app = document.getElementById('app');
-  app.innerHTML = [inicio, () => `<div class="seg"><button class="${calSeg===0?'sel':''}" data-act="calSeg" data-n="0">Calendario</button><button class="${calSeg===1?'sel':''}" data-act="calSeg" data-n="1">Quincenas</button></div>` + (calSeg ? quincenasV() : calendario()), carteraV, estadisticas, ajustes][tab]();
+  app.innerHTML = [inicio, () => `<div class="seg"><button class="${calSeg===0?'sel':''}" data-act="calSeg" data-n="0">Calendario</button><button class="${calSeg===1?'sel':''}" data-act="calSeg" data-n="1">Quincenas</button></div>` + (calSeg ? quincenasV() : calendario()), carteraV, estadisticas, () => (verCar ? pantallaCarrusel() : ajustes())][tab]();
+  carTimer(); carSwipe(); carAltura();
+  clearTimeout(window._gNovT); window._gNovT = setTimeout(guiaNovWeb, 900);   /* 13.5.1: tutorial de lo nuevo */
   if(anim && !matchMedia('(prefers-reduced-motion: reduce)').matches) app.animate([{opacity:0, transform:'translateY(8px)'}, {opacity:1, transform:'none'}], {duration:260, easing:'cubic-bezier(.2,.8,.2,1)'});
   // las gráficas se animan cuando aparecen en pantalla
   const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ e.target.classList.add('ver'); obs.unobserve(e.target); } }), {threshold:.35});
   app.querySelectorAll('.pastel, .barras').forEach(g => obs.observe(g));
   const n = [['inicio','Inicio'],['cal','Calendario'],['cartera','Quincenas y tarjetas'],['stats','Estadísticas'],['perfil','Ajustes']];
   const calHoy = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/><text x="12" y="18.6" text-anchor="middle" font-size="8.5" font-weight="800" fill="currentColor" stroke="none" font-family="system-ui,sans-serif">${hoy().getDate()}</text></svg>`;   /* el número del día de hoy */
-  const navEl = document.getElementById('nav'), solo = tab === 0 && verAvisos;   // en Avisos: solo Atrás, abajo a la derecha
+  const soloCar = tab === 4 && verCar;   /* 13.5.0: Carrusel de Inicio también con solo Atrás abajo a la derecha */
+  const navEl = document.getElementById('nav'), solo = (tab === 0 && verAvisos) || soloCar;   // en Avisos: solo Atrás, abajo a la derecha
+  window._soloNav = solo; revisarArriba();
   if(navEl.classList.contains('solo') !== solo){ navEl.classList.toggle('solo', solo); if(!matchMedia('(prefers-reduced-motion: reduce)').matches) navEl.animate([{opacity:0, translate:'0 24px'}, {opacity:1, translate:'0 0'}], {duration:320, easing:'cubic-bezier(.3,0,.15,1)'}); }
-  if(solo){ navEl.innerHTML = `<button class="sel" data-act="avisos" data-n="0" aria-label="Atrás"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>`; return; }
+  if(solo){ navEl.innerHTML = `<button class="sel" data-act="${soloCar ? 'carVolver' : 'avisos'}" data-n="0" aria-label="Atrás"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>`; return; }
   document.getElementById('nav').innerHTML = n.map(([k,t],i) => `<button class="${i===tab?'sel':''}" data-act="tab" data-n="${i}" aria-label="${t}" ${i===tab?'aria-current="page"':''}>${k === 'cal' ? calHoy : IC[k]}</button>`).join('');
 }
+
+/* 13.5.0: botón para subir en las pantallas con solo Atrás (Avisos, Carrusel de Inicio): aparece al llegar al final */
+function revisarArriba(){
+  const b = document.getElementById('arriba'); if(!b) return;
+  const fin = document.documentElement.scrollHeight - innerHeight;
+  const ver = !!window._soloNav && fin > innerHeight / 2 && scrollY >= fin - 120;
+  b.classList.toggle('ver', ver);
+}
+addEventListener('scroll', revisarArriba, {passive:true});
 aplicarTema();
 if(!D.nombre && !D.pagos.length){ setTimeout(() => { const v = prompt('¡Bienvenido a Mis Pagos! ¿Cómo te llamas?'); if(v){ D.nombre = v.trim(); guardar(); pintar(); } }, 400); }
 pintar();
@@ -2120,6 +2862,82 @@ function guiarActualizar(p){
       const inside = e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom;
       capa.remove(); if(inside) b.click(); });
   }, 500);
+}
+
+/* ---------- 13.5.1: tutorial interactivo de las funciones nuevas (una vez por sección, como el de bienvenida) ---------- */
+function guiaWeb(pasos, alFin){
+  if(document.getElementById('guia')) return;
+  let i = 0;
+  const capa = document.createElement('div'); capa.id = 'guia';
+  capa.style.cssText = 'position:fixed;inset:0;z-index:98';
+  capa.innerHTML = '<div id="gHueco" style="position:fixed;border-radius:22px;box-shadow:0 0 0 9999px rgba(11,16,32,.84);pointer-events:none;transition:all .35s cubic-bezier(.3,0,.15,1);outline:2.5px solid #fff;outline-offset:4px"></div><div id="gGlobo" style="position:fixed;left:16px;right:16px;background:#fff;color:#121A35;border-radius:22px;padding:16px 18px;box-shadow:0 20px 40px -10px rgba(0,0,0,.4)"></div>';
+  document.body.appendChild(capa);
+  capa.animate([{opacity:0},{opacity:1}], {duration:260});
+  const hueco = capa.querySelector('#gHueco'), globo = capa.querySelector('#gGlobo');
+  const fin = () => { capa.animate([{opacity:1},{opacity:0}], {duration:220}).onfinish = () => { capa.remove(); window._guiaFin = Date.now(); if(alFin) alFin(); }; };
+  const mostrar = () => {
+    const [ti, tx, obj] = pasos[i]; const el = obj ? obj() : null;
+    if(el) el.scrollIntoView({block:'center', behavior:'smooth'});
+    setTimeout(() => {
+      const r = el ? el.getBoundingClientRect() : null;
+      if(r) Object.assign(hueco.style, {display:'block', left:(r.left - 8) + 'px', top:(r.top - 8) + 'px', width:(r.width + 16) + 'px', height:(r.height + 16) + 'px'});
+      else Object.assign(hueco.style, {display:'block', left:'50%', top:'50%', width:'0px', height:'0px'});
+      globo.innerHTML = `<div style="display:flex;gap:3px">${pasos.map((_, k) => `<span style="flex:1;height:5px;border-radius:3px;background:${k <= i ? '#1C326E' : '#DDE2EC'}"></span>`).join('')}</div>
+        <div style="color:#6B7280;font-size:12px;margin:8px 0 2px">${i + 1} de ${pasos.length}</div><div style="font-size:18px;font-weight:800">${ti}</div><div style="font-size:14px;color:#3C4256;line-height:1.45;margin:6px 0 12px">${tx}</div>
+        <div style="display:flex;align-items:center;gap:8px">${i ? '<button data-g="atras" aria-label="Atrás" style="width:40px;height:40px;border-radius:50%;background:#F1F3F8;font-size:24px;line-height:1">‹</button>' : ''}<button data-g="omitir" style="color:#6B7280;padding:8px 6px">Omitir</button><span style="flex:1"></span><button data-g="sig" style="background:#1C326E;color:#fff;font-weight:700;border-radius:99px;padding:10px 18px">${i === pasos.length - 1 ? 'Finalizar' : pasos[i][3] ? 'Selecciónalo o continúa' : 'Continuar'}</button></div>`;
+      const h = window.innerHeight;
+      if(!r){ globo.style.top = '50%'; globo.style.bottom = ''; globo.style.transform = 'translateY(-50%)'; }
+      else if(r.bottom + 260 < h){ globo.style.top = (r.bottom + 18) + 'px'; globo.style.bottom = ''; globo.style.transform = ''; }
+      else { globo.style.top = ''; globo.style.bottom = Math.max(20, h - r.top + 18) + 'px'; globo.style.transform = ''; }
+      globo.animate([{opacity:0, transform:(globo.style.transform || '') + ' translateY(12px)'},{opacity:1, transform:globo.style.transform || 'none'}], {duration:300, easing:CURVA});
+    }, el ? 420 : 0);
+  };
+  const irA = (ant) => { const p = pasos[i]; if(p[4] && p[4] !== ant[4]){ hueco.style.display = 'none'; globo.innerHTML = ''; p[4](); setTimeout(mostrar, 520); } else mostrar(); };
+  capa.addEventListener('click', e => {
+    const g = e.target.closest('[data-g]'); vibrar([12]);
+    if(g){ const ant = pasos[i];
+      if(g.dataset.g === 'omitir') return fin();
+      if(g.dataset.g === 'atras'){ if(i){ i--; irA(ant); } return; }
+      if(i === pasos.length - 1) return fin();
+      i++; irA(ant); return; }
+    const r = hueco.getBoundingClientRect();
+    if(hueco.style.display !== 'none' && r.width > 1 && e.clientX >= r.left && e.clientX <= r.right && e.clientY >= r.top && e.clientY <= r.bottom){   // tocó lo resaltado
+      const ant = pasos[i]; if(ant[3]){ ant[3](); if(i === pasos.length - 1) return fin(); i++; hueco.style.display = 'none'; globo.innerHTML = ''; setTimeout(mostrar, 520); } else if(i < pasos.length - 1){ i++; irA(ant); } else fin();
+    }
+  });
+  setTimeout(mostrar, 200);
+}
+function guiaNovWeb(){
+  if(document.getElementById('guia') || document.getElementById('bv') || !D.pagos.length || Date.now() - (window._guiaFin || 0) < 4000) return;
+  if(document.documentElement.classList.contains('conHoja')) return;
+  D.guiaNov = D.guiaNov || {};
+  const q = s0 => document.querySelector(s0);
+  const marcar = k => { D.guiaNov[k] = Date.now(); guardar(); };
+  if(tab === 0 && !verAvisos && !D.guiaNov.inicio && q('#app .carWrap')){
+    marcar('inicio');
+    const arriba0 = () => window.scrollTo({top:0, behavior:'smooth'});
+    const pasos = [['Novedad: carrusel de tarjetas', 'La tarjeta principal ahora es un carrusel. Deslízala hacia los lados para ver Quincenas, Mis tarjetas, Estadísticas, Ahorros y Mi perfil; también cambia sola cada 6 segundos. Al tocar una tarjeta, abres su sección.', () => q('#app .carWrap'), null, arriba0]];
+    if(q('#app .anilloBtn')) pasos.push(['Marca como pagado con el anillo', 'En el Registro de pagos, toca el anillo de días restantes para marcar un pago como pagado. Si tocas el resto de la tarjeta, abres su detalle.', () => q('#app .anilloBtn'), null, () => {}]);
+    pasos.push(['Elige tus tarjetas', 'En Mi perfil → Apariencia y diseño → Carrusel de Inicio decides qué tarjetas aparecen y en qué versión. Inicio siempre aparece.', null, null, arriba0]);
+    guiaWeb(pasos, arriba0);
+  } else if(tab === 1 && calSeg === 1 && !D.guiaNov.quin && q('#app .fqBtn')){
+    marcar('quin');
+    const abrir = () => { if(!fqAbierto){ fqAbierto = true; fqActualizar(['fqZona'], 0); } };
+    guiaWeb([['Novedad: filtra tus quincenas', 'Toca el embudo para filtrar los pagos de cada quincena.', () => q('#app .fqBtn'), abrir, null],
+      ['Todos, Propios o Compartidos', 'Elige qué pagos ver. Con Compartidos también eliges a la persona y quién lo compartió; al final de cada tarjeta aparece el total. Para quitar el filtro, cierra el embudo.', () => q('#fqZona'), null, abrir]],
+      () => { if(fqAbierto){ fqAbierto = false; fqMenu = false; fqDirMenu = false; fqModo = 0; fqPersona = ''; fqDir = 0; fqActualizar(['fqZona', 'qCuerpo'], 0); } });
+  } else if(tab === 4 && !verCar && !D.guiaNov.ajustes && q('#app .ajSec')){
+    marcar('ajustes');
+    guiaWeb([['Novedad: secciones que se despliegan', 'Toca el título de una sección para abrirla o cerrarla. Cerrada, te muestra un resumen a la derecha.', () => q('#app .ajSec'), null, null],
+      ['Carrusel de Inicio', 'En Apariencia y diseño encontrarás Carrusel de Inicio: ahí ves las tarjetas tal como aparecen y eliges su versión o las ocultas.', null, null, null]]);
+  }
+}
+function guiaHojaWeb(){
+  if(document.getElementById('guia') || (D.guiaNov || {}).detalle) return;
+  const h2 = [...document.querySelectorAll('#capa .hoja h2')].find(x => x.textContent.trim() === 'Solicitudes y recordatorios'); if(!h2) return;
+  D.guiaNov = D.guiaNov || {}; D.guiaNov.detalle = Date.now(); guardar();
+  const caja = h2.nextElementSibling || h2;
+  guiaWeb([['Novedad: solicitudes y recordatorios', 'Aquí está todo lo que le mandas a la otra persona: pedirle que actualice el monto (cuando ya lo hizo, verás una flecha verde y quién lo cambió), enviarle un recordatorio y avisarle que ya pagaste tu parte.', () => caja, null, null]]);
 }
 function recorridoWeb(id){
   const p = D.pagos.find(x => x.id === id) || D.pagos.find(x => !x.pagado); if(!p) return;
