@@ -1,7 +1,7 @@
 // Diagnóstico de solo lectura (temporal): pagos compartidos entre Alexis y Gaby.
 const admin = require('firebase-admin');
 admin.initializeApp({ credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SA)) });
-const out = s => console.log('::notice::' + String(s).replace(/\n/g, ' '));
+const buf = []; const out = s => buf.push(String(s));
 (async () => {
   const db = admin.firestore();
   const yo = 'alexisgalmich08@gmail.com';
@@ -24,5 +24,6 @@ const out = s => console.log('::notice::' + String(s).replace(/\n/g, ' '));
     const fs = []; q.forEach(d => { const f = d.data(); fs.push({ t: d.createTime.toDate(), s: `  ${d.id.slice(0, 6)} · ${f.estado} · ${f.nombre} → ${f.otroNombre} <${f.otroCorreo}> · part=${JSON.stringify(f.participantes)} · creado ${d.createTime.toDate().toISOString().slice(0, 16)}` }); });
     fs.sort((a, b) => b.t - a.t).slice(0, 15).forEach(x => out(x.s));
   }
+  for (let i = 0; i < buf.length; i += 12) console.log('::notice::' + buf.slice(i, i + 12).join(' %0A '));
   process.exit(0);
 })().catch(e => { out('ERROR ' + e.message); process.exit(1); });
