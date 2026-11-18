@@ -302,7 +302,7 @@ button:active,.pago:active,.pc:active,a.btn:active{transform:scale(.97);transiti
 .carPlacaCont{position:relative}
 .carPlaca{position:absolute;top:-11px;left:-11px;right:-11px;bottom:var(--espInicio);background:rgba(28,43,74,.06);border:1px solid rgba(0,0,0,.08);-webkit-backdrop-filter:blur(6px) saturate(130%);backdrop-filter:blur(6px) saturate(130%);border-radius:29px;opacity:0;pointer-events:none;transition:opacity .2s}   /* 13.4.16, ítem 3: placa pizarra del video (Smart Widgets), medida: #606FA1, 11 px por los lados y arriba, cubre los puntos abajo */
 .carPlacaCont.carPlacaOn .carPlaca{opacity:1}
-.carWrap{position:relative;overflow:hidden;touch-action:pan-y}   /* relative para quedar sobre la placa */
+.carWrap{position:relative;overflow:hidden;touch-action:none}   /* 13.6: sobre el carrusel solo se desliza a los lados (la página no se mueve hacia abajo por accidente) */   /* relative para quedar sobre la placa */
 .carTrack{display:flex;align-items:stretch;column-gap:8%;transition:transform .5s cubic-bezier(.22,.9,.28,1)}   /* 13.4.16, ítem 3: hueco ~8 % entre tarjetas (video: 7–10 %); el desplazamiento pasa a pasos de 108 % */
 .carSlide{flex:0 0 100%;min-width:0;display:flex;transition:transform .5s cubic-bezier(.22,.9,.28,1),border-radius .5s cubic-bezier(.22,.9,.28,1)}
 /* ítem 7 (ronda 13.4.15, estilo Samsung Smart Widgets) + 13.4.16, ítem 3: la tarjeta que entra llega
@@ -316,9 +316,8 @@ button:active,.pago:active,.pc:active,a.btn:active{transform:scale(.97);transiti
 .carSlide .hero.apretada{padding-top:10px;padding-bottom:10px;gap:2px}
 .carSlide .hero.apretada .cIco:not(.ch){width:20px;height:20px}
 .carSlide .hero.apretada .carTot{padding-top:2px}
-.carSlide .hero.apretada .heroIc{width:30px;height:30px}
 .carSlide .hero.apretada .carFila,.carSlide .hero.apretada .carBarraF .fila{line-height:1.15}
-.carSlide:not(:first-child) .hero{justify-content:space-between;gap:8px}   /* tarjetas nuevas: el aire que sobra se reparte parejo entre sus elementos (también arriba y abajo de cada línea) */
+.carSlide:not(:first-child) .hero{justify-content:space-between;gap:4px}   /* tarjetas nuevas: el aire que sobra se reparte parejo entre sus elementos (también arriba y abajo de cada línea) */
 .carSlide:not(:first-child) .hero>*{margin-top:0 !important;margin-bottom:0 !important}
 .carSlide:first-child .hero>*:last-child{margin-top:auto}   /* Inicio: 20 px arriba y abajo; si otra tarjeta es más alta, el pie se queda abajo */
 #fqZona,#fqChips,#fqMenuZ,#qCuerpo{display:flow-root}   /* 13.5.1: sin márgenes que colapsen: la altura animada termina exacta (sin brinquito final) */
@@ -451,9 +450,6 @@ button:active,.pago:active,.pc:active,a.btn:active{transform:scale(.97);transiti
 .carFila{gap:10px}
 
 /* 13.5.2: tarjetas nuevas compactas para caber en la altura de Inicio (sin agrandar el carrusel) */
-.carSlide:not(:first-child) .heroIc{width:32px;height:32px}
-.carSlide:not(:first-child) .heroIc svg{width:28px;height:28px}
-.carSlide:not(:first-child) .heroMes{font-size:15px}
 .carSlide:not(:first-child) .heroLin{margin:0}
 .carSlide:not(:first-child) .carFila{padding:0;font-size:13px;line-height:1.25}
 .carSlide:not(:first-child) .cIco{width:22px;height:22px;border-radius:7px}
@@ -462,7 +458,6 @@ button:active,.pago:active,.pc:active,a.btn:active{transform:scale(.97);transiti
 .carSlide:not(:first-child) .carBarraF{margin:0}
 .carSlide:not(:first-child) .carBarraF .fila{font-size:13px !important;line-height:1.25}
 .carSlide:not(:first-child) .carBarra{height:8px;margin:3px 0 0}
-.carSlide:not(:first-child) .carStrip{padding:6px 8px;font-size:12px;margin:0}
 .carSlide:not(:first-child) .carDias{height:56px}
 .carSlide:not(:first-child) .carCirculo{width:26px;height:26px;font-size:12px}
 .carSlide:not(:first-child) .carFalta{font-size:15px;margin:0}
@@ -473,6 +468,102 @@ button:active,.pago:active,.pc:active,a.btn:active{transform:scale(.97);transiti
 .carSlide:not(:first-child) .carF50 .fila{line-height:1.2}
 .carSlide:not(:first-child) .balBarra{height:8px;margin:3px 0 0}
 .carSlide:not(:first-child) svg[width="100"]{width:78px;height:78px}
+
+/* 13.6: Gasto compartido */
+.compTog{display:flex;align-items:center;gap:12px;margin-top:14px;padding:12px 14px;border-radius:18px;background:var(--card);box-shadow:var(--sombra);cursor:pointer}
+.compTog input{width:22px !important;height:22px;flex:none;margin:0;accent-color:var(--acc,#1C326E)}
+#compBox{overflow:hidden}
+#compBox.plegado{height:0;opacity:0;visibility:hidden}
+#sugPer{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+#sugPer:empty{display:none}
+.sugChip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:99px;background:color-mix(in srgb, var(--fg) 7%, transparent);color:var(--fg);font-size:14px;max-width:100%}
+.sugChip b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sugOk{width:18px;height:18px;border-radius:50%;background:#1FA463;color:#fff;font-size:11px;display:grid;place-items:center;flex:none}
+/* 13.6: signo de pesos en los campos de dinero (teclado numérico con inputmode="decimal") */
+.pesosW{position:relative;display:block}
+.pesosW::before{content:"$";position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--fg);opacity:.7;font-size:16px;pointer-events:none;z-index:1}
+.pesosW>input{padding-left:30px !important;width:100%}
+
+/* 13.6: ventana con diseño */
+.rica{display:flex;flex-direction:column;align-items:center;text-align:center;padding:6px 4px 4px}
+.ricaIco{position:relative;width:68px;height:68px;border-radius:50%;display:grid;place-items:center;animation:ricaPop .52s cubic-bezier(.34,1.56,.64,1) both}
+.ricaIco svg{width:30px;height:30px}
+.ricaIns{position:absolute;right:-8px;bottom:-6px;background:#fff;border-radius:12px;padding:2px;box-shadow:0 4px 10px rgba(0,0,0,.15)}
+.ricaIns .ico{width:28px !important;height:28px !important;font-size:14px !important;border-radius:9px !important}
+.ricaTit{font-size:21px !important;margin:16px 0 0 !important;text-align:center}
+.ricaTx{color:var(--gr,#6B7280);font-size:14px;margin:6px 0 0;line-height:1.4}
+.ricaDet{width:100%;margin-top:18px;padding:14px;border-radius:20px;background:color-mix(in srgb, var(--fg) 6%, transparent);text-align:left}
+.ricaNota{margin-top:12px;padding:6px 12px;border-radius:99px;font-size:12px;text-align:center;background:color-mix(in srgb, var(--acc,#1C326E) 14%, transparent)}
+.ricaBtns{width:100%;margin-top:20px;display:flex;flex-direction:column;gap:10px}
+.btn.texto{background:none;color:var(--gr,#6B7280);padding:8px 16px}
+.rica>*{animation:ricaEnt .34s cubic-bezier(.3,0,.15,1) both}
+.rica>*:nth-child(2){animation-delay:.06s}.rica>*:nth-child(3){animation-delay:.1s}.rica>*:nth-child(4){animation-delay:.14s}.rica>*:nth-child(5){animation-delay:.18s}
+@keyframes ricaEnt{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes ricaPop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+
+/* 13.6: monto arriba a la derecha, columnas, anillos y animación al mostrar la tarjeta */
+.carMonto{font-size:22px;font-weight:800;white-space:nowrap;padding-left:8px}
+.carCols{display:flex;align-items:flex-end;gap:6px;height:76px}
+.carCol{flex:1;min-width:0;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end}
+.carCol b{font-size:11px}
+.carCol i{display:block;width:24px;border-radius:7px;margin:4px 0;transform-origin:bottom}
+.carCol span{font-size:11px;line-height:1.35;opacity:.65;width:100%;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:none}
+.carCol b{line-height:1.25;flex:none}
+.carAnF{display:flex;align-items:center;gap:14px}
+.carAnillos{flex:none;color:var(--fg)}
+.carLey{display:flex;align-items:center;gap:8px;font-size:13px;padding:3px 0}
+.carLey .peso{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.carLey .punto{width:10px;height:10px;border-radius:50%;flex:none}
+.carSlide.anima .carCol i{animation:colSube .62s cubic-bezier(.3,0,.15,1) both}
+.carSlide.anima .anilloA{animation:anilloLlena .9s cubic-bezier(.3,0,.15,1) both}
+.carSlide.anima .carBarra i{animation:llena .9s cubic-bezier(.3,0,.15,1) both}
+.carSlide.anima .carMonto{animation:ricaEnt .46s cubic-bezier(.3,0,.15,1) .16s both}
+@keyframes colSube{from{transform:scaleY(0)}to{transform:none}}
+@keyframes anilloLlena{from{stroke-dashoffset:var(--L)}}
+
+.carMed{position:relative;width:104px;height:58px;flex:none;color:var(--fg)}
+.carMedTx{position:absolute;left:0;right:0;bottom:0;text-align:center;line-height:1.1}
+.carMedTx b{display:block;font-size:15px}
+.carMedTx span{font-size:10px;opacity:.65}
+
+.carSlide .hero.apretada .carAnillos{width:80px;height:80px}
+.carSlide .hero.apretada .carCols{height:80px}
+.carSlide .hero.apretada .carF50 .fila{font-size:12px}
+.carSlide .hero.apretada .heroLin{margin:0}
+
+.carSlide:not(:first-child) .carBarra{height:12px}
+.carSlide:not(:first-child) .carBarraF .cIco{width:30px;height:30px}
+
+/* 13.6.3: las tarjetas nuevas usan los mismos márgenes, ícono y pie que la tarjeta principal; las gráficas son más chicas para caber sin amontonarse */
+.carSlide:not(:first-child) .hero{padding:20px 20px 12px}
+.carSlide:not(:first-child) .carStrip{margin:0;padding:9px 12px;font-size:12px;font-weight:400;opacity:.85;gap:8px}
+.carSlide:not(:first-child) .carStrip .cIco.ch{width:16px;height:16px}
+.carSlide:not(:first-child) .carStrip .cIco.ch svg{width:16px;height:16px}
+.carSlide:not(:first-child) .carMonto{font-size:24px}
+.carSlide .hero.apretada{padding-top:14px !important;padding-bottom:10px !important}
+
+.carSlide:not(:first-child) .carLey{padding:1px 0}
+.carSlide:not(:first-child) .carDias{height:44px}
+.carSlide:not(:first-child) .carF50 .fila{font-size:12px;line-height:1.15}
+.carSlide:not(:first-child) .balBarra{height:7px;margin:2px 0 0}
+.carSlide:not(:first-child) svg[width="100"]{width:66px;height:66px}
+
+.carSlide:not(:first-child) .heroN > .fila:first-child .peso > *{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.carSlide:not(:first-child) .carFila .cIco{width:20px;height:20px;border-radius:6px}
+.carSlide:not(:first-child) .carFila .cIco svg{width:12px;height:12px}
+
+/* 13.6.5: Quincenas medida sobre el ejemplo: línea pegada al encabezado, filas de 31 px separadas 9, y lo que sobra se reparte en los huecos de abajo */
+.carSlide .hero.carQuin{justify-content:flex-start !important;gap:0 !important;padding:20px 20px 12px !important}
+.carSlide .hero.carQuin>.heroLin{margin:4px 0 0 !important}
+.carSlide .hero.carQuin>.carBarraF{margin:auto 0 0 !important;min-height:31px}
+.carSlide .hero.carQuin>.carStrip{margin-top:auto !important}
+.carSlide .hero.carQuin>.heroLin+.carBarraF{margin-top:max(7px, auto) !important}
+.carSlide .hero.carQuin .carBarraF{gap:12px;align-items:center}
+.carSlide .hero.carQuin .carBarraF .cIco{width:34px;height:31px;border-radius:10px;background:rgba(59,111,224,.12)}
+.carSlide .hero.carQuin .carBarraF .cIco svg{width:16px;height:16px}
+.carSlide .hero.carQuin .carBarraF .fila{font-size:14px !important;line-height:17px}
+.carSlide .hero.carQuin .carBarra{height:11px !important;margin:3px 0 0 !important}
 </style>
 </head>
 <body>
@@ -509,7 +600,7 @@ function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&am
 function sinPrefijo(n){ return n.replace(/^Pagar |^Pago /,''); }
 
 const FRECS = {M1:'mensual', M2:'bimestral', M3:'trimestral', M6:'semestral', M12:'anual', D15:'quincenal', D7:'semanal', U:'una sola vez'};
-const CATS = {tarjeta:['💳','Tarjeta de crédito'], tienda:['🛍️','Crédito departamental'], carro:['🚗','Pago del carro'], prestamo:['🏦','Préstamo'],
+const CATS = {tarjeta:['💳','Tarjeta de crédito'], tienda:['🛍️','Crédito departamental'], carro:['🚗','Pago del auto'], prestamo:['🏦','Préstamo'],
   renta:['🏠','Renta / vivienda'], luz:['💡','Luz, agua o gas'], internet:['📡','Internet'], telefono:['📱','Teléfono'], despensa:['🛒','Despensa y súper'],
   gasolina:['⛽','Gasolina y transporte'], salud:['🩺','Salud y consultas'], seguro:['🛡️','Seguros'],
   escuela:['🎓','Escuela y colegiaturas'], personal:['🧹','Personal y empleados'], proveedor:['📦','Proveedores'], ahorro:['🐷','Ahorro'],
@@ -546,7 +637,7 @@ function extHtml(cat, e, nombreEd){
     if(t === 'o') return `<label>${n}</label><select name="x_${k}"><option value=""></option>${o.split('|').map(x => `<option ${x === (e||{})[k] ? 'selected' : ''}>${x}</option>`).join('')}</select>`;
     return `<label>${n}</label><input name="x_${k}" value="${v}" ${t === 'f' ? 'type="date"' : t === 'tel' ? 'type="tel" inputmode="tel"' : t === 'n' || t === 'd' ? 'inputmode="decimal"' : ''} ${t === 'd' ? 'placeholder="$0"' : ''}>`; }).join('');
 }
-const EJ_NOM = {tarjeta:'Pagar tarjeta BBVA', tienda:'Pagar Liverpool', carro:'Mensualidad del auto', prestamo:'Préstamo de mi hermano', renta:'Pagar la renta', luz:'Pagar la luz (CFE)', internet:'Pagar Total Play', telefono:'Pagar el celular', despensa:'Despensa de la semana', gasolina:'Gasolina del auto', salud:'Consulta con el pediatra', seguro:'Seguro del auto', escuela:'Colegiatura', personal:'Pago a la niñera', proveedor:'Pedido al proveedor', ahorro:'Ahorro para el viaje', streaming:'Pagar Netflix', grupo:'Tanda de la oficina', extra:'Reparación del auto'};
+const EJ_NOM = {tarjeta:'Pagar tarjeta BBVA', tienda:'Pagar Liverpool', carro:'Mensualidad del auto', prestamo:'Préstamo de mi hermano', renta:'Pagar la renta', luz:'Pagar la luz (CFE)', internet:'Pagar Total Play', telefono:'Pagar el teléfono', despensa:'Despensa de la semana', gasolina:'Gasolina del auto', salud:'Consulta con el pediatra', seguro:'Seguro del auto', escuela:'Colegiatura', personal:'Pago a la niñera', proveedor:'Pedido al proveedor', ahorro:'Ahorro para el viaje', streaming:'Pagar Netflix', grupo:'Tanda de la oficina', extra:'Reparación del auto'};
 const ejemploNombre = c => 'Ej. ' + (EJ_NOM[c] || 'Pagar Netflix');
 function extUpd(f){ if(f.nombre) f.nombre.placeholder = ejemploNombre(f.cat.value); const box = f.querySelector('#extCampos'); if(!box) return; const prev = {}; f.querySelectorAll('[name^="x_"]').forEach(el => prev[el.name.slice(2)] = el.value);
   const p = D.pagos.find(x => x.id === +f.dataset.id) || {}; box.innerHTML = extHtml(f.cat.value, Object.assign({}, p.ext || {}, prev), f.nombre ? f.nombre.value : ''); if(box.innerHTML) box.animate([{opacity:0},{opacity:1}], {duration:240}); }
@@ -696,6 +787,42 @@ function frecUpd(f){ const c = f.cat.value, ant = f.frec.value, l = frecsDe(c);
 function datosVis(cat, comp){ const cred = esCredito(cat), serv = esServicio(cat), subs = cat === 'streaming', otro = ['renta','grupo','otro'].includes(cat);
   const v = {srv:serv, tj:cred, cta:cred || otro || comp, ref:cred || serv || cat === 'renta' || cat === 'otro', tit:otro || comp};
   if(subs){ v.cta = v.ref = v.tit = false; } /* suscripciones y membresías: nunca llevan datos para pagar */ v.alguno = v.srv || v.tj || v.cta || v.ref || v.tit; return v; }
+
+/* 13.6: Gasto compartido: se despliega/compacta con su altura, con vibración */
+function compTog(ck){
+  const box = document.getElementById('compBox'); if(!box) return;
+  vibrar([12]); const abrir = ck.checked;
+  box.getAnimations().forEach(a => a.cancel());
+  const h0 = box.getBoundingClientRect().height;
+  box.classList.toggle('plegado', !abrir);
+  box.style.height = 'auto'; const h1 = abrir ? box.getBoundingClientRect().height : 0; box.style.height = '';
+  box.animate([{height:h0 + 'px', opacity:abrir ? 0 : 1},{height:h1 + 'px', opacity:abrir ? 1 : 0}], {duration:Math.max(240, Math.min(420, 240 + Math.abs(h1 - h0) / 4)), easing:CURVA});
+  if(abrir){ [...box.children].forEach((k, i) => k.animate([{opacity:0, transform:'translateY(-8px)'},{opacity:1, transform:'none'}], {duration:320, delay:60 + Math.min(i, 5) * 35, easing:CURVA, fill:'backwards'})); setTimeout(() => { const q = ck.form && ck.form.conQuien; if(q && !q.value) q.focus(); }, 260); }
+}
+/* 13.6: sugerencias de persona mientras escribes nombre, correo o número; al terminar, busca si esa cuenta usa Mis Pagos */
+function sugPersona(inp, alTerminar){
+  const box = document.getElementById('sugPer'); if(!box) return;
+  const q = inp.value.trim(), ql = q.toLowerCase(), qd = q.replace(/\D/g, '');
+  const lista = personas().filter(z => !z.nombre.includes('@') || !personas().some(y => y !== z && y.mail && y.mail.toLowerCase() === z.nombre.toLowerCase()));
+  const coinc = !q ? [] : lista.filter(z => z.nombre.toLowerCase().includes(ql) || (z.mail && z.mail.toLowerCase().includes(ql)) || (qd.length >= 3 && (z.tel || '').replace(/\D/g, '').includes(qd)))
+    .filter(z => z.nombre.toLowerCase() !== ql).slice(0, 4);
+  const chip = (nom, det, val, ok) => `<button type="button" class="sugChip" data-v="${esc(val)}" onclick="const i=this.closest('form').conQuien; i.value=this.dataset.v; vibrar([10]); document.getElementById('sugPer').innerHTML=''">${ok ? '<span class="sugOk">✓</span>' : ''}<b>${esc(nom)}</b>${det ? `<span class="gris chico">${esc(det)}</span>` : ''}</button>`;
+  let h = coinc.map(z => chip(z.nombre, z.mail || z.tel || '', z.nombre, !!(z.mail || (D.correoDe || {})[z.nombre.toLowerCase()]))).join('');
+  box.innerHTML = h;
+  const esCorreo = /^[^@\s]+@[^@\s]+\.[a-z]{2,}$/i.test(q), esTel = qd.length >= 10 && /^[0-9 +()-]+$/.test(q);
+  if(!(esCorreo || esTel) || !D.nube || !D.nube.refresh) return;
+  clearTimeout(sugPersona._t);
+  sugPersona._t = setTimeout(async () => {
+    try{
+      const correo = esCorreo ? ql : await correoDeTelefono(qd.slice(-10));
+      if(inp.value.trim() !== q) return;
+      if(!correo){ box.innerHTML = h + `<p class="gris chico" style="margin:6px 4px 0">Esta persona aún no usa Mis Pagos: el gasto se divide solo en tu app.</p>`; return; }
+      if(!(D.nomCorreo || {})[correo]) await nombreDeCorreo(correo);
+      const nom = (D.nomCorreo || {})[correo]; if(inp.value.trim() !== q) return;
+      box.innerHTML = chip(nom || correo, (nom ? correo + ' · ' : '') + 'usa Mis Pagos', esCorreo ? q : correo, true) + h;
+    }catch(e){}
+  }, alTerminar ? 0 : 650);
+}
 function datosUpd(f){ const v = datosVis(f.cat.value || adivinarCat(f.nombre.value), !!(f.compartido && f.compartido.checked));
   const m = (el, on) => { if(el) el.style.display = on ? '' : 'none'; };
   m(document.getElementById('datosTit'), v.alguno); m(f.numServicio, v.srv); m(document.getElementById('tjBox'), v.tj); m(f.cuenta, v.cta); m(f.referencia, v.ref); m(f.titular, v.tit); }
@@ -975,6 +1102,17 @@ function animarBalance(){
     requestAnimationFrame(paso); });
   const lt = document.querySelector('.balT.late'); if(lt){ enfocarBal = false; setTimeout(() => { if(navigator.vibrate) navigator.vibrate(25); }, 420); }
 }
+
+/* 13.6.1: la tarjeta principal se anima al llegar a Inicio: el monto cuenta hacia arriba y los íconos aparecen con rebote */
+function animarHero(){
+  const h = document.getElementById('hero'); if(!h || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cuenta = el => { const txt = el.textContent, fin = num(txt), cent = /\.\d\d$/.test(txt.trim()); if(!(fin > 0)) return; const t0 = performance.now(), d = 820;
+    const paso = now => { const f = Math.min(1, (now - t0) / d), e = 1 - Math.pow(1 - f, 3), v = fin * e; el.textContent = f >= 1 ? txt : dinero(cent ? Math.round(v * 100) / 100 : Math.round(v)); if(f < 1) requestAnimationFrame(paso); };
+    el.textContent = dinero(0); requestAnimationFrame(paso); };
+  const m = h.querySelector('.heroMonto b'); if(m) cuenta(m);
+  h.querySelectorAll('.ind .chico.gris:last-child').forEach(cuenta);
+  h.querySelectorAll('.indIc').forEach((ic, i) => ic.animate([{transform:'scale(0)'},{transform:'scale(1.12)', offset:.7},{transform:'none'}], {duration:440, delay:200 + i * 90, easing:'cubic-bezier(.3,0,.15,1)', fill:'backwards'}));
+}
 function heroNuevo(delMes, pag, tot){
   const g = grupos(), hy = hoy();
   const suma = l => dinero(Math.round(l.reduce((s,p) => s + miMonto(p), 0)));
@@ -1026,13 +1164,29 @@ function carAltura(){
   const tr = document.getElementById('carTrack'); if(!tr) return;
   const ini = tr.querySelector('.carSlide:first-child .hero'); if(!ini) return;
   tr.style.setProperty('--carH', ini.offsetHeight + 'px');
-  tr.querySelectorAll('.carSlide:not(:first-child) .hero').forEach(h => { h.classList.remove('apretada'); if(h.scrollHeight > h.clientHeight + 1) h.classList.add('apretada'); });
+  tr.querySelectorAll('.carSlide:not(:first-child) .hero').forEach(h => { h.classList.remove('apretada'); if(!h.classList.contains('carQuin') && h.scrollHeight > h.clientHeight + 1) h.classList.add('apretada'); });
 }
+
+/* 13.6.2: íconos ilustrados de color para el encabezado de las tarjetas del carrusel */
+const ICT = {   /* 13.6.3: sin fondo y del tamaño del calendario de la tarjeta principal; contornos en el color del calendario */
+  quin:`<svg viewBox="0 0 40 40"><defs><linearGradient id="gq" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF8A3C"/><stop offset="1" stop-color="#FF5A1F"/></linearGradient><linearGradient id="gm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE07A"/><stop offset="1" stop-color="#F2A600"/></linearGradient></defs><rect x="4" y="7" width="28" height="26" rx="5" fill="currentColor" fill-opacity=".08"/><path d="M9 7h18a5 5 0 0 1 5 5v3H4v-3a5 5 0 0 1 5-5z" fill="url(#gq)"/><rect x="4" y="7" width="28" height="26" rx="5" fill="none" stroke="currentColor" stroke-width="2.2"/><rect x="10" y="3.5" width="2.6" height="6.5" rx="1.3" fill="currentColor"/><rect x="23.4" y="3.5" width="2.6" height="6.5" rx="1.3" fill="currentColor"/><text x="18" y="24.5" dominant-baseline="central" font-size="11" font-weight="800" text-anchor="middle" fill="currentColor" font-family="system-ui,sans-serif">15</text><circle cx="31" cy="30" r="7" fill="url(#gm)" stroke="#C98A00" stroke-width="1.3"/><text x="31" y="33.2" font-size="8.7" font-weight="800" text-anchor="middle" fill="#9A6A00" font-family="system-ui,sans-serif">$</text></svg>`,
+  tj:`<svg viewBox="0 0 40 40"><defs><linearGradient id="gt1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2BD4C4"/><stop offset="1" stop-color="#0097D6"/></linearGradient><linearGradient id="gt2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A77BFF"/><stop offset="1" stop-color="#6B35F0"/></linearGradient><linearGradient id="gt3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE07A"/><stop offset="1" stop-color="#F2A600"/></linearGradient></defs><rect x="4" y="9" width="26" height="17" rx="4" fill="url(#gt1)" transform="rotate(-12 18 17)"/><rect x="8" y="15" width="28" height="18" rx="4" fill="url(#gt2)"/><rect x="8" y="19.5" width="28" height="3" fill="#000" fill-opacity=".4"/><rect x="12" y="25" width="6.5" height="4.5" rx="1.2" fill="url(#gt3)"/><rect x="22" y="26.5" width="10" height="1.7" rx=".85" fill="#fff" fill-opacity=".8"/></svg>`,
+  est:`<svg viewBox="0 0 40 40"><rect x="6" y="25" width="5.2" height="9" rx="1.6" fill="#1FA463"/><rect x="13.5" y="19" width="5.2" height="15" rx="1.6" fill="#F2A600"/><rect x="21" y="23" width="5.2" height="11" rx="1.6" fill="#FF6A00"/><rect x="28.5" y="14" width="5.2" height="20" rx="1.6" fill="#3B6FE0"/><path d="M6 18l8-6 7 3.5 10-9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="31" cy="6.5" r="2.4" fill="currentColor"/><rect x="4" y="34.2" width="32" height="1.8" rx="1" fill="currentColor"/></svg>`,
+  aho:`<svg viewBox="0 0 40 40"><defs><linearGradient id="ga" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC2D2"/><stop offset="1" stop-color="#FF8FAE"/></linearGradient><linearGradient id="gm2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE07A"/><stop offset="1" stop-color="#F2A600"/></linearGradient></defs><ellipse cx="17" cy="23.5" rx="13" ry="9.5" fill="url(#ga)"/><circle cx="30" cy="22" r="5" fill="url(#ga)"/><rect x="8" y="29" width="4.5" height="7" rx="1.4" fill="#F06A90"/><rect x="20" y="29" width="4.5" height="7" rx="1.4" fill="#F06A90"/><path d="M9 16.5l2.5-6 3.5 4.5z" fill="#F06A90"/><circle cx="25" cy="19.5" r="1.4" fill="#5A2A38"/><circle cx="33.5" cy="22.5" r="2" fill="#F06A90"/><rect x="13" y="15.5" width="7" height="1.8" rx=".9" fill="#7A3D50"/><circle cx="16.5" cy="8.5" r="6" fill="url(#gm2)" stroke="#C98A00" stroke-width="1.3"/><text x="16.5" y="11.2" font-size="7.5" font-weight="800" text-anchor="middle" fill="#9A6A00" font-family="system-ui,sans-serif">$</text></svg>`
+};
+const fotoMini = () => D.foto ? `<img src="${D.foto}" alt="" style="width:44px;height:44px;border-radius:50%;object-fit:cover">` : `<span style="width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--ava,#1C326E);color:#fff;font-weight:800">${esc((D.nombre || 'M').charAt(0).toUpperCase())}</span>`;
 function carTarjeta(k){ return adornarStrips(carTarjeta0(k)); }
 function adornarStrips(h){ return String(h).replace(/<div class="carStrip">([\s\S]*?)<\/div>/g, (m, t) => `<div class="carStrip">${icoCar(t.replace(/<[^>]+>/g, ''), null, true)}<span>${t}</span></div>`); }
 function carTarjeta0(k){
   const cfg = carCfg(), ver = cfg[k];
-  const cab = (ic, tit, sub, der) => `<div class="fila" style="align-items:center"><span class="heroIc">${ic}</span><div class="peso" style="padding-left:6px;min-width:0"><b class="heroMes">${tit}</b><div class="chico gris">${sub}</div></div>${der || ''}</div><div class="heroLin"></div>`;
+  const cab = (ic, tit, sub, der, colDer) => `<div class="fila" style="align-items:center"><span class="heroIc">${ic}</span><div class="peso" style="padding-left:6px;min-width:0"><b class="heroMes">${tit}</b><div class="chico gris">${sub}</div></div>${der ? `<b class="carMonto"${colDer ? ` style="color:${colDer}"` : ''}>${der.replace(/<\/?b>/g, '')}</b>` : ''}</div><div class="heroLin"></div>`;   /* 13.6: resultado arriba a la derecha */
+  const tema0 = document.documentElement.dataset.tema, osc = ['oscuro','glassn'].includes(tema0);
+  const PAL = osc ? ['#8FA8FF','#FFA25C','#5FD49A','#B79CFF','#5CC8F2'] : ['var(--r-azu,#1C326E)','#FF6A00','#1FA463','#7C5CE6','#0097D6'];
+  const corto$ = v => v >= 1000 ? '$' + (v / 1000 >= 100 ? Math.round(v / 1000) : (Math.round(v / 100) / 10)) + 'k' : '$' + Math.round(v);
+  const columnas = xs => `<div class="carCols">${xs.map((x, i) => `<div class="carCol"><b>${corto$(x.v)}</b><i style="height:${Math.max(8, x.v / Math.max(1, ...xs.map(z => z.v)) * 100)}%;background:${PAL[i % PAL.length]};animation-delay:${120 + i * 70}ms"></i><span>${x.n}</span></div>`).join('')}</div>`;
+  const anillos = xs => { const R = 42, g = 9, cols = ['#7C5CE6', PAL[1], PAL[4]], mx = Math.max(1, ...xs.map(z => z.v));
+    return `<svg class="carAnillos" viewBox="0 0 100 100" width="66" height="66">${xs.map((x, i) => { const r = R - i * (g + 4), L = 2 * Math.PI * r, f = Math.max(.02, x.v / mx);
+      return `<circle cx="50" cy="50" r="${r}" fill="none" stroke="currentColor" stroke-opacity=".1" stroke-width="${g}"/><circle class="anilloA" cx="50" cy="50" r="${r}" fill="none" stroke="${cols[i]}" stroke-width="${g}" stroke-linecap="round" transform="rotate(-90 50 50)" stroke-dasharray="${L}" stroke-dashoffset="${L * (1 - f)}" style="--L:${L};animation-delay:${120 + i * 80}ms"/>`; }).join('')}</svg>`; };
   const fila = (a, b) => `<div class="carFila">${icoCar(a)}<span class="bn peso">${a}</span><b class="ba">${b}</b></div>`;   /* 13.5.1: ícono por renglón */
   const barra = (t, v, tot, col, ic) => `<div class="carBarraF">${icoCar(t, ic)}<div class="peso" style="min-width:0"><div class="fila" style="font-size:15px"><b class="peso" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t}</b><span style="font-weight:800">${typeof v === 'number' ? dinero(Math.round(v * 100) / 100) : v}</span></div><div class="carBarra"><i style="--w:${tot > 0 ? Math.max(0, Math.min(1, v / tot)) : 0};background:${col || 'var(--r-azu)'};animation-delay:300ms"></i></div></div></div>`;   /* 5px: en la columna flex los márgenes no colapsan y 5+5 deja el mismo hueco de 10px que antes */
   const entrar = D.bloqueo && D.bloqueo.hash ? (D.bloqueo.cred ? 'Face ID y contraseña' : 'Contraseña') : 'Apagado';
@@ -1047,27 +1201,29 @@ function carTarjeta0(k){
       const dias7 = [], h0 = hoy();
       for(let i = 0; i < 7; i++){ const d = new Date(h0.getTime() + i * DIA); dias7.push([d, ordenados().filter(p => !p.pagado && fecha(p.vence).toDateString() === d.toDateString()).length]); }
       const mx = Math.max(1, ...dias7.map(x => x[1]));
-      return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB.cal, 'Quincenas', 'Próximos 7 días por pagos', `<b>${dinero(t2)}</b>`)}
+      return `<div class="hero heroN carQuin" style="${estiloHero()}">${cab(ICT.quin, 'Quincenas', 'Próximos 7 días', dinero(ordenados().filter(p => !p.pagado && (fecha(p.vence) - hoy()) / DIA < 7 && fecha(p.vence) >= hoy()).reduce((s0, p) => s0 + miMonto(p), 0)))}
         <div class="carDias">${dias7.map(([d, c]) => `<div class="carDia"><i style="height:${Math.max(8, c / mx * 100)}%"></i><span>${['D','L','M','M','J','V','S'][(d.getDay() + 6) % 7]}</span></div>`).join('')}</div>
         <div class="carStrip">Siguiente quincena: ${dinero(t2)} · ${q2.filter(p => !p.pagado).length} pagos</div></div>`;
     }
     const n1 = q1.filter(p => !p.pagado).length, n2 = q2.filter(p => !p.pagado).length, pg12 = q1.filter(p => p.pagado).length + q2.filter(p => p.pagado).length;
-    return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB.cal, 'Quincenas', 'Cuánto apartar de cada nómina', '')}
+    return `<div class="hero heroN carQuin" style="${estiloHero()}">${cab(ICT.quin, 'Quincenas', 'Siguiente · ' + sigA.getDate() + ' – ' + sigB.getDate() + ' ' + MESES[sigB.getMonth()], dinero(t2))}
       ${barra('Actual · ' + n1 + ' pagos', t1, porQ, t1 > porQ ? '#E5484D' : 'var(--r-azu)')}${barra('Siguiente · ' + n2 + ' pagos', t2, porQ, t2 > porQ ? '#E5484D' : 'var(--r-azu)')}
-      ${(() => { const hs = ordenados().filter(p => !p.pagado && fecha(p.vence).toDateString() === hoy().toDateString()); return fila('Hoy · ' + (hs.length ? hs.slice(0, 2).map(p => esc(sinPrefijo(p.nombre))).join(' y ') : 'sin pagos'), dinero(Math.round(hs.reduce((s0, p) => s0 + miMonto(p), 0)))); })()}
-      <div class="carStrip">Aparta ${dinero(t1)} esta quincena · ${n1} ${n1 === 1 ? 'pago' : 'pagos'}</div></div>`;   /* 13.5.2: igual que en Android, para caber en la altura de Inicio */
+      ${(() => { const h0 = hoy(), px = ordenados().find(p => !p.pagado && fecha(p.vence) > h0); return `<div class="carStrip">${px ? 'Siguiente pago: ' + esc(sinPrefijo(px.nombre)) + ' · ' + corto(px.vence) : 'No tienes más pagos pendientes'}</div>`; })()}</div>`;   /* 13.6: el monto va arriba; abajo, el siguiente pago */
   }
   if(k === 'tj'){
     const tjs = D.pagos.filter(p => p.credito && !p.creadoPor && !p.pagado);
     const tot = tjs.reduce((s0, p) => s0 + miMonto(p), 0);
     if(ver === 'v5'){
-      return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB3.tarjeta, 'Mis tarjetas', 'Tu parte: ' + dinero(tot), '')}
+      return `<div class="hero heroN" style="${estiloHero()}">${cab(ICT.tj, 'Mis tarjetas', 'Cortes y pagos mínimos', dinero(tot))}
         ${tjs.slice(0, 3).map(p => `<div class="carFila"><span class="carCirculo">${p.diaCorte || '—'}</span><span class="bn peso" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(sinPrefijo(p.nombre))}</span><span class="chico gris">mín. ${p.minimo ? dinero(num(p.minimo)) : '—'}</span><b class="ba">${dinero(miMonto(p))}</b></div>`).join('') || '<p class="gris chico">Sin tarjetas por pagar.</p>'}
         <div class="carStrip">${tjs.length} ${tjs.length === 1 ? 'tarjeta' : 'tarjetas'} por pagar · total ${dinero(tot)}</div></div>`;
     }
-    return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB3.tarjeta, 'Mis tarjetas', 'Tu parte en tarjetas', `<b>${dinero(tot)}</b>`)}
-      ${tjs.slice(0, 3).map(p => barra(esc(sinPrefijo(p.nombre)), miMonto(p), tot, null, 'tarjeta')).join('') || '<p class="gris chico">Sin tarjetas por pagar.</p>'}
-      <div class="carStrip">${tjs.length} ${tjs.length === 1 ? 'tarjeta' : 'tarjetas'} por pagar · tu parte ${dinero(tot)}</div></div>`;
+    /* 13.6: anillos concéntricos (distinto a las barras de las demás tarjetas) */
+    const t3 = tjs.slice().sort((x, y) => miMonto(y) - miMonto(x)).slice(0, 3), cA = ['#7C5CE6', PAL[1], PAL[4]];
+    const dh = hoy().getDate(), corte = tjs.filter(p => p.diaCorte).sort((x, y) => ((x.diaCorte - dh + 31) % 31) - ((y.diaCorte - dh + 31) % 31))[0];
+    return `<div class="hero heroN" style="${estiloHero()}">${cab(ICT.tj, 'Mis tarjetas', 'Tu parte de cada una', dinero(tot))}
+      ${t3.length ? `<div class="carAnF">${anillos(t3.map(p => ({v:miMonto(p)})))}<div class="peso" style="min-width:0">${t3.map((p, i) => `<div class="carLey"><span class="punto" style="background:${cA[i]}"></span><b class="peso">${esc(sinPrefijo(p.nombre))}</b><b>${dinero(Math.round(miMonto(p)))}</b></div>`).join('')}</div></div>` : '<p class="gris chico">Sin tarjetas por pagar.</p>'}
+      <div class="carStrip">${corte ? 'Próximo corte: ' + esc(sinPrefijo(corte.nombre)) + ' · día ' + corte.diaCorte : tjs.length + (tjs.length === 1 ? ' tarjeta' : ' tarjetas') + ' por pagar'}</div></div>`;
   }
   if(k === 'est'){
     const r = pagosDelMes(), todos = [...r.pag, ...r.pen].sort((a, b) => b.completo - a.completo);
@@ -1077,39 +1233,41 @@ function carTarjeta0(k){
       const vals = [0, 1, 2].map(c => todos.filter(x => cat(x) === c).reduce((s0, x) => s0 + x.completo, 0));
       const cols = ['#7C5CE6', '#1FA463', '#F2A600'], noms = ['Tarjetas', 'Casa', 'Otros'];
       const pct = totMes > 0 ? Math.round(vals[0] / totMes * 100) : 0;
-      return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB2.barras, 'Estadísticas', 'Este mes por categoría', `<b>${dinero(totMes)}</b>`)}
+      return `<div class="hero heroN" style="${estiloHero()}">${cab(ICT.est, 'Estadísticas', 'Este mes por categoría', `<b>${dinero(totMes)}</b>`)}
         <div style="display:flex;align-items:center;gap:12px">${dona(vals, cols, dinero(Math.round(totMes)))}<div class="peso chico" style="line-height:1.7">${noms.map((c, i) => `<div><span class="punto" style="background:${cols[i]}"></span> ${c} ${totMes > 0 ? Math.round(vals[i] / totMes * 100) : 0} %</div>`).join('')}</div></div>
         <div class="carStrip">${pct >= 50 ? pct + ' de cada 100 pesos van a tarjetas' : 'Tus tarjetas son el ' + pct + ' % del mes'}</div></div>`;
     }
-    const top = todos.slice(0, 3), totTop = top.reduce((s0, x) => s0 + x.completo, 0);
-    return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB2.barras, 'Estadísticas', 'Top 3 de este mes', `<b>${dinero(totTop)}</b>`)}
-      ${top.map(x => barra(esc(sinPrefijo(x.p.nombre)), Math.round(x.completo), totMes, null, 'barras')).join('') || '<p class="gris chico">Sin pagos este mes.</p>'}
-      <div class="carStrip">Top 3: ${dinero(totTop)} de ${dinero(totMes)} este mes</div></div>`;
+    /* 13.6: columnas de colores con los 5 pagos más grandes del mes */
+    const top = todos.slice(0, 5), pctT = totMes > 0 && top[0] ? Math.round(top[0].completo / totMes * 100) : 0;
+    return `<div class="hero heroN" style="${estiloHero()}">${cab(ICT.est, 'Estadísticas', 'Lo más grande de ' + MESES[hoy().getMonth()], dinero(Math.round(totMes)))}
+      ${top.length ? columnas(top.map(x => ({v:x.completo, n:esc(sinPrefijo(x.p.nombre))}))) : '<p class="gris chico">Sin pagos este mes.</p>'}
+      <div class="carStrip">${top[0] ? 'El más grande: ' + esc(sinPrefijo(top[0].p.nombre)) + ' · ' + pctT + '% del mes' : 'Agrega tus pagos para ver tus estadísticas'}</div></div>`;
   }
   if(k === 'aho'){
     const lib = libreMes(), ing = lib ? lib[0] : 0, tot = lib ? lib[1] : 0, libre = lib ? lib[2] : 0;
     if(ver === 'v6'){
       const f50 = (t, real, ideal) => `<div class="carF50"><div class="fila chico"><b class="peso">${t}</b><span>Real ${Math.round(real * 100)} % · Ideal ${Math.round(ideal * 100)} %</span></div>${barraBal(Math.min(1, Math.max(0, real)), 'var(--r-azu)', 300)}</div>`;
-      return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB2.bolsa, 'Ahorros', 'Real vs ideal 50/30/20', '')}
+      return `<div class="hero heroN" style="${estiloHero()}">${cab(ICT.aho, 'Ahorros', 'Fondo: 3 meses de pagos', ing > 0 ? dinero(Math.round(tot * 3)) : '', '#1FA463')}
         ${f50('Necesidades', ing > 0 ? tot / ing : 0, .5)}${f50('Ahorro', ing > 0 ? Math.max(0, libre) / ing : 0, .2)}${f50('Gustos', ing > 0 ? Math.max(0, 1 - tot / ing - Math.max(0, libre) / ing) : 0, .3)}
-        <div class="carStrip">Fondo de emergencia: ${dinero(Math.round(tot * 3))} (3 meses de pagos)</div></div>`;
+        <div class="carStrip">Real vs ideal 50/30/20 de tu ingreso</div></div>`;
     }
     const pct = ing > 0 ? Math.round(tot / ing * 100) : 0;
-    return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB2.bolsa, 'Ahorros', libre < 0 ? 'Este mes no alcanza para ahorrar' : 'Este mes sí alcanza para ahorrar', '')}
-      <div class="carFalta" style="color:${libre < 0 ? '#E5484D' : '#1FA463'}">${libre < 0 ? 'Te faltan ' + dinero(Math.abs(Math.round(libre))) : 'Te quedan ' + dinero(Math.round(libre))}</div>
-      <div class="carDiv"></div>
-      ${fila('Ingresos', dinero(Math.round(ing)))}${fila('Pagos fijos', pct + ' % · ' + dinero(Math.round(tot)))}
+    /* 13.6.1: medidor (semicírculo) de cuánto de tu ingreso se va en pagos fijos */
+    const colM = pct > 100 ? '#E5484D' : pct >= 70 ? '#F2A600' : '#1FA463', R = 46, L = Math.PI * R, fM = Math.max(.02, Math.min(1, pct / 100));
+    return `<div class="hero heroN" style="${estiloHero()}">${cab(ICT.aho, 'Ahorros', ing > 0 ? (libre < 0 ? 'Te faltan este mes' : 'Te quedan este mes') : 'Agrega tu ingreso', ing > 0 ? (libre < 0 ? '-' : '') + dinero(Math.abs(Math.round(libre))) : '', libre < 0 ? '#E5484D' : '#1FA463')}
+      <div class="carAnF"><div class="carMed"><svg viewBox="0 0 120 66" width="104" height="58"><path d="M 14 60 A ${R} ${R} 0 0 1 106 60" fill="none" stroke="currentColor" stroke-opacity=".1" stroke-width="11" stroke-linecap="round"/><path class="anilloA" d="M 14 60 A ${R} ${R} 0 0 1 106 60" fill="none" stroke="${colM}" stroke-width="11" stroke-linecap="round" stroke-dasharray="${L}" stroke-dashoffset="${L * (1 - fM)}" style="--L:${L}"/></svg><div class="carMedTx"><b style="color:${colM}">${ing > 0 ? pct + '%' : '—'}</b><span>de tu ingreso</span></div></div>
+      <div class="peso" style="min-width:0"><div class="carLey"><span class="punto" style="background:#1FA463"></span><b class="peso">Ingresos</b><b>${dinero(Math.round(ing))}</b></div><div class="carLey"><span class="punto" style="background:${colM}"></span><b class="peso">Pagos fijos</b><b>${dinero(Math.round(tot))}</b></div></div></div>
       <div class="carStrip">${libre < 0 ? 'Este mes no alcanza para ahorrar' : 'Puedes apartar ' + dinero(Math.round(libre)) + ' para ahorrar'}</div></div>`;
   }
   if(k === 'per'){
     if(ver === 'v5'){
-      return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB3.personas, 'Mi perfil', 'Cuenta y seguridad', '')}
+      return `<div class="hero heroN" style="${estiloHero()}">${cab(fotoMini(), 'Mi perfil', 'Cuenta y seguridad', D.pagos.length + (D.pagos.length === 1 ? ' pago' : ' pagos'))}
         ${fila('Cuenta', cuenta)}${fila('Personas', personas().length + ' personas')}${fila('Entrar', entrar)}
-        <div class="carStrip">${D.pagos.length} pagos · ${personas().length} personas · ${nombreTema(document.documentElement.dataset.tema)}</div></div>`;
+        <div class="carStrip">Apariencia: ${nombreTema(document.documentElement.dataset.tema)}</div></div>`;
     }
-    return `<div class="hero heroN" style="${estiloHero()}">${cab(SIMB3.personas, 'Mi perfil', esc(D.nombre || 'Tu nombre'), '')}
-      ${fila('Personas', personas().length)}${fila('Apariencia', nombreTema(document.documentElement.dataset.tema))}${fila('Entrar', entrar)}${fila('Teléfono', esc(D.miTel || '—'))}
-      <div class="carTot"><span>Ingreso</span><b>${D.ingreso > 0 ? dinero(Math.round(D.ingreso)) + ' al mes' : 'sin registrar'}</b></div></div>`;
+    return `<div class="hero heroN" style="${estiloHero()}">${cab(fotoMini(), 'Mi perfil', esc(D.nombre || 'Tu nombre'), D.ingreso > 0 ? dinero(Math.round(D.ingreso)) : '')}
+      ${fila('Personas', personas().length)}${fila('Entrar', entrar)}${fila('Teléfono', esc(D.miTel || '—'))}
+      <div class="carStrip">${D.pagos.length} pagos · ${nombreTema(document.documentElement.dataset.tema)}${D.ingreso > 0 ? '' : ' · agrega tu ingreso'}</div></div>`;
   }
   return '';
 }
@@ -1133,6 +1291,7 @@ function carPintar(animar, saliente){
   tr.querySelectorAll('.carSlide').forEach(s => { s.style.transform = ''; s.style.borderRadius = ''; s.style.overflow = ''; });
   document.querySelectorAll('.carDots i').forEach((d, i) => d.classList.toggle('on', i === window._carIdx));
   if(saliente != null && saliente >= 0 && saliente < tr.children.length && saliente !== window._carIdx){ const o = tr.children[saliente]; o.style.transform = 'scale(.96)'; }   /* 13.4.16, ítem 3: la saliente se achica a 0.96 mientras sale (video) */
+  { const sx = tr.children[window._carIdx]; if(sx && animar){ sx.classList.remove('anima'); void sx.offsetWidth; sx.classList.add('anima'); if(window._carIdx === 0) animarHero(); } }   /* 13.6: sus gráficas se llenan al llegar (solo esa vez) */
   if(animar && !matchMedia('(prefers-reduced-motion: reduce)').matches){   /* ítem 7: la entrante llega a 0.95 y crece a 1.0 al asentarse */
     const s = tr.children[window._carIdx]; if(!s) return;
     carPlaca(true);   /* la placa aparece con el cambio... */
@@ -1164,7 +1323,7 @@ function carSwipe(){
   wrap.addEventListener('pointermove', e => {
     if(x0 === null || (pid !== null && e.pointerId !== pid)) return;
     const nx = e.clientX - x0, ny = e.clientY - y0;
-    if(!arr){ if(Math.abs(nx) < 12 || Math.abs(nx) < Math.abs(ny) * 1.4) return; arr = true; try{ wrap.setPointerCapture(e.pointerId); }catch(_){} }
+    if(!arr){ if(Math.abs(nx) < 10 || Math.abs(nx) < Math.abs(ny) * .8) return; arr = true; try{ wrap.setPointerCapture(e.pointerId); }catch(_){} }
     dx = nx;
     const i = window._carIdx || 0, t = entrante(), lista = carLista();
     if(t < 0 || t >= lista.length) dx = nx * .3;   /* en los extremos, resistencia */
@@ -1279,6 +1438,7 @@ function inicio(){
   let h = `<div class="hola"><span class="ava">${esc((D.nombre||'?')[0].toUpperCase())}</span>
     <div class="peso"><div class="b" style="font-size:22px">Hola${D.nombre ? ', ' + esc(D.nombre) : ''}</div><div class="gris chico">Bienvenido de nuevo</div></div>
     <button class="mas" data-act="avisos" data-n="1" aria-label="Avisos" style="margin-right:10px;position:relative;display:grid;place-items:center">${CAMPANA}${(D.historial||[]).some(a => !a.leido) ? `<span style="position:absolute;top:-2px;right:-2px;min-width:18px;height:18px;border-radius:9px;background:#E5484D;color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center">${Math.min(9,(D.historial||[]).filter(a => !a.leido).length)}</span>` : ''}</button><button class="mas" data-act="nuevo" aria-label="Agregar pago">+</button></div>
+    ${D.pagos.filter(p => p.nubeFalla && p.compartido && !p.creadoPor).map(p => `<button class="pago est-roj" style="display:block" data-act="detalle" data-id="${p.id}"><b>⚠️ ${esc(sinPrefijo(p.nombre))} no se pudo compartir</b><div class="gris chico" style="margin-top:4px">${esc(p.nubeFalla)}</div></button>`).join('')}
     ${(D.invitaciones || []).map(x => `<button class="pago est-ama" style="display:block" data-act="invitacion" data-i="${x.id}"><b>✉ ${esc(x.de)} compartió ${esc(sinPrefijo(x.nombre))} contigo</b><div class="gris chico">Toca para aceptarlo o rechazarlo</div></button>`).join('')}
     ${D.pagos.filter(p => p.nubeSolVista && !p.creadoPor).map(p => `<button class="pago est-ama" style="display:block" data-act="solicitud" data-id="${p.id}"><b>✎ Piden un cambio en ${esc(sinPrefijo(p.nombre))}</b><div class="gris chico">Toca para revisarlo</div></button>`).join('')}
     ${(D.avisosNube || []).length ? `<button class="pago est-azu" style="display:block" data-act="avisoNubeOk">${D.avisosNube.map(esc).join('<br>')}<div class="gris chico">Toca para ocultar</div></button>` : ''}
@@ -1744,9 +1904,9 @@ function ajustes(){
     <button data-act="nombre" style="display:block;margin:6px auto 0;font-size:24px;font-weight:800">${esc(D.nombre || 'Tu nombre')}</button>
     <div class="gris" style="text-align:center;margin:4px 0">${correo ? esc(correo) : 'Sin cuenta'} · ${D.pagos.length} ${D.pagos.length === 1 ? 'pago' : 'pagos'}</div>
     ${acordeon('datos', 'Datos personales', ICONO_AJ.pers, D.ingreso > 0 ? dinero(Math.round(D.ingreso)) + ' al mes' : 'Agregar', filasHtml([['Nombre', esc(D.nombre || 'Agregar'), 'nombre'], ['Correo', correo ? esc(correo) : 'Sin cuenta', 'cuenta'], ['Teléfono', esc(D.miTel || 'Agregar'), 'tel'], ['Días de pago', ({15:'Día 15 y fin de mes', 14:'Día 14 y fin de mes', 10:'Día 10 y día 25'})[D.quincena||15] || ('Día ' + D.quincena + ' y fin de mes'), 'quincena'], ['Ingreso', D.ingreso > 0 ? dinero(Math.round(D.ingreso)) + ' al mes' : 'Agregar', 'presupuesto']]))}
-    ${acordeon('avisos', 'Pagos y avisos', ICONO_AJ.bell, D.avisos ? 'Activados' : 'Activar', filasHtml([['Avisos de pagos en este celular', D.avisos ? 'Activados' : 'Activar', 'avisos'], ['Recordar a quien compartes', D.autoRec === false ? 'No' : 'Sí', 'autoRecAj']]))}
-    ${acordeon('cuenta', 'Cuenta y seguridad', ICONO_AJ.esc, personas().length + ' personas', filasHtml([['Cuenta y pagos compartidos', correo ? (D.nube.verif ? 'Conectada' : 'Sin verificar') : 'Sin cuenta', 'cuenta'], ['Personas con las que pagas', personas().length + ' personas', 'personas'], ['Entrar con contraseña', D.bloqueo && D.bloqueo.hash ? (D.bloqueo.cred ? 'Face ID y contraseña' : 'Contraseña') : 'Apagado', 'bloqueo']]))}
-    ${acordeon('apariencia', 'Apariencia y diseño', ICONO_AJ.apa, nombreTema(document.documentElement.dataset.tema), `<div style="padding-bottom:4px">${[temas.slice(0,3), temas.slice(3)].map((fila,f) => `<div class="seg" style="margin:${f ? '8px' : '0'} 0 0">${fila.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div>`).join('')}<p class="gris chico" style="margin-bottom:12px">Auto cambia entre Claro y Oscuro según tu celular. Glass blanco es blanco con toques de color. Glass oscuro es cristal ahumado siempre.</p>
+    ${acordeon('avisos', 'Pagos y avisos', ICONO_AJ.bell, D.avisos ? 'Activados' : 'Activar', filasHtml([['Avisos de pagos en este teléfono', D.avisos ? 'Activados' : 'Activar', 'avisos'], ['Recordar a quien compartes', D.autoRec === false ? 'No' : 'Sí', 'autoRecAj']]))}
+    ${acordeon('cuenta', 'Cuenta y seguridad', ICONO_AJ.esc, personas().length + ' personas', filasHtml([['Cuenta y pagos compartidos', correo ? (D.nube.verif ? 'Conectada' : 'Sin verificar') : 'Sin cuenta', 'cuenta'], ['Personas con las que pagas', personas().length + ' personas', 'personas'], ['Entrar con contraseña', D.bloqueo && D.bloqueo.hash ? (D.bloqueo.cred ? 'Face ID y contraseña' : 'Contraseña') : 'Apagado', 'bloqueo'], ['Bloquear al salir de la app', ({0:'De inmediato',1:'1 min',5:'5 min',10:'10 min'})[D.bloqueoMin != null ? D.bloqueoMin : 10], 'bloqueoMin']]))}
+    ${acordeon('apariencia', 'Apariencia y diseño', ICONO_AJ.apa, nombreTema(document.documentElement.dataset.tema), `<div style="padding-bottom:4px">${[temas.slice(0,3), temas.slice(3)].map((fila,f) => `<div class="seg" style="margin:${f ? '8px' : '0'} 0 0">${fila.map(([k,n]) => `<button class="${D.tema===k?'sel':''}" data-act="tema" data-n="${k}">${n}</button>`).join('')}</div>`).join('')}<p class="gris chico" style="margin-bottom:12px">Auto cambia entre Claro y Oscuro según tu teléfono. Glass blanco es blanco con toques de color. Glass oscuro es cristal ahumado siempre.</p>
       ${(() => { const f = (n, extra, act) => `<button class="dato" style="width:100%;padding:14px 0;border-top:1px solid var(--line)" data-act="${act}"><span style="text-align:left;flex:1">${n}</span><span class="gris" style="max-width:45%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${extra} ›</span></button>`;
         const vis = ['quin','tj','est','aho','per'].filter(k => (carCfg()[k] || 'v6') !== 'no').length;
         return f('Diseño de tarjeta principal', listaHero()[selHero()][0], 'colores') + f('Carrusel de Inicio', vis + ' de 5 tarjetas', 'carPantalla') + f('Fondo del modo Glass', D.fondoGlass ? 'Tu foto' : 'Predeterminado', 'fondoGlass')
@@ -1801,6 +1961,8 @@ function hojaFondo(){
 }
 /* ===================== hojas: detalle y editor ===================== */
 let hojaT = null;
+
+function ponerPesos(root){ (root || document).querySelectorAll('input[inputmode="decimal"]:not([data-pz])').forEach(i => { i.dataset.pz = 1; if(i.parentElement.classList.contains('pesosW')) return; const w = document.createElement('span'); w.className = 'pesosW'; if(i.style.marginTop){ w.style.marginTop = i.style.marginTop; i.style.marginTop = ''; } if(i.style.display === 'none'){ w.style.display = 'none'; i.style.display = ''; } i.parentNode.insertBefore(w, i); w.appendChild(i); if(i.placeholder === '$0') i.placeholder = '0'; }); }
 function abrirHoja(html){
   clearTimeout(hojaT); document.documentElement.classList.add('conHoja');
   const capa = document.getElementById('capa');
@@ -1808,6 +1970,7 @@ function abrirHoja(html){
   requestAnimationFrame(() => { capa.querySelector('.velo').classList.add('ver'); capa.querySelector('.hoja').classList.add('ver'); });
   setTimeout(() => capa.querySelectorAll('.pastel').forEach(e => e.classList.add('ver')), 250);   /* gráficas dentro de la hoja */
   setTimeout(guiaHojaWeb, 1100);   /* 13.5.1: tutorial de la novedad del detalle compartido */
+  ponerPesos(capa);
 }
 function cerrarHoja(){
   const capa = document.getElementById('capa'); const h = capa.querySelector('.hoja'); if(!h) return;
@@ -1886,17 +2049,19 @@ function editor(id){
     <label style="display:none">¿Es un crédito?</label><select name="credito" style="display:none"><option value="no">No es crédito</option><option value="tarjeta" ${p.credito && p.tipoCred!=='departamental'?'selected':''}>Tarjeta de crédito</option><option value="departamental" ${p.credito && p.tipoCred==='departamental'?'selected':''}>Crédito departamental</option></select>
     <div class="dos soloCredito" style="${esCredito(catEd) ? '' : 'display:none'}"><div><label>Día de corte</label><input name="diaCorte" inputmode="numeric" value="${p.diaCorte||''}"></div><div><label>Pago mínimo</label><input name="minimo" inputmode="decimal" value="${esc(p.minimo||'')}"></div></div>
     ${(() => { const tj = D.pagos.filter(q => q.credito && q.id !== p.id); if(!tj.length) return '';
-      return `<label>¿Con qué lo pagas?</label><select name="pagoCon"><option value="0">Efectivo, débito o transferencia</option>${tj.map(q => `<option value="${q.id}" ${p.pagoCon === q.id ? 'selected' : ''}>Tarjeta de crédito: ${esc(sinPrefijo(q.nombre))}${q.creadoPor ? ' (de ' + esc(q.creadoPor) + ')' : ''}</option>`).join('')}</select><p class="gris chico" style="margin:4px 4px 0">Si lo pagas con una tarjeta de crédito, no se suma aparte en tus totales: ya va dentro del pago de esa tarjeta.</p>`; })()}
+      return `<label>Método de pago</label><select name="pagoCon"><option value="0">Efectivo, débito o transferencia</option>${tj.map(q => `<option value="${q.id}" ${p.pagoCon === q.id ? 'selected' : ''}>Tarjeta de crédito: ${esc(sinPrefijo(q.nombre))}${q.creadoPor ? ' (de ' + esc(q.creadoPor) + ')' : ''}</option>`).join('')}</select><p class="gris chico" style="margin:4px 4px 0">Si lo pagas con una tarjeta de crédito, no se suma aparte en tus totales: ya va dentro del pago de esa tarjeta.</p>`; })()}
     <label id="datosTit">Datos para pagar</label><input name="numServicio" value="${esc(p.numServicio||'')}" placeholder="Número de servicio"><div id="tjBox"><input name="numTarjeta" inputmode="numeric" value="" placeholder="${p.tarjetaUlt ? 'Tarjeta: ' + esc(p.tarjetaUlt) + ' (escribe para cambiar)' : 'Número de tarjeta (16 dígitos)'}">
     <div class="dos" style="margin-top:8px;grid-template-columns:1.6fr 1fr"><input name="expira" maxlength="5" inputmode="numeric" value="" placeholder="${p.tarjetaUlt ? 'Vencimiento: ••/••' : 'Vencimiento MM/AA'}" oninput="const d=this.value.replace(/[^0-9]/g,'').slice(0,4); const sube=(this._a||0) < this.value.length; this.value = d.length > 2 ? d.slice(0,2)+'/'+d.slice(2) : (d.length===2 && sube ? d+'/' : d); this._a=this.value.length"><input name="cvv" type="password" inputmode="numeric" maxlength="4" value="" placeholder="${p.tarjetaUlt ? 'CVV: •••' : 'CVV'}"></div></div>
     <input name="cuenta" id="edCuenta" style="margin-top:8px" value="" placeholder="${p.tieneDatos ? 'Cuenta: ' + esc(p.cuentaUlt||'') + ' (escribe para cambiar)' : 'Número de cuenta o CLABE'}"><input name="referencia" style="margin-top:8px" value="" placeholder="${p.tieneDatos && p.refUlt ? 'Referencia: ' + esc(p.refUlt) : 'Referencia'}"><input name="titular" style="margin-top:8px" value="${esc(p.titularVis||'')}" placeholder="Titular">
-    <label style="display:flex;align-items:center;gap:10px"><input type="checkbox" name="compartido" onchange="datosUpd(this.form)" style="width:auto;flex:none;margin:0" ${p.compartido?'checked':''}><span style="flex:1">Lo pago con alguien más</span></label>
-    <input name="conQuien" list="per" type="text" value="${esc(p.conQuien||'')}" placeholder="Correo o número" style="width:100%"><datalist id="per">${per}</datalist>
-    <select name="modoParte" style="margin-top:10px" onchange="const e=this.value==='monto'; this.form.miParte.style.display=e?'none':''; this.form.miFijo.style.display=e?'':'none'; document.getElementById('elOtro').style.display=e?'':'none'"><option value="pct">Dividir por porcentaje (%)</option><option value="monto" ${p.miFijo ? 'selected' : ''}>Dividir por montos exactos ($)</option></select>
+    <label class="compTog"><input type="checkbox" name="compartido" onchange="datosUpd(this.form); compTog(this)" ${p.compartido?'checked':''}><span style="flex:1"><b>Gasto compartido</b><span class="gris chico" style="display:block">Divídelo con otra persona</span></span></label>
+    <div id="compBox" class="${p.compartido ? '' : 'plegado'}">   <!-- 13.6: solo se despliega al activar Gasto compartido -->
+    <input name="conQuien" type="text" value="${esc(p.conQuien||'')}" placeholder="Nombre, correo o número" autocomplete="off" style="width:100%" oninput="sugPersona(this)" onblur="setTimeout(() => sugPersona(this, true), 150)"><div id="sugPer"></div>
+    <select name="modoParte" style="margin-top:10px" onchange="const e=this.value==='monto'; this.form.miParte.style.display=e?'none':''; (this.form.miFijo.closest('.pesosW') || this.form.miFijo).style.display=e?'':'none'; document.getElementById('elOtro').style.display=e?'':'none'"><option value="pct">Dividir por porcentaje (%)</option><option value="monto" ${p.miFijo ? 'selected' : ''}>Dividir por montos exactos ($)</option></select>
     <input name="miParte" inputmode="numeric" value="${p.miParte||50}" placeholder="Mi parte %" style="width:100%;margin-top:8px;${p.miFijo ? 'display:none' : ''}">
-    <input name="miFijo" inputmode="decimal" value="${esc(p.miFijo||'')}" placeholder="Lo que pagas tú ($)" style="width:100%;margin-top:8px;${p.miFijo ? '' : 'display:none'}" oninput="const t=num(this.form.monto.value), y=num(this.value); document.getElementById('elOtro').textContent = t ? 'La otra persona paga ' + dinero(Math.max(0, Math.round((t-y)*100)/100)) + ' (de ' + dinero(t) + ')' : ''">
+    <input name="miFijo" inputmode="decimal" value="${esc(p.miFijo||'')}" placeholder="Lo que pagas tú" style="width:100%;margin-top:8px;${p.miFijo ? '' : 'display:none'}" oninput="const t=num(this.form.monto.value), y=num(this.value); document.getElementById('elOtro').textContent = t ? 'La otra persona paga ' + dinero(Math.max(0, Math.round((t-y)*100)/100)) + ' (de ' + dinero(t) + ')' : ''">
     <p class="gris chico" id="elOtro" style="margin:4px 4px 0;${p.miFijo ? '' : 'display:none'}"></p>
     ${p.creadoPor ? '' : `<p class="gris chico" style="margin:8px 4px 0">La otra persona verá tu cuenta o CLABE y el titular para depositarte su parte. Los datos de tus tarjetas nunca se comparten.</p>`}
+    </div>
     <button class="btn lleno" style="margin-top:20px" type="submit">Guardar</button>
     <div class="dos" style="margin-top:10px"><button class="btn borde" type="button" data-act="cerrar">Cancelar</button>${id ? `<button class="btn borde" type="button" style="color:var(--r-roj)" data-act="borrar" data-id="${id}">Eliminar</button>` : '<span></span>'}</div>
   </form>`);
@@ -2010,14 +2175,56 @@ async function token(){
   }
   return D.nube.token;
 }
+
+/* 13.6.2: seguridad — huella del teléfono, sesiones, borrar cuenta y respaldo cifrado */
+async function telHash(t10){ const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('mispagos|tel|' + t10)); return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join(''); }
+function nombreEquipoWeb(){ const u = navigator.userAgent; return /iPhone/.test(u) ? 'iPhone (web)' : /iPad/.test(u) ? 'iPad (web)' : /Android/.test(u) ? 'Android (web)' : /Mac/.test(u) ? 'Mac (web)' : /Windows/.test(u) ? 'Windows (web)' : 'Navegador'; }
+async function registrarSesion(){
+  try{ D.equipoId = D.equipoId || Math.random().toString(16).slice(2) + Date.now().toString(16); const t = Date.now(); D.sesionDesde = t; D.sesionVista = t; guardar();
+    await pedir('PATCH', DOCS + '/avisos/' + D.nube.uid + '?updateMask.fieldPaths=ultSesion', {fields:{ultSesion:{mapValue:{fields:{t:iv(t), d:sv(nombreEquipoWeb()), id:sv(D.equipoId)}}}}}, await token()); }catch(e){}
+}
+async function revisarSesiones(){
+  try{ const r = await pedir('GET', DOCS + '/avisos/' + D.nube.uid, null, await token()); const f = r.fields || {};
+    const min = +((f.sesionMin || {}).integerValue || 0); if(!D.sesionDesde){ D.sesionDesde = Date.now(); guardar(); }
+    if(min > D.sesionDesde){ delete D.nube; guardar(); avisoNube('🔒 Se cerró tu sesión: pediste cerrarla en tus otros equipos. Tus pagos siguen aquí.'); return false; }
+    const us = f.ultSesion && f.ultSesion.mapValue && f.ultSesion.mapValue.fields;
+    if(us){ const t0 = +((us.t || {}).integerValue || 0), id0 = (us.id || {}).stringValue || '', eq = (us.d || {}).stringValue || 'otro equipo';
+      if(t0 > (D.sesionVista || 0) && id0 !== D.equipoId){ D.sesionVista = t0; avisoNube(`🔐 Nuevo inicio de sesión en tu cuenta desde ${eq}. Si no fuiste tú, cambia tu contraseña y cierra las demás sesiones en Mi perfil → Cuenta.`); } }
+  }catch(e){}
+  return true;
+}
+async function cerrarOtrasSesiones(){ const t = Date.now(); await pedir('PATCH', DOCS + '/avisos/' + D.nube.uid + '?updateMask.fieldPaths=sesionMin', {fields:{sesionMin:iv(t)}}, await token()); D.sesionDesde = t + 1; guardar(); return {titulo:'Listo', texto:'Las demás sesiones se cerrarán al conectarse.'}; }
+async function eliminarCuenta(clave){
+  const yo = D.nube.correo; sesion(await pedir('POST', AUTHU + 'signInWithPassword?key=' + FB.key, {email:yo, password:clave, returnSecureToken:true})); D.nube.correo = yo;
+  const uid = D.nube.uid, tk = await token(); let b = 0, s0 = 0;
+  const res = await pedir('POST', DOCS + ':runQuery', {structuredQuery:{from:[{collectionId:'compartidos'}], where:{fieldFilter:{field:{fieldPath:'participantes'}, op:'ARRAY_CONTAINS', value:sv(yo)}}}}, tk);
+  for(const x of (Array.isArray(res) ? res : [])){ const d = x.document; if(!d) continue; const id = d.name.split('/').pop();
+    try{ if(gs(d.fields, 'creadoPor') === uid){ await pedir('DELETE', DOCS + '/compartidos/' + id, null, tk); b++; } else { await pedir('PATCH', DOCS + '/compartidos/' + id + '?updateMask.fieldPaths=estado&updateMask.fieldPaths=actualizado', {fields:{estado:sv('rechazado'), actualizado:iv(Date.now())}}, tk); s0++; } }catch(e){} }
+  try{ await pedir('DELETE', DOCS + '/usuarios/' + uid, null, tk); }catch(e){}
+  try{ await pedir('DELETE', DOCS + '/avisos/' + uid, null, tk); }catch(e){}
+  await pedir('POST', AUTHU + 'delete?key=' + FB.key, {idToken: tk});
+  delete D.nube; delete D.perfilPublicado; guardar();
+  return {titulo:'Cuenta eliminada', texto:`Tu cuenta se eliminó.${b ? ' Se borraron ' + b + ' pagos que compartías.' : ''}${s0 ? ' Saliste de ' + s0 + ' pagos que te compartían.' : ''} Tus pagos siguen en este equipo.`};
+}
+async function llaveRespaldo(clave, sal){ const k = await crypto.subtle.importKey('raw', new TextEncoder().encode(clave), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2', salt:sal, iterations:120000, hash:'SHA-256'}, k, {name:'AES-GCM', length:256}, false, ['encrypt', 'decrypt']); }
+const b64 = u => btoa(String.fromCharCode(...new Uint8Array(u))), deB64 = s0 => Uint8Array.from(atob(s0), c => c.charCodeAt(0));
+async function cifrarRespaldo(txt, clave){ const sal = crypto.getRandomValues(new Uint8Array(16)), ivv = crypto.getRandomValues(new Uint8Array(12));
+  const ct = await crypto.subtle.encrypt({name:'AES-GCM', iv:ivv}, await llaveRespaldo(clave, sal), new TextEncoder().encode(txt));
+  return JSON.stringify({app:'mispagos-cifrado', v:1, sal:b64(sal), iv:b64(ivv), datos:b64(ct)}); }
+async function descifrarRespaldo(env, clave){ const o = JSON.parse(env);
+  try{ const pt = await crypto.subtle.decrypt({name:'AES-GCM', iv:deB64(o.iv)}, await llaveRespaldo(clave, deB64(o.sal)), deB64(o.datos)); return new TextDecoder().decode(pt); }catch(e){ throw new Error('La contraseña no es correcta.'); } }
+function datosRespaldo(){ const c = JSON.parse(JSON.stringify(D)); ['nube','bloqueo','perfilPublicado','equipoId','sesionDesde','sesionVista'].forEach(k => delete c[k]); return JSON.stringify(c, null, 1); }   /* tu sesión y tu contraseña de entrada nunca van en el archivo */
 async function crearCuenta(correo, clave){
   sesion(await pedir('POST', AUTHU + 'signUp?key=' + FB.key, {email:correo.trim(), password:clave, returnSecureToken:true}));
   D.nube.correo = correo.trim().toLowerCase(); D.nube.verif = false; guardar();
   await pedir('POST', AUTHU + 'sendOobCode?key=' + FB.key, {requestType:'VERIFY_EMAIL', idToken: await token()});
+  registrarSesion();
 }
 async function entrar(correo, clave){
   sesion(await pedir('POST', AUTHU + 'signInWithPassword?key=' + FB.key, {email:correo.trim(), password:clave, returnSecureToken:true}));
   D.nube.correo = correo.trim().toLowerCase(); guardar(); await revisarVerif();
+  registrarSesion();
 }
 async function revisarVerif(){
   const r = await pedir('POST', AUTHU + 'lookup?key=' + FB.key, {idToken: await token()});
@@ -2030,6 +2237,7 @@ const gs = (f,k) => (f[k] && f[k].stringValue) || '', gi = (f,k,d) => f[k] && f[
 async function sincronizar(){
   if(!D.nube || !D.nube.refresh) throw new Error('Inicia sesión primero.');
   if(!D.nube.verif && !(await revisarVerif())) throw new Error('Primero verifica tu correo con el enlace que te enviamos.');
+  if(!(await revisarSesiones())) return 'Se cerró la sesión';   /* 13.6.2 */
   const yo = D.nube.correo, uid = D.nube.uid; let sub = 0, nue = 0, cam = 0, qui = 0;
   await publicarPerfil();
   for(const p of D.pagos){ const q = (p.conQuien || '').trim(); if(q.includes('@') && !(D.nomCorreo || {})[q.toLowerCase()]) await nombreDeCorreo(q); }
@@ -2040,7 +2248,9 @@ async function sincronizar(){
     if(!otro && p.conQuien.includes('@')) otro = p.conQuien.trim().toLowerCase();
     const tel = ((per && per.tel) || p.conQuien).replace(/\D/g, '');
     if(!otro && tel.length >= 10) otro = await correoDeTelefono(tel.slice(-10));
-    if(!otro.includes('@') || otro === yo) continue;
+    if(!otro) otro = ((D.correoDe || {})[p.conQuien.trim().toLowerCase()] || '');   /* 13.5.4: su correo, por los pagos que ya comparten */
+    if(!otro.includes('@')){ delete p.nubeFalla; continue; }   /* 13.6: no usa Mis Pagos: se divide solo aquí (no es error) */
+    if(otro === yo){ p.nubeFalla = 'No puedes compartir un pago contigo mismo.'; continue; }
     const firma = [p.pagado ? 'P' : '', p.nombre, p.monto, p.vence, p.frec, p.miParte, p.miFijo||'', p.conQuien, otro, p.credito ? p.tipoCred || 'tarjeta' : '', p.diaCorte || 0, p.minimo || '', (p.cuentaUlt||'') + (p.refUlt||'') + (p.titularVis||'') + (p.numServicio||'') + (p.tarjetaUlt||'') + (p.e2eCambio||'') + 'd3', p._faltaPub ? Date.now() : ''].join('|');
     if(p.nubeId && firma === p.nubeFirma) continue;
     /* datos para pagar (cifrados solo para la otra persona). Si no se pueden leer aquí o falta su llave, NO se mandan:
@@ -2058,12 +2268,18 @@ async function sincronizar(){
     if(datosV !== null) fields.datos = sv(datosV);
     if(!p.nubeId){ fields.estado = sv('pendiente'); fields.solicitud = sv(''); const r = await pedir('POST', DOCS + '/compartidos', {fields}, await token()); p.nubeId = r.name.split('/').pop(); p.nubeEstado = 'pendiente'; }
     else await pedir('PATCH', DOCS + '/compartidos/' + p.nubeId + '?' + Object.keys(fields).map(k => 'updateMask.fieldPaths=' + k).join('&'), {fields}, await token());
-    p.nubeFirma = firma; sub++;
-  } catch(e){ console.warn('sincronizar: subir', e); } }
+    p.nubeFirma = firma; sub++; delete p.nubeFalla;
+  } catch(e){ console.warn('sincronizar: subir', e); p.nubeFalla = 'No se pudo enviar; se vuelve a intentar al sincronizar.'; } }
   const res = await pedir('POST', DOCS + ':runQuery', {structuredQuery:{from:[{collectionId:'compartidos'}], where:{fieldFilter:{field:{fieldPath:'participantes'}, op:'ARRAY_CONTAINS', value:sv(yo)}}}}, await token());
   const vistos = new Set();
   (Array.isArray(res) ? res : []).forEach(x => { try {   /* 13.5.0: un documento raro ya no bloquea los demás */
     const d = x.document; if(!d) return; const id = d.name.split('/').pop(), f = d.fields; vistos.add(id);
+    { /* 13.5.4: guarda el correo de la otra persona con el nombre con que la ves. Antes, al compartirle un pago a
+         "Alexis" (contacto creado al recibir sus pagos, sin correo) no se encontraba su cuenta y el pago NUNCA se enviaba. */
+      const em = ((f.participantes && f.participantes.arrayValue && f.participantes.arrayValue.values) || []).map(v => v.stringValue).find(e => e && e.toLowerCase() !== (yo || '').toLowerCase());
+      if(em){ D.correoDe = D.correoDe || {};
+        const nombres = gs(f, 'creadoPor') === uid ? [gs(f, 'otroNombre')] : [nomCreador(f), gs(f, 'creadorNombre')];   // siempre el nombre de la OTRA persona
+        nombres.forEach(n => { if(n && !n.includes('@')) D.correoDe[n.trim().toLowerCase()] = em.toLowerCase(); }); } }
     try{ const ro = JSON.parse(gs(f,'recordatorio') || 'null'); D.recVisto = D.recVisto || {};
       if(ro && ro.deCorreo !== yo && ro.t > (D.recVisto[id] || 0)){ D.recVisto[id] = ro.t;
         if(ro.tipo === 'pagueParte'){ (D.partePide = D.partePide || {})[id] = {v:ro.v, monto:ro.monto || '', de:ro.de}; avisoNube(`💸 ${ro.de} dice que ya te pagó su parte de ${gs(f,'nombre')}${ro.monto ? ' (' + dinero(num(ro.monto)) + ')' : ''}. Ábrelo para confirmarlo.`); }
@@ -2104,7 +2320,7 @@ async function sincronizar(){
     if(!nuevo && montoAntes && montoAntes !== p.monto && (p.credito || p.variable)) p.montoAct = {m: p.monto, f: iso(hoy()), h: horaCorta(), corte: corteActual(p)};   /* el creador actualizó el monto tras el corte: flecha verde + registro */
     { const pv = gs(f,'pagadoV'), po = gs(f,'parteOk');   // quien lo creó confirmó el pago (o que recibió tu parte): aquí queda pagado
       const parte = po && po === p.vence;
-      if(((pv && pv === p.vence) || parte) && !p.pagado){ p.pagado = true; (p.hist = p.hist||[]).push({f:iso(hoy()), v:p.vence, m:p.monto, per:p.periodo||''}); if(!nuevo) avisoNube(`✅ ${nomCreador(f)} confirmó tu pago de ${sinPrefijo(p.nombre)}${parte ? ' (recibió tu parte)' : ''}.`); }
+      if(((pv && pv === p.vence) || parte) && !p.pagado){ p.pagado = true; (p.hist = p.hist||[]).push({f:iso(hoy()), v:p.vence, m:p.monto, per:p.periodo||''}); if(!nuevo) avisoNube(parte ? `✅ ${nomCreador(f)} confirmó que recibió tu parte de ${sinPrefijo(p.nombre)}.` : `✅ ${nomCreador(f)} pagó ${sinPrefijo(p.nombre)}: aquí también quedó pagado.`); }
       else if(!pv && !po && p.pagado && !nuevo){ p.pagado = false; } }
     { const pp = D.pagos.find(z => z.nubeId === id); const crudo = gs(f,'datos');
       const creador = ((f.participantes && f.participantes.arrayValue && f.participantes.arrayValue.values) || []).map(v => v.stringValue).find(e => e && e.toLowerCase() !== yo.toLowerCase()) || '';
@@ -2120,7 +2336,11 @@ async function sincronizar(){
     if(nuevo){ D.pagos.push(p); nue++; } else cam++;
   } catch(e){ console.warn('sincronizar: documento', e); } });
   D.invitaciones = (D.invitaciones || []).filter(z => vistos.has(z.id));
-  const antes = D.pagos.length; D.pagos = D.pagos.filter(p => !(p.creadoPor && p.nubeId && !vistos.has(p.nubeId))); qui = antes - D.pagos.length;
+  if(!sincronizar._otra && D.pagos.some(p => !p.nubeId && p.compartido && !p.creadoPor && (D.correoDe || {})[(p.conQuien || '').trim().toLowerCase()])){
+    sincronizar._otra = true; setTimeout(() => sincronizar().then(pintar).catch(() => {}).finally(() => { sincronizar._otra = false; }), 1200); }   /* 13.5.4: ya se sabe su correo: se envía de una vez */
+  const fuera = Array.isArray(res) ? D.pagos.filter(p => p.creadoPor && p.nubeId && !vistos.has(p.nubeId)) : [];   /* 13.6: sin respuesta no se borra nada */
+  fuera.forEach(p => { avisoNube(`🗑️ ${p.creadoPor} eliminó el pago compartido ${sinPrefijo(p.nombre)}.`); (D.eliminadosAviso = D.eliminadosAviso || []).push({de:p.creadoPor, nombre:sinPrefijo(p.nombre)}); });
+  const antes = D.pagos.length; D.pagos = D.pagos.filter(p => !fuera.includes(p)); qui = antes - D.pagos.length;
   D.nube.ultima = Date.now(); guardar();
   const r = []; if(sub) r.push(sub + (sub === 1 ? ' pago compartido subido' : ' pagos compartidos subidos')); if(nue) r.push(nue + (nue === 1 ? ' pago nuevo para ti' : ' pagos nuevos para ti')); if(cam) r.push(cam + ' actualizados'); if(qui) r.push(qui + ' quitados');
   return r.length ? r.join(' · ') : 'Todo al día';
@@ -2128,8 +2348,9 @@ async function sincronizar(){
 async function publicarPerfil(){
   try{ let tel = (D.miTel || '').replace(/\D/g, ''); if(tel.length >= 10) tel = tel.slice(-10);
     const pub = await Boveda.publica();
-    const clave = [D.nube.correo, tel, D.nombre, pub.length].join('|'); if(clave === D.perfilPublicado) return;
-    await pedir('PATCH', DOCS + '/usuarios/' + D.nube.uid, {fields:{correo:sv(D.nube.correo.toLowerCase()), tel:sv(tel), nombre:sv(D.nombre || ''), pub:sv(pub)}}, await token());
+    const clave = ['h2', D.nube.correo, tel, D.nombre, pub.length].join('|'); if(clave === D.perfilPublicado) return;
+    const fields = {correo:sv(D.nube.correo.toLowerCase()), nombre:sv(D.nombre || ''), pub:sv(pub)}; if(tel.length === 10) fields.telH = sv(await telHash(tel));   /* 13.6.2: el número ya no se publica tal cual */
+    await pedir('PATCH', DOCS + '/usuarios/' + D.nube.uid, {fields}, await token());
     D.perfilPublicado = clave; guardar(); }catch(e){}
 }
 function nomCreador(f){
@@ -2157,15 +2378,15 @@ async function pubDeCorreo(correo){
     const d = (Array.isArray(r) ? r : []).find(x => x.document); return d ? gs(d.document.fields, 'pub') : ''; }catch(e){ return ''; }
 }
 async function correoDeTelefono(tel){
-  try{ const r = await pedir('POST', DOCS + ':runQuery', {structuredQuery:{from:[{collectionId:'usuarios'}], where:{fieldFilter:{field:{fieldPath:'tel'}, op:'EQUAL', value:sv(tel)}}, limit:1}}, await token());
+  try{ const r = await pedir('POST', DOCS + ':runQuery', {structuredQuery:{from:[{collectionId:'usuarios'}], where:{fieldFilter:{field:{fieldPath:'telH'}, op:'EQUAL', value:sv(await telHash(tel))}}, limit:1}}, await token());
     const d = (Array.isArray(r) ? r : []).find(x => x.document); return d ? gs(d.document.fields, 'correo').toLowerCase() : ''; }catch(e){ return ''; }
 }
 async function responderInvitacion(id, aceptar){
   await pedir('PATCH', DOCS + '/compartidos/' + id + '?updateMask.fieldPaths=estado&updateMask.fieldPaths=actualizado', {fields:{estado:sv(aceptar ? 'aceptado' : 'rechazado'), actualizado:iv(Date.now())}}, await token());
   const inv = (D.invitaciones || []).find(z => z.id === id); if(inv) movimiento((aceptar ? '🤝 Aceptaste ' : '✖️ Rechazaste ') + sinPrefijo(inv.nombre || 'un pago compartido') + (inv.de ? ' (de ' + inv.de + ')' : ''));
   D.invitaciones = (D.invitaciones || []).filter(z => z.id !== id); guardar();
-  if(aceptar){ await sincronizar(); return 'Aceptado. Ya aparece en tus pagos.'; }
-  return 'Rechazado. Le avisaremos a quien te lo compartió.';
+  if(aceptar){ await sincronizar(); const pa = D.pagos.find(z => z.nubeId === id); return {titulo:'¡Listo!', texto:(inv ? sinPrefijo(inv.nombre) : 'El pago') + ' ya aparece en tus pagos.', id: pa ? pa.id : null}; }
+  return {titulo:'Rechazado', texto:'Le avisamos a ' + (inv && inv.de ? inv.de : 'quien te lo compartió') + ' que no lo aceptaste.'};
 }
 async function enviarSolicitud(p, cambios){
   cambios.de = D.nombre || D.nube.correo;
@@ -2180,7 +2401,31 @@ async function responderSolicitud(p, aprobar){
 }
 function describir(sol){ try{ const o = JSON.parse(sol); return [o.nombre && 'Nombre: ' + o.nombre, o.monto != null && 'Monto: $' + o.monto, o.vence && 'Fecha: ' + corto(o.vence)].filter(Boolean).join(' · '); }catch(e){ return ''; } }
 function borrarNube(p){ if(!p.creadoPor && p.nubeId && D.nube && D.nube.refresh) token().then(t => fetch(DOCS + '/compartidos/' + p.nubeId, {method:'DELETE', headers:{Authorization:'Bearer ' + t}})).catch(() => {}); }
-async function tarea(fn){ try{ const r = await fn(); if(r) alert(r); }catch(e){ alert(e.message || 'No hay conexión'); } pintar(); }
+
+/* 13.6: ventana con diseño (como las de Apariencia): ícono grande, título centrado, tarjeta de detalle y botones grandes */
+
+/* 13.6: si alguien eliminó un pago que te compartió, te lo decimos con una ventana al abrir la app */
+function avisosEliminadosWeb(){
+  const l0 = D.eliminadosAviso || []; if(!l0.length || document.getElementById('guia') || document.documentElement.classList.contains('conHoja')) return;
+  D.eliminadosAviso = []; guardar();
+  const de = l0.every(x => x.de === l0[0].de) ? l0[0].de : 'Alguien';
+  hojaRica({color:'#E5484D', icono:SIMB3.recibo.replace('currentColor', '#fff'), titulo:esc(de) + (l0.length === 1 ? ' eliminó un pago compartido' : ` eliminó ${l0.length} pagos compartidos`),
+    texto:esc(l0.map(x => x.nombre).join(', ')) + (l0.length === 1 ? ' ya no aparece en tus pagos.' : ' ya no aparecen en tus pagos.'), botones:[{t:'Entendido', act:'cerrar'}]});
+}
+function hojaRica(o){
+  const ic = o.icono || '';
+  abrirHoja(`<div class="rica">
+    <div class="ricaIco" style="background:${o.color || 'var(--acc,#1C326E)'}">${ic}${o.insignia ? `<span class="ricaIns">${o.insignia}</span>` : ''}</div>
+    <h1 class="ricaTit">${o.titulo}</h1>${o.texto ? `<p class="ricaTx">${o.texto}</p>` : ''}
+    ${o.detalle ? `<div class="ricaDet"><div class="fila" style="align-items:center;gap:12px">${o.detalle.logo || ''}<div class="peso" style="min-width:0"><div class="b" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${o.detalle.nombre}</div>${o.detalle.sub ? `<div class="gris chico">${o.detalle.sub}</div>` : ''}</div>${o.detalle.monto ? `<b style="font-size:20px">${o.detalle.monto}</b>` : ''}</div>${o.detalle.nota ? `<div class="ricaNota">${o.detalle.nota}</div>` : ''}</div>` : ''}
+    <div class="ricaBtns">${(o.botones || []).map(x => `<button class="btn ${x.cls || 'lleno'}" data-act="${x.act}" ${x.data || ''}>${x.t}</button>`).join('')}</div></div>`);
+  vibrar([14]);
+}
+function resultadoWeb(ok, titulo, texto, idVer){
+  hojaRica({color: ok ? '#1FA463' : '#E5484D', icono: ok ? '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l5 4.5 9-9.5"/></svg>' : SIMB2.alerta.replace('currentColor', '#fff'),
+    titulo: esc(titulo), texto: esc(texto), botones: idVer ? [{t:'Ver pago', act:'detalle', data:`data-id="${idVer}"`}, {t:'Cerrar', act:'cerrar', cls:'texto'}] : [{t:'Entendido', act:'cerrar'}]});
+}
+async function tarea(fn){ try{ const r = await fn(); if(r && typeof r === 'object') resultadoWeb(true, r.titulo, r.texto, r.id); else if(r) resultadoWeb(true, 'Listo', r); }catch(e){ resultadoWeb(false, 'No se pudo', e.message || 'No hay conexión'); } pintar(); }   /* 13.6: resultado con diseño (antes alert) */
 function hojaCuenta(){
   const n = D.nube || {};
   if(!n.refresh) return abrirHoja(`<h1>Cuenta de Mis Pagos</h1><p class="gris">Con una cuenta, los pagos que compartes con alguien le aparecen en su app, con quién los creó.</p>
@@ -2189,7 +2434,9 @@ function hojaCuenta(){
     <div class="dos" style="margin-top:10px"><button class="btn borde" type="submit" name="a" value="crear">Crear cuenta</button><button class="btn borde" type="submit" name="a" value="olvide">Olvidé mi contraseña</button></div></form>`) || enlazarCuenta();
   abrirHoja(`<h1>Cuenta</h1><div class="caja"><div class="b">${esc(n.correo)}</div><p class="gris chico">${n.verif ? 'Tus pagos compartidos con alguien que tiene correo en "Personas" se comparten con su cuenta.' : 'Falta verificar tu correo: abre el enlace que te enviamos y toca "Ya verifiqué".'}</p>
     ${n.verif ? '<button class="btn lleno" data-act="sync">Sincronizar ahora</button>' : '<button class="btn lleno" data-act="verif">Ya verifiqué</button>'}
-    <button class="btn borde" style="margin-top:10px" data-act="salir">Cerrar sesión</button></div>`);
+    <button class="btn borde" style="margin-top:10px" data-act="salir">Cerrar sesión</button>
+    <button class="btn borde" style="margin-top:10px" data-act="cerrarOtras">Cerrar sesión en otros equipos</button>
+    <button class="btn texto" style="margin-top:6px;color:#E5484D" data-act="borrarCuenta">Eliminar mi cuenta</button></div>`);
 }
 function enlazarCuenta(){
   const fm = document.getElementById('cta'); if(!fm) return;
@@ -2488,7 +2735,7 @@ document.addEventListener('click', (ev) => {
     case 'verDato': case 'copiarDato': {
       if(!confirm(a === 'verDato' ? '¿Mostrar el dato completo?' : '¿Copiar el dato completo?')) break;
       Boveda.leer(+b.dataset.id).then(o => { const v = o[b.dataset.k] || '';
-        if(!v){ aviso(o._error ? 'Este dato no se puede leer en este celular. Vuelve a capturarlo con ✎ Editar.' : 'Este dato está vacío. Captúralo con ✎ Editar.'); return; }
+        if(!v){ aviso(o._error ? 'Este dato no se puede leer en este teléfono. Vuelve a capturarlo con ✎ Editar.' : 'Este dato está vacío. Captúralo con ✎ Editar.'); return; }
         if(a === 'verDato'){ const el = document.getElementById('dv-' + b.dataset.k); if(el){ const antes = el.textContent; el.textContent = v; setTimeout(() => { el.textContent = antes; }, 30000); } }
         else navigator.clipboard.writeText(v.replace(/\s/g,'')).then(() => { aviso('✓ Copiado (se borra en 1 min)'); setTimeout(() => navigator.clipboard.writeText('').catch(() => {}), 60000); }); }); break; }
     case 'mes': { const d = +n;
@@ -2565,7 +2812,7 @@ document.addEventListener('click', (ev) => {
     case 'borrarAvisos': if(confirm('¿Borrar todos los avisos?')){ D.historial = []; guardar(); pintar(); } break;
     case 'filtro': filtroIni = +n; pintar(); window.scrollTo(0,0); break;
     case 'glassBlur': abrirHoja(`<h1>Desenfoque del fondo</h1><div class="caja" style="padding:4px 16px">${['Normal','30 % más','50 % más','80 % más'].map((x,i) => `<button class="dato opRadio" style="width:100%;padding:14px 0;${i ? 'border-top:1px solid var(--line)' : ''}" data-act="glassBlurSel" data-n="${i}"><span class="rad${(D.glassBlur||0)===i ? ' on' : ''}"></span><span class="peso" style="text-align:left;padding-left:14px">${x}</span></button>`).join('')}</div><button class="btn borde" style="margin-top:14px" data-act="cerrar">Cerrar</button>`); break;
-    case 'glassNoche': abrirHoja(`<h1>De noche, pasar a Glass oscuro</h1><div class="caja" style="padding:4px 16px">${['No, dejar el Glass que elegí','Sí, cuando mi celular esté en modo oscuro'].map((x,i) => `<button class="dato opRadio" style="width:100%;padding:14px 0;${i ? 'border-top:1px solid var(--line)' : ''}" data-act="glassNocheSel" data-n="${i}"><span class="rad${(D.glassNoche?1:0)===i ? ' on' : ''}"></span><span class="peso" style="text-align:left;padding-left:14px">${x}</span></button>`).join('')}</div><button class="btn borde" style="margin-top:14px" data-act="cerrar">Cerrar</button>`); break;
+    case 'glassNoche': abrirHoja(`<h1>De noche, pasar a Glass oscuro</h1><div class="caja" style="padding:4px 16px">${['No, dejar el Glass que elegí','Sí, cuando mi teléfono esté en modo oscuro'].map((x,i) => `<button class="dato opRadio" style="width:100%;padding:14px 0;${i ? 'border-top:1px solid var(--line)' : ''}" data-act="glassNocheSel" data-n="${i}"><span class="rad${(D.glassNoche?1:0)===i ? ' on' : ''}"></span><span class="peso" style="text-align:left;padding-left:14px">${x}</span></button>`).join('')}</div><button class="btn borde" style="margin-top:14px" data-act="cerrar">Cerrar</button>`); break;
     case 'glassNocheSel': document.querySelectorAll('.opRadio .rad').forEach(r => r.classList.toggle('on', b.contains(r))); D.glassNoche = +n === 1; guardar(); aplicarTema(); setTimeout(() => { cerrarHoja(); pintar(); }, 220); break;
     case 'glassBlurSel': document.querySelectorAll('.opRadio .rad').forEach(r => r.classList.toggle('on', b.contains(r))); D.glassBlur = +n; guardar(); aplicarTema(); setTimeout(() => { cerrarHoja(); pintar(); }, 220); break;
     case 'fotoGuardar': if(window._rcGuardar) window._rcGuardar(); break;
@@ -2585,9 +2832,12 @@ document.addEventListener('click', (ev) => {
     case 'importar': document.getElementById('imp').click(); break;
     case 'cuenta': hojaCuenta(); break;
     case 'invitacion': { const x = (D.invitaciones || []).find(z => z.id === b.dataset.i);
-      if(!x) break; const m = num(x.monto) * x.parte / 100;
-      abrirHoja(`<h1>${esc(x.de)} compartió un pago contigo</h1><div class="caja"><div class="b">${esc(sinPrefijo(x.nombre))}</div><div class="gris">Vence ${corto(x.vence)} · te toca ${x.parte} %${m ? ': ' + dinero(Math.round(m)) : ''}</div></div>
-        <button class="btn lleno" style="margin-top:16px" data-act="invSi" data-i="${x.id}">Aceptar</button><button class="btn borde" style="margin-top:10px" data-act="invNo" data-i="${x.id}">Rechazar</button>`); break; }
+      if(!x) break; const m = num(x.monto) * x.parte / 100; const pt = {nombre:x.nombre, cat:adivinarCat(x.nombre)};
+      hojaRica({color:'var(--ava,#1C326E)', icono:`<b style="font-size:28px;color:#fff">${esc((x.de || '?').charAt(0).toUpperCase())}</b>`, insignia:icono(pt),
+        titulo:`${esc(x.de)} compartió un pago contigo`, texto:'Al aceptarlo aparece en tus pagos y te avisamos cuando venza.',
+        detalle:{logo:icono(pt), nombre:esc(sinPrefijo(x.nombre)), sub:'Vence ' + corto(x.vence), monto: m ? dinero(Math.round(m)) : '', nota:`Te toca el ${x.parte} %${num(x.monto) ? ' de ' + dinero(num(x.monto)) : ''}`},
+        botones:[{t:'Aceptar', act:'invSi', data:`data-i="${x.id}"`}, {t:'Rechazar', act:'invNo', cls:'borde', data:`data-i="${x.id}"`}, {t:'Después', act:'cerrar', cls:'texto'}]});
+      break; }
     case 'invSi': { const x = (D.invitaciones || []).find(z => z.id === b.dataset.i); if(x) limpiarAvisos({nombre:x.nombre}); cerrarHoja(); tarea(() => responderInvitacion(b.dataset.i, true)); break; }
     case 'invNo': cerrarHoja(); tarea(() => responderInvitacion(b.dataset.i, false)); break;
     case 'solicitud': { const p = D.pagos.find(z => z.id === id); if(!p || !p.nubeSolVista) break; let q = {}; try{ q = JSON.parse(p.nubeSolVista); }catch(e){}
@@ -2646,7 +2896,7 @@ document.addEventListener('click', (ev) => {
       guardar(); if(navigator.vibrate) navigator.vibrate(15); if(b.dataset.volver) detalle(p.id); else ctlPintar(p); break; }
     case 'usarPrecio': { const p = D.pagos.find(z => z.id === +b.dataset.id), of = +b.dataset.m; if(!confirm(`Cambiará de ${dinero(num(p.monto))} a ${dinero(of)} desde el periodo que vence el ${corto(p.vence)}. Lo pagado antes no cambia.`)) break;
       registrarPrecio(p, p.monto, String(of), p.vence); p.monto = String(of); movimiento(`💲 Actualizaste el precio de ${sinPrefijo(p.nombre)}: ${dinero(of)}`); guardar(); if(p.nubeId && D.nube && D.nube.verif) sincronizar().catch(() => {}); if(navigator.vibrate) navigator.vibrate(20); detalle(p.id); break; }
-    case 'compartirQ': abrirHoja(`<h1>Compartir reporte quincenal</h1><div class="caja" style="padding:4px 16px">${['Todos los pagos','Solo pagos propios','Solo pagos compartidos'].map((x,i) => `<button class="dato" style="width:100%;padding:14px 0;${i ? 'border-top:1px solid var(--line)' : ''}" data-act="compartirQSel" data-n="${i}"><span class="peso" style="text-align:left">${x}</span><span class="gris">›</span></button>`).join('')}</div><p class="gris chico" style="margin:10px 4px 0">Se abre el menú de tu celular para mandarlo por WhatsApp, mensajes, correo u otra app.</p><button class="btn borde" style="margin-top:14px" data-act="cerrar">Cerrar</button>`); break;
+    case 'compartirQ': abrirHoja(`<h1>Compartir reporte quincenal</h1><div class="caja" style="padding:4px 16px">${['Todos los pagos','Solo pagos propios','Solo pagos compartidos'].map((x,i) => `<button class="dato" style="width:100%;padding:14px 0;${i ? 'border-top:1px solid var(--line)' : ''}" data-act="compartirQSel" data-n="${i}"><span class="peso" style="text-align:left">${x}</span><span class="gris">›</span></button>`).join('')}</div><p class="gris chico" style="margin:10px 4px 0">Se abre el menú de tu teléfono para mandarlo por WhatsApp, mensajes, correo u otra app.</p><button class="btn borde" style="margin-top:14px" data-act="cerrar">Cerrar</button>`); break;
     case 'compartirQSel': { const fl = +n, tx = reporteQ(fl); cerrarHoja(); if(navigator.vibrate) navigator.vibrate(15);
       imagenReporte(fl).then(f => { if(f && navigator.canShare && navigator.canShare({files:[f]})) return navigator.share({files:[f], title:'Reporte quincenal', text:'📊 Reporte quincenal · Mis Pagos'});
         if(navigator.share) return navigator.share({title:'Reporte quincenal', text:tx}); return navigator.clipboard.writeText(tx).then(() => aviso('✓ Reporte copiado')); }).catch(() => {}); break; }
@@ -2661,6 +2911,11 @@ document.addEventListener('click', (ev) => {
     case 'sync': cerrarHoja(); tarea(sincronizar); break;
     case 'verif': cerrarHoja(); tarea(async () => (await revisarVerif()) ? 'Correo verificado. ' + await sincronizar() : 'Todavía no aparece verificado. Revisa tu correo (también en spam).'); break;
     case 'salir': delete D.nube; guardar(); cerrarHoja(); pintar(); aviso('Sesión cerrada'); break;
+    case 'bloqueoMin': abrirHoja(`<h1>Bloquear al salir de la app</h1><p class="gris">Cuánto tiempo fuera de Mis Pagos antes de volver a pedir tu contraseña.</p>${[[0,'De inmediato'],[1,'Después de 1 minuto'],[5,'Después de 5 minutos'],[10,'Después de 10 minutos']].map(([m, t0]) => `<button class="btn ${(D.bloqueoMin != null ? D.bloqueoMin : 10) === m ? 'lleno' : 'borde'}" style="margin-top:10px" data-act="bloqueoMinSel" data-n="${m}">${t0}</button>`).join('')}`); break;
+    case 'bloqueoMinSel': D.bloqueoMin = +n; guardar(); vibrar([12]); cerrarHoja(); pintar(); break;
+    case 'cerrarOtras': cerrarHoja(); tarea(cerrarOtrasSesiones); break;
+    case 'borrarCuenta': { cerrarHoja();
+      setTimeout(() => { const k = prompt('Se borra tu cuenta ' + D.nube.correo + ', los pagos que compartes y sales de los que te comparten. Tus pagos de este equipo se quedan. No se puede deshacer.\n\nEscribe tu contraseña para confirmar:'); if(k) tarea(() => eliminarCuenta(k)); }, 320); break; }
     case 'presupuesto': {
       const fr = prompt('¿Cada cuándo te pagan? Escribe 1 = quincena, 2 = mes, 3 = semana', (D.ingresoFrec||0)+1); if(fr === null) break;
       const v = prompt('¿Cuánto te pagan cada vez?', D.ingresoPago||''); if(v === null) break;
@@ -2668,13 +2923,21 @@ document.addEventListener('click', (ev) => {
       const k = Math.max(0, Math.min(2, (parseInt(fr)||1) - 1)), m = num(v);
       D.ingresoFrec = k; D.ingresoPago = v; D.ingreso = k === 0 ? m*2 : k === 1 ? m : m*4.33; D.otros = num(o); guardar(); pintar(); break; }
     case 'exportar': {
-      const blob = new Blob([JSON.stringify(D, null, 1)], {type:'application/json'});
-      const u = URL.createObjectURL(blob), l = document.createElement('a'); l.href = u; l.download = 'mis-pagos-respaldo.json'; l.click(); setTimeout(() => URL.revokeObjectURL(u), 2000); break; }
+      /* 13.6.2: el archivo va cifrado con contraseña y SIN tu sesión (antes llevaba todo, incluida la sesión) */
+      const k1 = prompt('Pon una contraseña para proteger el respaldo (mínimo 6). La necesitarás para cargarlo; si la olvidas, nadie puede abrirlo.'); if(k1 === null) break;
+      if(k1.length < 6){ aviso('Usa al menos 6 caracteres'); break; }
+      if(prompt('Repite la contraseña') !== k1){ aviso('Las contraseñas no coinciden'); break; }
+      cifrarRespaldo(datosRespaldo(), k1).then(txt => { const blob = new Blob([txt], {type:'application/json'});
+        const u = URL.createObjectURL(blob), l = document.createElement('a'); l.href = u; l.download = 'mis-pagos-respaldo.json'; l.click(); setTimeout(() => URL.revokeObjectURL(u), 2000); }); break; }
   }
 });
 document.addEventListener('change', (ev) => {
   if(ev.target.dataset.act !== 'importar' || !ev.target.files[0]) return;
-  ev.target.files[0].text().then(t => { const d = JSON.parse(t); if(!d.pagos) throw 0; D = d; guardar(); aplicarTema(); pintar(); aviso('✓ Respaldo cargado'); }).catch(() => aviso('Ese archivo no es un respaldo de Mis Pagos'));
+  ev.target.files[0].text().then(async t => {
+    if(t.includes('"mispagos-cifrado"')){ const k = prompt('Contraseña del respaldo'); if(k === null) return; try{ t = await descifrarRespaldo(t, k); }catch(e){ aviso(e.message); return; } }
+    const d = JSON.parse(t); if(!d.pagos) throw 0;
+    const conservar = {nube:D.nube, bloqueo:D.bloqueo, equipoId:D.equipoId, sesionDesde:D.sesionDesde, sesionVista:D.sesionVista};   /* tu sesión y tu contraseña de entrada se quedan como están */
+    D = Object.assign(d, conservar); guardar(); aplicarTema(); pintar(); aviso('✓ Respaldo cargado'); }).catch(() => aviso('Ese archivo no es un respaldo de Mis Pagos'));
 });
 
 /* ===================== pintar ===================== */
@@ -2699,8 +2962,9 @@ function pintar(anim){
   avanzar();
   const app = document.getElementById('app');
   app.innerHTML = [inicio, () => `<div class="seg"><button class="${calSeg===0?'sel':''}" data-act="calSeg" data-n="0">Calendario</button><button class="${calSeg===1?'sel':''}" data-act="calSeg" data-n="1">Quincenas</button></div>` + (calSeg ? quincenasV() : calendario()), carteraV, estadisticas, () => (verCar ? pantallaCarrusel() : ajustes())][tab]();
-  carTimer(); carSwipe(); carAltura();
-  clearTimeout(window._gNovT); window._gNovT = setTimeout(guiaNovWeb, 900);   /* 13.5.1: tutorial de lo nuevo */
+  carTimer(); carSwipe(); carAltura(); ponerPesos(document.getElementById('app'));
+  if(tab === 0 && window._tabAnt !== 0) animarHero(); window._tabAnt = tab;   /* 13.6.1 */
+  clearTimeout(window._gNovT); window._gNovT = setTimeout(() => { avisosEliminadosWeb(); guiaNovWeb(); }, 900);   /* 13.5.1: tutorial de lo nuevo */
   if(anim && !matchMedia('(prefers-reduced-motion: reduce)').matches) app.animate([{opacity:0, transform:'translateY(8px)'}, {opacity:1, transform:'none'}], {duration:260, easing:'cubic-bezier(.2,.8,.2,1)'});
   // las gráficas se animan cuando aparecen en pantalla
   const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ e.target.classList.add('ver'); obs.unobserve(e.target); } }), {threshold:.35});
@@ -2765,7 +3029,7 @@ if('serviceWorker' in navigator) navigator.serviceWorker.addEventListener('contr
 /* ================= Bienvenida, primer pago guiado y recorrido ================= */
 const AVS = ['🐶','🐱','🐼','🦊','🐰','🐻','🐨','🐯','🦁','🐸','🐧','🦄','🐵','🐹','🦉'];
 const AVC = ['#FFE3D3','#E3ECFF','#E6F6EC','#FFF3C9','#F3E5FF','#FFE0EA'];
-const EJ = {internet:['Internet','599'], streaming:['Netflix','299'], luz:['Luz CFE','650'], telefono:['Plan de celular','349'], renta:['Renta','6500'], tarjeta:['Tarjeta de crédito','2500'], tienda:['Liverpool','800'], grupo:['Tanda','1000'], otro:['Gimnasio','450']};
+const EJ = {internet:['Internet','599'], streaming:['Netflix','299'], luz:['Luz CFE','650'], telefono:['Plan móvil','349'], renta:['Renta','6500'], tarjeta:['Tarjeta de crédito','2500'], tienda:['Liverpool','800'], grupo:['Tanda','1000'], otro:['Gimnasio','450']};
 function avatarURL(e, c){ const cv = document.createElement('canvas'); cv.width = cv.height = 256; const x = cv.getContext('2d');
   x.fillStyle = c; x.beginPath(); x.arc(128,128,128,0,7); x.fill(); x.font = '150px serif'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(e, 128, 140); return cv.toDataURL('image/png'); }
 let BV = null;
@@ -3088,7 +3352,7 @@ const Bloq = (() => {
   }
   document.addEventListener('visibilitychange', () => {
     if(document.hidden){ ocultaDesde = Date.now(); return; }
-    if(activo() && ocultaDesde && Date.now() - ocultaDesde > 10 * 60000 && !document.getElementById('bloqueo')){ abierta = false; mostrarEntrar(); }   /* si ya está la pantalla de entrada (p. ej. a medio recuperar), se queda como está */
+    if(activo() && ocultaDesde && Date.now() - ocultaDesde > (D.bloqueoMin != null ? D.bloqueoMin : 10) * 60000 && !document.getElementById('bloqueo')){ abierta = false; mostrarEntrar(); }   /* si ya está la pantalla de entrada (p. ej. a medio recuperar), se queda como está */
     ocultaDesde = 0; });
   return {
     iniciar(){ if(activo() && !abierta){ mostrarEntrar(); return; }
