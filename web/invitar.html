@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F5F6FA">
+<title>Te invitaron a Mis Pagos</title>
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+:root{--fg:#121A35;--gr:#6B7280;--bg:#F5F6FA;--card:#fff;--acc:#1C326E}
+@media (prefers-color-scheme: dark){:root{--fg:#EEF1F8;--gr:#9AA3B5;--bg:#0E1220;--card:#181D2E;--acc:#5B7BE8}}
+*{box-sizing:border-box;margin:0}
+body{font-family:-apple-system,system-ui,Roboto,sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.c{width:100%;max-width:420px;background:var(--card);border-radius:28px;padding:26px 22px 22px;box-shadow:0 20px 50px -20px rgba(10,20,50,.35);text-align:center;animation:e .45s cubic-bezier(.3,0,.15,1) both}
+@keyframes e{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
+.ic{width:68px;height:68px;border-radius:50%;background:#1FA463;display:grid;place-items:center;margin:0 auto;font-size:30px}
+h1{font-size:21px;margin-top:16px}
+p{color:var(--gr);font-size:14px;line-height:1.45;margin-top:8px}
+.d{margin-top:18px;padding:14px;border-radius:20px;background:color-mix(in srgb,var(--fg) 6%,transparent);text-align:left}
+.r{display:flex;align-items:center;gap:10px}.r b{font-size:16px}.r .m{margin-left:auto;font-size:20px;font-weight:800}
+.n{margin-top:10px;padding:6px 12px;border-radius:99px;font-size:12px;text-align:center;background:color-mix(in srgb,var(--acc) 14%,transparent)}
+a.b{display:block;margin-top:12px;padding:14px;border-radius:99px;font-weight:700;text-decoration:none;font-size:16px}
+a.l{background:var(--acc);color:#fff}a.o{border:1.2px solid color-mix(in srgb,var(--fg) 25%,transparent);color:var(--fg)}
+.pasos{text-align:left;margin-top:14px;font-size:13px;color:var(--gr);line-height:1.6}
+</style>
+</head>
+<body>
+<div class="c" id="c"></div>
+<script>
+/* 13.7.1: invitación a Mis Pagos. Detecta el sistema: Android → la APK más reciente publicada; iPhone → la versión
+   web para Safari (la más reciente). La info del pago viaja en el enlace (#d=...), sin datos bancarios. */
+const APK = 'https://raw.githubusercontent.com/alexisGH96/MisPagos/main/MisPagos.apk';
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const dinero = n => '$' + (Math.round((+n || 0) * 100) / 100).toLocaleString('es-MX', {minimumFractionDigits: (+n % 1) ? 2 : 0, maximumFractionDigits: 2});
+let d = null, crudo = '';
+try { crudo = (location.hash.match(/d=([^&]+)/) || [])[1] || ''; const b = crudo.replace(/-/g, '+').replace(/_/g, '/'); d = JSON.parse(decodeURIComponent(escape(atob(b + '='.repeat((4 - b.length % 4) % 4))))); } catch (e) {}
+const ua = navigator.userAgent, android = /Android/i.test(ua), ios = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && 'ontouchend' in document);
+const c = document.getElementById('c');
+if (!d) {
+  c.innerHTML = `<div class="ic">💳</div><h1>Mis Pagos</h1><p>Organiza tus pagos y divídelos con quien quieras.</p>
+    ${android || !ios ? `<a class="b l" href="${APK}">Descargar para Android</a>` : ''}${ios || !android ? `<a class="b ${android ? 'o' : 'l'}" href="./">Abrir en iPhone (Safari)</a>` : ''}`;
+} else {
+  if (ios || !android) try { localStorage.setItem('mpInvitacion', JSON.stringify(d)); } catch (e) {}
+  const v = d.v ? new Date(d.v + 'T12:00').toLocaleDateString('es-MX', {day: 'numeric', month: 'short'}) : '';
+  c.innerHTML = `<div class="ic">👥</div><h1>${esc(d.de)} te invitó a dividir un pago</h1>
+    <p>${d.pl ? 'Plan ' + esc(d.pl) + '. ' : ''}Lo gestiona ${esc(d.de)}. Se divide entre ${esc(d.np || 2)} personas${v ? ' y vence el ' + esc(v) : ''}${d.f ? ' (' + esc(String(d.f).toLowerCase()) + ')' : ''}.</p>
+    <div class="d"><div class="r"><b>${esc(d.n)}</b><span class="m">${dinero(d.mt)}</span></div><p style="margin-top:2px">Total ${dinero(d.m)}</p><div class="n">Te toca el ${esc(d.pt)} %</div></div>
+    ${android ? `<a class="b l" href="${APK}">Descargar Mis Pagos para Android</a>
+      <a class="b o" href="mispagos://invitacion#d=${crudo}">Ya la instalé: abrir la invitación</a>
+      <div class="pasos">1. Descarga e instala la app (si te lo pide, permite instalar desde tu navegador).<br>2. Vuelve aquí y toca “Ya la instalé”.<br>3. Crea tu cuenta: el pago aparece solo.</div>`
+    : `<a class="b l" href="./">Abrir Mis Pagos en Safari</a>
+      <div class="pasos">1. Toca “Abrir Mis Pagos”.<br>2. En Safari, toca Compartir → “Agregar a pantalla de inicio”.<br>3. Crea tu cuenta: el pago aparece solo.</div>
+      ${!ios ? `<a class="b o" href="${APK}">¿Tienes Android? Descarga la app</a>` : ''}`}`;
+}
+</script>
+</body>
+</html>
