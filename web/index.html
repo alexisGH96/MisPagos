@@ -584,7 +584,13 @@ button:active,.pago:active,.pc:active,a.btn:active{transform:scale(.97);transiti
 </head>
 <body>
 <div id="fondoGlass"></div>
-<main id="app"></main>
+<main id="app"><p style="text-align:center;margin-top:40vh;opacity:.6;font-size:15px">Cargando Mis Pagos…</p></main>
+<script>
+/* 13.8.3: si algo impide abrir la app en este navegador, se dice qué pasó en lugar de quedarse en blanco */
+window._errInicio = '';
+window.addEventListener('error', e => { if(!window._errInicio) window._errInicio = (e.message || 'error') + (e.lineno ? ' (línea ' + e.lineno + ')' : ''); });
+setTimeout(() => { const a = document.getElementById('app'); if(a && /Cargando Mis Pagos/.test(a.textContent) && !document.getElementById('bv')) a.innerHTML = '<div style="max-width:420px;margin:30vh auto 0;padding:0 24px;text-align:center;font-family:-apple-system,system-ui,sans-serif"><h2 style="margin:0 0 8px">No se pudo abrir Mis Pagos</h2><p style="opacity:.7;line-height:1.45">Ábrela en Safari (iPhone) o Chrome (Android) y, si sigue igual, envía una captura de esta pantalla.</p>' + (window._errInicio ? '<p style="opacity:.5;font-size:12px;margin-top:14px">' + window._errInicio.replace(/</g, '&lt;') + '</p>' : '') + '<p><a href="./" style="font-weight:700">Volver a intentar</a></p></div>'; }, 8000);
+</script>
 <nav id="nav" aria-label="Secciones"></nav>
 <button id="arriba" data-act="irArriba" aria-label="Ir arriba"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button>
 <div id="capa"></div>
