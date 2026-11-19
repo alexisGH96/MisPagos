@@ -13,7 +13,10 @@
 body{font-family:-apple-system,system-ui,Roboto,sans-serif;background:var(--bg);color:var(--fg);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
 .c{width:100%;max-width:420px;background:var(--card);border-radius:28px;padding:26px 22px 22px;box-shadow:0 20px 50px -20px rgba(10,20,50,.35);text-align:center;animation:e .45s cubic-bezier(.3,0,.15,1) both}
 @keyframes e{from{opacity:0;transform:translateY(16px) scale(.97)}to{opacity:1;transform:none}}
-.ic{width:68px;height:68px;border-radius:50%;background:#1FA463;display:grid;place-items:center;margin:0 auto;font-size:30px}
+.ic{width:72px;height:72px;border-radius:22px;display:grid;place-items:center;margin:0 auto;font-size:34px;color:#fff;font-weight:800;position:relative;box-shadow:0 10px 22px -10px rgba(0,0,0,.45);animation:p .55s cubic-bezier(.34,1.56,.64,1) .1s both}
+@keyframes p{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.ic svg{width:44px;height:44px}
+.ins{position:absolute;right:-8px;bottom:-8px;width:30px;height:30px;border-radius:50%;background:var(--acc);border:3px solid var(--card);font-size:13px;display:grid;place-items:center}
 h1{font-size:21px;margin-top:16px}
 p{color:var(--gr);font-size:14px;line-height:1.45;margin-top:8px}
 .d{margin-top:18px;padding:14px;border-radius:20px;background:color-mix(in srgb,var(--fg) 6%,transparent);text-align:left}
@@ -36,20 +39,27 @@ let d = null, crudo = '';
 try { crudo = (location.hash.match(/d=([^&]+)/) || [])[1] || ''; const b = crudo.replace(/-/g, '+').replace(/_/g, '/'); d = JSON.parse(decodeURIComponent(escape(atob(b + '='.repeat((4 - b.length % 4) % 4))))); } catch (e) {}
 const ua = navigator.userAgent, android = /Android/i.test(ua), ios = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && 'ontouchend' in document);
 const c = document.getElementById('c');
+/* ícono del pago que se comparte (marca conocida o uno alusivo) */
+const MARCAS = [['spotify','#1DB954','<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M5.5 9.2c4.3-1.4 9-1 12.6 1"/><path d="M6.4 12.6c3.5-1 7.3-.7 10.2.9"/><path d="M7.3 15.8c2.8-.7 5.6-.4 7.8.7"/></svg>'],
+  ['netflix','#000','<b style="color:#E50914;font-size:40px;font-family:Georgia,serif">N</b>'],['youtube','#FF0000','▶'],['disney','#113CCF','D+'],['prime','#00A8E1','▶'],['amazon','#232F3E','a'],
+  ['max','#002BE7','max'],['hbo','#5822B4','max'],['apple','#000','<span style="font-size:30px"></span>'],['xbox','#107C10','X'],['playstation','#003791','PS'],['chatgpt','#10A37F','✦'],['crunchyroll','#F47521','C'],['paramount','#0064FF','P+'],['vix','#FF6B00','V']];
+function iconoPago(d){ const n = String(d.n || '').toLowerCase(); const m = MARCAS.find(x => n.includes(x[0]));
+  if(m) return `<div class="ic" style="background:${m[1]}">${m[2]}<span class="ins">${esc(String(d.de || '?').charAt(0).toUpperCase())}</span></div>`;
+  const E = {msi:'🗓️',streaming:'🎬',luz:'💡',internet:'📡',telefono:'📱',renta:'🏠',grupo:'👥',tarjeta:'💳'}; return `<div class="ic" style="background:linear-gradient(135deg,#A77BFF,#6B35F0)">${E[d.cat] || '💳'}<span class="ins">${esc(String(d.de || '?').charAt(0).toUpperCase())}</span></div>`; }
 if (!d) {
   c.innerHTML = `<div class="ic">💳</div><h1>Mis Pagos</h1><p>Organiza tus pagos y divídelos con quien quieras.</p>
     ${android || !ios ? `<a class="b l" href="${APK}">Descargar para Android</a>` : ''}${ios || !android ? `<a class="b ${android ? 'o' : 'l'}" href="./">Abrir en iPhone (Safari)</a>` : ''}`;
 } else {
   if (ios || !android) try { localStorage.setItem('mpInvitacion', JSON.stringify(d)); } catch (e) {}
   const v = d.v ? new Date(d.v + 'T12:00').toLocaleDateString('es-MX', {day: 'numeric', month: 'short'}) : '';
-  c.innerHTML = `<div class="ic">👥</div><h1>${esc(d.de)} te invitó a dividir un pago</h1>
+  c.innerHTML = `${iconoPago(d)}<h1>${esc(d.de)} te invitó a dividir un pago</h1>
     <p>${d.pl ? 'Plan ' + esc(d.pl) + '. ' : ''}Lo gestiona ${esc(d.de)}. Se divide entre ${esc(d.np || 2)} personas${v ? ' y vence el ' + esc(v) : ''}${d.f ? ' (' + esc(String(d.f).toLowerCase()) + ')' : ''}.</p>
     <div class="d"><div class="r"><b>${esc(d.n)}</b><span class="m">${dinero(d.mt)}</span></div><p style="margin-top:2px">Total ${dinero(d.m)}</p><div class="n">Te toca el ${esc(d.pt)} %</div></div>
     ${android ? `<a class="b l" href="${APK}">Descargar Mis Pagos para Android</a>
       <a class="b o" href="mispagos://invitacion#d=${crudo}">Ya la instalé: abrir la invitación</a>
-      <div class="pasos">1. Descarga e instala la app (si te lo pide, permite instalar desde tu navegador).<br>2. Vuelve aquí y toca “Ya la instalé”.<br>3. Crea tu cuenta: el pago aparece solo.</div>`
+      <div class="pasos">1. Toca “Descargar Mis Pagos” e instala la app. Si tu teléfono lo pide, permite instalar apps desde tu navegador.<br>2. Regresa a esta página y toca “Ya la instalé”.<br>3. Crea tu cuenta y verás este pago listo en la app.</div>`
     : `<a class="b l" href="./">Abrir Mis Pagos en Safari</a>
-      <div class="pasos">1. Toca “Abrir Mis Pagos”.<br>2. En Safari, toca Compartir → “Agregar a pantalla de inicio”.<br>3. Crea tu cuenta: el pago aparece solo.</div>
+      <div class="pasos">1. Toca “Abrir Mis Pagos”.<br>2. En Safari, toca Compartir y luego “Agregar a pantalla de inicio”.<br>3. Crea tu cuenta y verás este pago listo en la app.</div>
       ${!ios ? `<a class="b o" href="${APK}">¿Tienes Android? Descarga la app</a>` : ''}`}`;
 }
 </script>
