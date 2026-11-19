@@ -1,6 +1,6 @@
 {
-  "versionCode": 174,
-  "versionName": "13.8.2",
+  "versionCode": 175,
+  "versionName": "13.8.3",
   "apk": "MisPagos.apk",
-  "notas": "**Importar pagos desde Excel**\n- Sirve para cualquier tipo de pago: la app detecta la categoría y lo acomoda. Está hasta arriba al agregar un pago y puedes descargar un archivo de ejemplo.\n\n**Compras a meses sin intereses**\n- Dentro de cada tarjeta: precio, MSI y mensualidad en desplegables; el monto se calcula solo y avanza cada mes.\n\n**Gastos compartidos**\n- Divide un gasto con varias personas e invita a quien no usa Mis Pagos con un enlace (Android o iPhone) con su parte incluida.\n- Nueva pantalla \"Invitaciones enviadas\" en Mi perfil → Cuenta y seguridad.\n\n**Más claro y visual**\n- Íconos alusivos a lo que escribes, carrusel con columnas, anillos y medidor, y textos más claros en Mi perfil.\n\n**Seguridad**\n- Bloqueo automático elegible, aviso de inicio de sesión en otro dispositivo, cerrar las demás sesiones, eliminar tu cuenta y respaldo con contraseña."
+  "notas": "Corrección de errores y mejoras en rendimiento."
 }
