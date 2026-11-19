@@ -19,17 +19,21 @@ body{font-family:-apple-system,system-ui,Roboto,sans-serif;background:var(--bg);
 .ins{position:absolute;right:-8px;bottom:-8px;width:30px;height:30px;border-radius:50%;background:var(--acc);border:3px solid var(--card);font-size:13px;display:grid;place-items:center}
 h1{font-size:21px;margin-top:16px}
 p{color:var(--gr);font-size:14px;line-height:1.45;margin-top:8px}
-.d{margin-top:18px;padding:14px;border-radius:20px;background:color-mix(in srgb,var(--fg) 6%,transparent);text-align:left}
+.d{margin-top:18px;padding:14px;border-radius:20px;background:rgba(120,130,150,.12);text-align:left}
 .r{display:flex;align-items:center;gap:10px}.r b{font-size:16px}.r .m{margin-left:auto;font-size:20px;font-weight:800}
-.n{margin-top:10px;padding:6px 12px;border-radius:99px;font-size:12px;text-align:center;background:color-mix(in srgb,var(--acc) 14%,transparent)}
+.n{margin-top:10px;padding:6px 12px;border-radius:99px;font-size:12px;text-align:center;background:rgba(60,90,200,.14)}
 a.b{display:block;margin-top:12px;padding:14px;border-radius:99px;font-weight:700;text-decoration:none;font-size:16px}
-a.l{background:var(--acc);color:#fff}a.o{border:1.2px solid color-mix(in srgb,var(--fg) 25%,transparent);color:var(--fg)}
+a.l{background:var(--acc);color:#fff}a.o{border:1.2px solid rgba(120,130,150,.45);color:var(--fg)}
+a.c2{display:inline-block;margin-top:10px;font-size:14px;color:var(--acc);font-weight:700;text-decoration:none}
+.tip{margin-top:14px;padding:10px 12px;border-radius:14px;background:rgba(242,166,0,.14);font-size:13px;text-align:left;color:var(--fg)}
 .pasos{text-align:left;margin-top:14px;font-size:13px;color:var(--gr);line-height:1.6}
 </style>
 </head>
 <body>
-<div class="c" id="c"></div>
+<div class="c" id="c"><div class="ic" style="background:#1FA463">💳</div><h1>Mis Pagos</h1><p>Organiza tus pagos y divídelos con quien quieras.</p>
+<a class="b l" href="./">Abrir Mis Pagos (iPhone)</a><a class="b o" href="https://raw.githubusercontent.com/alexisGH96/MisPagos/main/MisPagos.apk">Descargar para Android</a></div>
 <script>
+try {
 /* 13.7.1: invitación a Mis Pagos. Detecta el sistema: Android → la APK más reciente publicada; iPhone → la versión
    web para Safari (la más reciente). La info del pago viaja en el enlace (#d=...), sin datos bancarios. */
 const APK = 'https://raw.githubusercontent.com/alexisGH96/MisPagos/main/MisPagos.apk';
@@ -38,6 +42,7 @@ const dinero = n => '$' + (Math.round((+n || 0) * 100) / 100).toLocaleString('es
 let d = null, crudo = '';
 try { crudo = (location.hash.match(/d=([^&]+)/) || [])[1] || ''; const b = crudo.replace(/-/g, '+').replace(/_/g, '/'); d = JSON.parse(decodeURIComponent(escape(atob(b + '='.repeat((4 - b.length % 4) % 4))))); } catch (e) {}
 const ua = navigator.userAgent, android = /Android/i.test(ua), ios = /iPhone|iPad|iPod/i.test(ua) || (/Macintosh/.test(ua) && 'ontouchend' in document);
+const otroNav = /OPiOS|OPT\//.test(ua) ? 'Opera' : /CriOS/.test(ua) ? 'Chrome' : /FxiOS/.test(ua) ? 'Firefox' : /EdgiOS/.test(ua) ? 'Edge' : /FBAN|FBAV|Instagram|WhatsApp/.test(ua) ? 'el navegador de otra app' : '';
 const c = document.getElementById('c');
 /* ícono del pago que se comparte (marca conocida o uno alusivo) */
 const MARCAS = [['spotify','#1DB954','<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M5.5 9.2c4.3-1.4 9-1 12.6 1"/><path d="M6.4 12.6c3.5-1 7.3-.7 10.2.9"/><path d="M7.3 15.8c2.8-.7 5.6-.4 7.8.7"/></svg>'],
@@ -58,10 +63,14 @@ if (!d) {
     ${android ? `<a class="b l" href="${APK}">Descargar Mis Pagos para Android</a>
       <a class="b o" href="mispagos://invitacion#d=${crudo}">Ya la instalé: abrir la invitación</a>
       <div class="pasos">1. Toca “Descargar Mis Pagos” e instala la app. Si tu teléfono lo pide, permite instalar apps desde tu navegador.<br>2. Regresa a esta página y toca “Ya la instalé”.<br>3. Crea tu cuenta y verás este pago listo en la app.</div>`
-    : `<a class="b l" href="./">Abrir Mis Pagos en Safari</a>
+    : `<a class="b l" href="./">Abrir Mis Pagos${otroNav ? '' : ' en Safari'}</a>
       <div class="pasos">1. Toca “Abrir Mis Pagos”.<br>2. En Safari, toca Compartir y luego “Agregar a pantalla de inicio”.<br>3. Crea tu cuenta y verás este pago listo en la app.</div>
-      ${!ios ? `<a class="b o" href="${APK}">¿Tienes Android? Descarga la app</a>` : ''}`}`;
+      ${!ios ? `<a class="b o" href="${APK}">¿Tienes Android? Descarga la app</a>` : ''}
+      ${ios && otroNav ? `<div class="tip">Estás usando ${otroNav}. Para instalar Mis Pagos en tu pantalla de inicio y recibir avisos, abre este enlace en <b>Safari</b>.<br><a class="c2" href="#" id="copiar">Copiar enlace</a></div>` : ''}`}`;
+  const cp = document.getElementById('copiar');
+  if (cp) cp.onclick = e => { e.preventDefault(); try { navigator.clipboard.writeText(location.href).then(() => { cp.textContent = '✓ Enlace copiado: pégalo en Safari'; }); } catch (x) { prompt('Copia este enlace y ábrelo en Safari:', location.href); } };
 }
+} catch (e) { /* si algo falla, se queda el contenido básico de arriba */ }
 </script>
 </body>
 </html>
