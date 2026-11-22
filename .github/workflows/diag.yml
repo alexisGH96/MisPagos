@@ -1,0 +1,16 @@
+name: Diagnostico
+on:
+  push:
+    paths: ['.github/diag/**']
+jobs:
+  diag:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-save firebase-admin@12.7.0
+      - run: node .github/diag/diag.js
+        env:
+          FIREBASE_SA: ${{ secrets.FIREBASE_SA }}
