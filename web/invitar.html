@@ -31,12 +31,12 @@ a.c2{display:inline-block;margin-top:10px;font-size:14px;color:var(--acc);font-w
 </head>
 <body>
 <div class="c" id="c"><div class="ic" style="background:#1FA463">💳</div><h1>Mis Pagos</h1><p>Organiza tus pagos y divídelos con quien quieras.</p>
-<a class="b l" href="./">Abrir Mis Pagos (iPhone)</a><a class="b o" href="https://raw.githubusercontent.com/alexisGH96/MisPagos/main/MisPagos.apk">Descargar para Android</a></div>
+<a class="b l" href="./">Abrir Mis Pagos (iPhone)</a><a class="b o" href="../MisPagos.apk">Descargar para Android</a></div>
 <script>
 try {
 /* 13.7.1: invitación a Mis Pagos. Detecta el sistema: Android → la APK más reciente publicada; iPhone → la versión
    web para Safari (la más reciente). La info del pago viaja en el enlace (#d=...), sin datos bancarios. */
-const APK = 'https://raw.githubusercontent.com/alexisGH96/MisPagos/main/MisPagos.apk';
+const APK = '../MisPagos.apk';   /* 13.9: misma página (github.io o web.app): si una red bloquea GitHub, la copia en Google sirve también el APK */
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dinero = n => '$' + (Math.round((+n || 0) * 100) / 100).toLocaleString('es-MX', {minimumFractionDigits: (+n % 1) ? 2 : 0, maximumFractionDigits: 2});
 let d = null, crudo = '';
