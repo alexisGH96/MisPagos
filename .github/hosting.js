@@ -5,7 +5,7 @@ const sa = JSON.parse(process.env.FIREBASE_SA), SITE = 'mispagos-bb986', API = '
 (async () => {
   const tok = (await admin.credential.cert(sa).getAccessToken()).access_token;
   const pedir = async (m, url, body, tipo) => { const r = await fetch(url, { method: m, headers: { Authorization: 'Bearer ' + tok, 'Content-Type': tipo || 'application/json' }, body: tipo ? body : body && JSON.stringify(body) });
-    const t = await r.text(); if (!r.ok) throw new Error(m + ' ' + url + ' → ' + r.status + ' ' + t.slice(0, 300)); return t ? JSON.parse(t) : {}; };
+    const t = await r.text(); if (!r.ok) throw new Error(m + ' ' + url.replace(/https:\/\/[^/]+/, '') + ' → ' + r.status + ' ' + Buffer.from(t.slice(0, 400)).toString('base64')); return t ? JSON.parse(t) : {}; };
   // archivos: /MisPagos/web/* , /MisPagos/MisPagos.apk , /MisPagos/version.json (mismas rutas que en github.io)
   const lista = []; for (const f of fs.readdirSync('web')) if (fs.statSync(path.join('web', f)).isFile()) lista.push(['web/' + f, '/MisPagos/web/' + f]);
   for (const f of ['MisPagos.apk', 'version.json']) if (fs.existsSync(f)) lista.push([f, '/MisPagos/' + f]);
