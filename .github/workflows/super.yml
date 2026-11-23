@@ -1,0 +1,27 @@
+name: Precios del super
+on:
+  schedule:
+    - cron: '30 12 * * *'
+  push:
+    branches: [main]
+    paths: ['.github/super.js', '.github/workflows/super.yml']
+permissions:
+  contents: write
+jobs:
+  precios:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node .github/super.js
+      - run: |
+          if git diff --quiet -- web/super.json 2>/dev/null && git ls-files --error-unmatch web/super.json >/dev/null 2>&1; then echo "sin cambios"; exit 0; fi
+          git config user.name "Mis Pagos (robot)"; git config user.email "robot@mispagos.local"
+          git add web/super.json && git commit -m "precios del super" && git push
+      # un push del robot no dispara otros flujos: la copia en Firebase se publica aquí mismo
+      - run: npm install --no-save firebase-admin@12.7.0 && node .github/hosting.js
+        env:
+          FIREBASE_SA: ${{ secrets.FIREBASE_SA }}
+          MSG: precios del super
