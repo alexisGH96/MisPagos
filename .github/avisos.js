@@ -1,12 +1,15 @@
 // Avisos push para quienes usan la versión web (iPhone):
-//  - 9:00 a.m.: pagos próximos a vencer (solo nombre y fecha, sin montos).
+//  - 9:00 a.m.: pagos próximos a vencer (solo nombre y fecha, sin montos) y avisos de corte (día del corte y día siguiente).
 //  - cada 15 min: avisos de pagos compartidos ("ya pagué mi parte", confirmaciones y recordatorios).
 const admin = require('firebase-admin');
 const webpush = require('web-push');
 admin.initializeApp({ credential: admin.credential.cert(JSON.parse(process.env.FIREBASE_SA)) });
 webpush.setVapidDetails('mailto:avisos@mispagos.app', process.env.VAPID_PUBLIC, process.env.VAPID_PRIVATE);
 const prueba = process.env.PRUEBA === 'true';
-const diario = prueba || process.env.HORARIO === '0 15 * * *' || process.env.EVENTO === 'workflow_dispatch';
+// 13.9: GitHub corre el robot pocas veces al día (a veces se salta la corrida de las 9:00), así que lo diario lo hace
+// la PRIMERA corrida después de las 9:00 de Monterrey; la fecha queda en robot/estado para no repetirlo ese día.
+const horaMty = +new Intl.DateTimeFormat('en-US', { timeZone: 'America/Monterrey', hour: 'numeric', hour12: false }).format(new Date()) % 24;
+let diario = prueba || process.env.EVENTO === 'workflow_dispatch';
 const hoyISO = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Monterrey' }).format(new Date());
 const dia = s => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)) / 86400000;
 const cuando = d => d < 0 ? 'ya venció' : d === 0 ? 'vence hoy' : d === 1 ? 'vence mañana' : `vence en ${d} días`;
@@ -74,6 +77,9 @@ const sinPrefijo = n => String(n || '').replace(/^Pagar |^Pago /, '');
     }
   } catch (e) { console.log('Compartidos:', e.message); }
   // ---- 2) una vez al día: pagos por vencer ----
+  const estadoRef = db.collection('robot').doc('estado');
+  if (!diario && horaMty >= 9) { try { const es = await estadoRef.get(); diario = !es.exists || es.data().diario !== hoyISO; } catch (e) { diario = process.env.HORARIO === '0 15 * * *'; } }
+  if (diario && !prueba) { try { await estadoRef.set({ diario: hoyISO, t: Date.now() }, { merge: true }); } catch (e) { } }
   if (diario) {
     // 2a) recordatorio automático a quien comparte un pago contigo: 2 días antes, 1 día antes y el día límite
     try {
@@ -110,6 +116,20 @@ const sinPrefijo = n => String(n || '').replace(/^Pagar |^Pago /, '');
       let msg = null;
       if (prueba) msg = { title: 'Mis Pagos', body: 'Prueba: los avisos ya funcionan en este iPhone ✓' };
       else {
+        // 13.8.4: avisos de corte (el día del corte y al día siguiente, por la mañana)
+        try {
+          const [hy, hm, hd] = hoyISO.split('-').map(Number);
+          const corteEn = (y, m, c) => Math.min(c, new Date(Date.UTC(y, m, 0)).getUTCDate());   // m: 1-12
+          const ayer = new Date(Date.UTC(hy, hm - 1, hd - 1)), ay = ayer.getUTCFullYear(), am = ayer.getUTCMonth() + 1, ad = ayer.getUTCDate();
+          for (const k of (a.cortes || [])) {
+            const c = +k.c; if (!c || !k.n) continue;
+            const lim = k.v ? (() => { const [y, m, d] = k.v.split('-').map(Number); return `${d} de ${['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'][m - 1]}`; })() : '';
+            if (corteEn(hy, hm, c) === hd)
+              await mandar(doc.ref, a.sub, { title: `Hoy es la fecha de corte de ${k.n}`, body: `Es posible que tu banco todavía no lo refleje: normalmente lo procesa en el transcurso del día. Mañana te recordamos actualizar el monto.${lim ? ' Fecha límite: ' + lim + '.' : ''}` });
+            else if (corteEn(ay, am, c) === ad)
+              await mandar(doc.ref, a.sub, { title: `${k.n} ya hizo su corte`, body: k.a ? 'Pide a quien lo creó que actualice el monto a pagar en Mis Pagos.' : `Abre Mis Pagos y actualiza el monto a pagar${lim ? ' antes del ' + lim : ''}.` });
+          }
+        } catch (e) { console.log('Avisos de corte:', e.message); }
         const lista = (a.proximos || []).map(p => ({ n: p.n, d: dia(p.v) - dia(hoyISO) })).filter(p => p.d <= 3 && p.d >= -3).sort((x, y) => x.d - y.d);
         if (!lista.length) continue;
         msg = lista.length === 1 ? { title: `${lista[0].n} ${cuando(lista[0].d)}`, body: 'Toca para abrir Mis Pagos y marcarlo cuando lo pagues.' }
