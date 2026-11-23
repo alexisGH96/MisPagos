@@ -2,7 +2,7 @@ name: Copia en Firebase Hosting
 on:
   push:
     branches: [main]
-    paths: ['web/**', 'version.json', '.github/hosting.js', '.github/workflows/hosting.yml']
+    paths: ['web/**', 'MisPagos.apk', 'version.json', '.github/hosting.js', '.github/workflows/hosting.yml']
 jobs:
   publicar:
     runs-on: ubuntu-latest
