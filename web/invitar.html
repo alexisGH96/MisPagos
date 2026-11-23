@@ -31,12 +31,12 @@ a.c2{display:inline-block;margin-top:10px;font-size:14px;color:var(--acc);font-w
 </head>
 <body>
 <div class="c" id="c"><div class="ic" style="background:#1FA463">💳</div><h1>Mis Pagos</h1><p>Organiza tus pagos y divídelos con quien quieras.</p>
-<a class="b l" href="./">Abrir Mis Pagos (iPhone)</a><a class="b o" href="https://raw.githubusercontent.com/alexisGH96/MisPagos/main/MisPagos.apk">Descargar para Android</a></div>
+<a class="b l" href="./">Abrir Mis Pagos (iPhone)</a><a class="b o" href="https://mispagos-bb986.web.app/MisPagos/android/descargar">Descargar para Android</a></div>
 <script>
 try {
 /* 13.7.1: invitación a Mis Pagos. Detecta el sistema: Android → la APK más reciente publicada; iPhone → la versión
    web para Safari (la más reciente). La info del pago viaja en el enlace (#d=...), sin datos bancarios. */
-const APK = location.hostname.endsWith('github.io') ? '../MisPagos.apk' : 'https://raw.githubusercontent.com/alexisGH96/MisPagos/main/MisPagos.apk';   /* 13.9: la página también vive en web.app (red de Google); el APK siempre sale de GitHub */
+const APK = location.hostname.endsWith('github.io') ? '../MisPagos.apk' : location.hostname.endsWith('web.app') ? '../android/descargar' : 'https://mispagos-bb986.web.app/MisPagos/android/descargar';   /* 13.10.1: en web.app el APK también sale de la red de Google (sin extensión; se descarga como MisPagos.apk) */
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dinero = n => '$' + (Math.round((+n || 0) * 100) / 100).toLocaleString('es-MX', {minimumFractionDigits: (+n % 1) ? 2 : 0, maximumFractionDigits: 2});
 let d = null, crudo = '';
@@ -60,11 +60,12 @@ if (!d) {
   c.innerHTML = `${iconoPago(d)}<h1>${esc(d.de)} te invitó a dividir un pago</h1>
     <p>${d.pl ? 'Plan ' + esc(d.pl) + '. ' : ''}Lo gestiona ${esc(d.de)}. Se divide entre ${esc(d.np || 2)} personas${v ? ' y vence el ' + esc(v) : ''}${d.f ? ' (' + esc(String(d.f).toLowerCase()) + ')' : ''}.</p>
     <div class="d"><div class="r"><b>${esc(d.n)}</b><span class="m">${dinero(d.mt)}</span></div><p style="margin-top:2px">Total ${dinero(d.m)}</p><div class="n">Te toca el ${esc(d.pt)} %</div></div>
+    ${String(d.t || '').replace(/\D/g, '').length >= 10 ? `<div class="tip">Al crear tu cuenta usa tu número que termina en <b>${esc(String(d.t).replace(/\D/g, '').slice(-4))}</b>: así el pago te llega solo.</div>` : `<div class="tip">Al crear tu cuenta usa el correo o el teléfono que le diste a ${esc(d.de)}: así el pago te llega solo.</div>`}
     ${android ? `<a class="b l" href="${APK}">Descargar Mis Pagos para Android</a>
       <a class="b o" href="mispagos://invitacion#d=${crudo}">Ya la instalé: abrir la invitación</a>
       <div class="pasos">1. Toca “Descargar Mis Pagos” e instala la app. Si tu teléfono lo pide, permite instalar apps desde tu navegador.<br>2. Regresa a esta página y toca “Ya la instalé”.<br>3. Crea tu cuenta y verás este pago listo en la app.</div>`
-    : `<a class="b l" href="./">Abrir Mis Pagos${otroNav ? '' : ' en Safari'}</a>
-      <div class="pasos">1. Toca “Abrir Mis Pagos”.<br>2. En Safari, toca Compartir y luego “Agregar a pantalla de inicio”.<br>3. Crea tu cuenta y verás este pago listo en la app.</div>
+    : `<a class="b l" href="./#inv=${crudo}">Abrir Mis Pagos${otroNav ? '' : ' en Safari'}</a>
+      <div class="pasos">${ios ? '1. Si abriste este enlace desde WhatsApp u otra app, primero ábrelo en Safari (toca ⋯ o el ícono de la brújula y “Abrir en Safari”).<br>2. Toca “Abrir Mis Pagos”.<br>3. En Safari, toca Compartir y luego “Agregar a pantalla de inicio”.<br>4. Abre Mis Pagos desde tu pantalla de inicio y crea tu cuenta.' : '1. Toca “Abrir Mis Pagos”.<br>2. Crea tu cuenta y verás este pago listo.'}</div>
       ${!ios ? `<a class="b o" href="${APK}">¿Tienes Android? Descarga la app</a>` : ''}
       ${ios && otroNav ? `<div class="tip">Estás usando ${otroNav}. Para instalar Mis Pagos en tu pantalla de inicio y recibir avisos, abre este enlace en <b>Safari</b>.<br><a class="c2" href="#" id="copiar">Copiar enlace</a></div>` : ''}`}`;
   const cp = document.getElementById('copiar');
