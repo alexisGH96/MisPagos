@@ -1,6 +1,6 @@
 {
-  "versionCode": 175,
-  "versionName": "13.8.3",
+  "versionCode": 183,
+  "versionName": "13.10.3",
   "apk": "MisPagos.apk",
-  "notas": "Corrección de errores y mejoras en rendimiento."
+  "notas": "$**Lista de compras (nuevo)**\\n- Dentro de cada pago de Despensa y súper: artículos con cantidad y precio que palomeas al comprar.\\n- Escanear ticket: sacamos artículos, cantidades, precios y total de la foto; revisas y queda en tu historial.\\n- Precios en línea de Chedraui como referencia y comparación con lo que has pagado en cada tienda.\\n- Cómo llegar a tu tienda en Google Maps y recordatorio en tu calendario.\\n\\n**Tipos de pago**\\n- Nuevos: Crédito en app y Crédito hipotecario, con explicación y tutorial campo por campo.\\n- Sugerencias al escribir: bancos, tiendas, apps, financieras, modelos de auto y aseguradoras.\\n\\n**Formulario**\\n- Opcionales en \"+ Opciones adicionales\"; plazo en lista; \"Eliminar este pago\" al final.\\n\\n**Tutoriales**\\n- El recuadro sigue a lo que se explica y se ajusta a su forma; el globo ya no lo tapa. Atrás, Reiniciar y Saltar tutorial en todos.\\n\\n**Invitaciones**\\n- Abren en cualquier red, el iPhone no pierde la invitación al pasar de WhatsApp a Safari y te dice con qué número registrarte."
 }
