@@ -10,11 +10,13 @@ const sa = JSON.parse(process.env.FIREBASE_SA), SITE = 'mispagos-bb986', API = '
   const lista = []; for (const f of fs.readdirSync('web')) if (fs.statSync(path.join('web', f)).isFile()) lista.push(['web/' + f, '/MisPagos/web/' + f]);
   for (const f of ['version.json'])   // el APK no: el plan gratuito de Firebase no permite archivos ejecutables (se descarga de GitHub)
   if (fs.existsSync(f)) lista.push([f, '/MisPagos/' + f]);
+  // 13.10.1: el APK sin extensión (el plan gratuito rechaza archivos .apk); se descarga como MisPagos.apk por los encabezados
+  if (fs.existsSync('MisPagos.apk')) lista.push(['MisPagos.apk', '/MisPagos/android/descargar']);
   const gz = {}, mapa = {};
   for (const [loc, ruta] of lista) { const z = zlib.gzipSync(fs.readFileSync(loc), { level: 9 }); const h = crypto.createHash('sha256').update(z).digest('hex'); gz[h] = z; mapa[ruta] = h; }
   const ver = await pedir('POST', `${API}/sites/${SITE}/versions`, { config: {
     redirects: [{ glob: '/', location: '/MisPagos/web/', statusCode: 302 }, { glob: '/MisPagos', location: '/MisPagos/web/', statusCode: 302 }, { glob: '/MisPagos/', location: '/MisPagos/web/', statusCode: 302 }],
-    headers: [{ glob: '**/sw.js', headers: { 'Cache-Control': 'no-cache' } }, { glob: '**/*.html', headers: { 'Cache-Control': 'no-cache' } }, { glob: '**/*.json', headers: { 'Cache-Control': 'no-cache' } }] } });
+    headers: [{ glob: '/MisPagos/android/descargar', headers: { 'Content-Type': 'application/vnd.android.package-archive', 'Content-Disposition': 'attachment; filename="MisPagos.apk"', 'Cache-Control': 'no-cache' } }, { glob: '**/sw.js', headers: { 'Cache-Control': 'no-cache' } }, { glob: '**/*.html', headers: { 'Cache-Control': 'no-cache' } }, { glob: '**/*.json', headers: { 'Cache-Control': 'no-cache' } }] } });
   const pop = await pedir('POST', `${API}/${ver.name}:populateFiles`, { files: mapa });
   for (const h of pop.uploadRequiredHashes || []) await pedir('POST', `${pop.uploadUrl}/${h}`, gz[h], 'application/octet-stream');
   await pedir('PATCH', `${API}/${ver.name}?update_mask=status`, { status: 'FINALIZED' });
