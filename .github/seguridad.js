@@ -14,3 +14,4 @@ const out = [];
   } catch (e) { out.push('permisos: error'); }
   console.log('::notice::' + out.join(' || '));
 })();
+// v2
