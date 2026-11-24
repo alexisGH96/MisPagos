@@ -1,0 +1,66 @@
+rules_version = '2';
+// 13.6.2 — reglas reforzadas. Pegar completas en Firebase → Firestore Database → Reglas → Publicar.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function ok() { return request.auth != null && request.auth.token.email_verified == true; }
+    function correo() { return request.auth.token.email.lower(); }
+    function txt(d, k, max) { return !(k in d) || (d[k] is string && d[k].size() <= max); }
+    function num(d, k) { return !(k in d) || d[k] is int; }
+
+    // Campos que la app puede escribir en un pago compartido (lo que agrega el robot de avisos no pasa por estas reglas)
+    function camposPago() {
+      return ['autoRec', 'nombre', 'monto', 'vence', 'pagadoV', 'frec', 'cat', 'parteCreador', 'fijoCreador', 'credito',
+              'diaCorte', 'minimo', 'creadoPor', 'creadorNombre', 'creadorCorreo', 'otroNombre', 'otroCorreo', 'participantes',
+              'actualizado', 'datos', 'estado', 'solicitud', 'recordatorio', 'parteOk'];
+    }
+    function pagoValido(d) {
+      return txt(d, 'nombre', 120) && txt(d, 'monto', 24) && txt(d, 'vence', 10) && txt(d, 'pagadoV', 10) && txt(d, 'frec', 8)
+        && txt(d, 'cat', 40) && txt(d, 'fijoCreador', 24) && txt(d, 'credito', 20) && txt(d, 'minimo', 24)
+        && txt(d, 'creadorNombre', 120) && txt(d, 'otroNombre', 160) && txt(d, 'otroCorreo', 160) && txt(d, 'creadorCorreo', 160)
+        && txt(d, 'datos', 20000) && txt(d, 'solicitud', 4000) && txt(d, 'recordatorio', 4000) && txt(d, 'parteOk', 10)
+        && num(d, 'parteCreador') && num(d, 'diaCorte') && num(d, 'actualizado')
+        && (!('estado' in d) || d.estado in ['pendiente', 'aceptado', 'rechazado']);
+    }
+
+    match /compartidos/{id} {
+      allow read: if ok() && correo() in resource.data.participantes;
+      allow create: if ok()
+        && request.resource.data.keys().hasOnly(camposPago())
+        && request.resource.data.creadoPor == request.auth.uid
+        && request.resource.data.creadorCorreo == correo()
+        && correo() in request.resource.data.participantes
+        && request.resource.data.participantes.size() == 2
+        && pagoValido(request.resource.data);
+      allow update: if ok() && pagoValido(request.resource.data) && (
+        (resource.data.creadoPor == request.auth.uid
+          && request.resource.data.creadoPor == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(camposPago())
+          && correo() in request.resource.data.participantes
+          && request.resource.data.participantes.size() == 2)
+        || (resource.data.creadoPor != request.auth.uid
+          && correo() in resource.data.participantes
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado', 'solicitud', 'recordatorio', 'actualizado'])));
+      allow delete: if ok() && resource.data.creadoPor == request.auth.uid;
+    }
+
+    // Tu documento privado: respaldo en la nube, avisos push y sesiones. Solo tú.
+    match /avisos/{uid} {
+      allow read, write: if ok() && request.auth.uid == uid;
+    }
+
+    // Directorio para encontrar cuentas. Nadie puede publicar un correo que no es el suyo
+    // (antes alguien podía poner tu correo en su perfil y recibir datos cifrados para ti).
+    // El teléfono ya no se guarda tal cual: solo su huella (telH).
+    match /usuarios/{uid} {
+      allow create, update: if ok() && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['correo', 'nombre', 'pub', 'telH'])
+        && request.resource.data.correo == correo()
+        && txt(request.resource.data, 'nombre', 120) && txt(request.resource.data, 'pub', 2000) && txt(request.resource.data, 'telH', 64);
+      allow delete: if ok() && request.auth.uid == uid;
+      allow get: if ok();
+      allow list: if ok() && request.query.limit <= 1;
+    }
+
+    match /{todo=**} { allow read, write: if false; }
+  }
+}
