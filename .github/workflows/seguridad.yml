@@ -15,4 +15,6 @@ jobs:
       - run: node .github/seguridad.js
         env:
           FIREBASE_SA: ${{ secrets.FIREBASE_SA }}
-      - run: npm audit --omit=dev --json > /tmp/a.json || true; node -e "const a=require('/tmp/a.json'); const m=(a.metadata||{}).vulnerabilities||{}; console.log('::notice::npm audit (firebase-admin del robot): ' + JSON.stringify(m))"
+      - run: |
+          npm audit --omit=dev --json > /tmp/a.json || true
+          node -e "const a=require('/tmp/a.json'); const m=(a.metadata||{}).vulnerabilities||{}; console.log('::notice::npm audit del robot ' + JSON.stringify(m))"
