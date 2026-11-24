@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<title>Entrar con Google · Mis Pagos</title>
+<style>
+  :root{color-scheme:light}
+  body{margin:0;font-family:-apple-system,system-ui,Segoe UI,Roboto,sans-serif;background:#F6F7FB;color:#121A35;min-height:100vh;display:flex;flex-direction:column}
+  .cab{height:34vh;border-radius:0 0 36px 36px;background:linear-gradient(135deg,#2F4FA8,#1C326E);position:relative;overflow:hidden;color:#fff;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+  .cab b{font-size:28px;display:block}.cab span{opacity:.8;font-size:14px}
+  .cab img{width:92px;height:92px;border-radius:22px}
+  .cab i{position:absolute;border-radius:50%;background:rgba(255,255,255,.09);width:70vw;height:70vw;right:-22vw;top:-24vw}
+  .t{background:#fff;margin:-30px 0 0;border-radius:30px 30px 0 0;flex:1;padding:28px 24px;box-shadow:0 -10px 30px -18px rgba(18,26,53,.35)}
+  h1{margin:0 0 6px;font-size:24px}p{color:#6B7280;margin:0 0 22px;font-size:14px;line-height:1.45}
+  #btn{display:flex;justify-content:center;min-height:44px}
+  a.volver{display:none;margin-top:18px;text-align:center;background:#1C326E;color:#fff;font-weight:700;border-radius:99px;padding:15px;text-decoration:none}
+  .err{color:#D93A3A;font-size:14px;margin-top:14px}
+</style>
+</head>
+<body>
+<div class="cab"><i></i><div style="position:relative"><b>Mis Pagos</b><span>Tus pagos, siempre a tiempo</span></div><img src="icon-512.png" alt="" style="position:relative"></div>
+<div class="t">
+  <h1>Entrar con Google</h1>
+  <p id="txt">Elige tu cuenta de Google. Después regresarás a la app de Mis Pagos.</p>
+  <div id="btn"></div>
+  <a class="volver" id="volver" href="#">Volver a Mis Pagos</a>
+  <div class="err" id="err"></div>
+</div>
+<script>
+/* 13.11: la app de Android abre esta página (en la red de Google) para entrar con Google: aquí se elige la cuenta y se
+   regresa a la app con el token de identidad (mispagos://google#t=…). La app lo cambia por su sesión. Nada se guarda aquí. */
+(async () => {
+  const err = m => { document.getElementById('err').textContent = m; };
+  let cfg = {}; try { const r = await fetch('auth.json', {cache:'no-store'}); if (r.ok) cfg = await r.json(); } catch (e) {}
+  if (!cfg.googleClientId) { document.getElementById('txt').textContent = 'Entrar con Google se activa pronto. Por ahora entra con tu correo y contraseña.'; return; }
+  const s = document.createElement('script'); s.src = 'https://accounts.google.com/gsi/client';
+  s.onerror = () => err('No pude cargar Google. Revisa tu conexión.');
+  s.onload = () => {
+    google.accounts.id.initialize({client_id: cfg.googleClientId, callback: r => {
+      const url = 'mispagos://google#t=' + encodeURIComponent(r.credential), v = document.getElementById('volver');
+      v.href = url; v.style.display = 'block'; document.getElementById('btn').style.display = 'none';
+      document.getElementById('txt').textContent = 'Listo. Toca el botón para regresar a la app.';
+      location.href = url;
+    }});
+    google.accounts.id.renderButton(document.getElementById('btn'), {theme:'outline', size:'large', shape:'pill', text:'continue_with', locale:'es', width: Math.min(360, innerWidth - 48)});
+  };
+  document.head.appendChild(s);
+})();
+</script>
+</body>
+</html>
