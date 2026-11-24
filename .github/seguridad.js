@@ -15,3 +15,4 @@ const out = [];
   console.log('::notice::' + out.join(' || '));
 })();
 // v2
+// v3
