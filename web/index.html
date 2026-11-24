@@ -2,6 +2,8 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'wasm-unsafe-eval' blob: https://cdn.jsdelivr.net https://accounts.google.com https://www.gstatic.com; worker-src 'self' blob:; frame-src https://accounts.google.com">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -298,9 +300,9 @@ button:active,.pago:active,.pc:active,a.btn:active{transform:scale(.97);transiti
 .indIc svg{width:14px;height:14px}
 .heroPie{margin-top:12px;padding:9px 12px;border-radius:100px;background:color-mix(in srgb, currentColor 8%, transparent);font-size:12px;opacity:.85;display:flex;gap:8px;align-items:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-.tjIcono{background:color-mix(in srgb, #1C326E 12%, transparent);color:#1C326E}
-:root[data-tema="claro2"] .tjIcono,:root[data-tema^="glass"] .tjIcono{background:color-mix(in srgb, #B5532E 12%, transparent);color:#B5532E}
-:root[data-tema="oscuro"] .tjIcono{background:rgba(185,179,255,.14);color:#B9B3FF}
+.tjIcono{background:none!important;color:#1C326E}   /* 13.11.4: sin fondo */
+:root[data-tema="claro2"] .tjIcono,:root[data-tema^="glass"] .tjIcono{color:#B5532E}
+:root[data-tema="oscuro"] .tjIcono{color:#B9B3FF}
 .tjFila{background:#fff;border:1px solid #EEF0F5}
 :root[data-tema="oscuro"] .tjFila,:root[data-tema="glassn"] .tjFila{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.08)}
 :root[data-tema="glass"] .tjFila{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
@@ -419,7 +421,7 @@ button:active,.pago:active,.pc:active,a.btn:active{transform:scale(.97);transiti
 :root[data-tema="glassd"] .btn.lleno{background:#7B2FF7;color:#fff}
 :root[data-tema="glassd"] .ico{background:#16161a !important;box-shadow:none !important;color:#fff !important;filter:grayscale(1)}
 :root[data-tema="glassd"] .indIc{background:#1a1a1e !important;color:#fff !important}
-:root[data-tema="glassd"] .tjIcono{background:rgba(255,255,255,.08);color:#fff}
+:root[data-tema="glassd"] .tjIcono{background:none;color:#fff}
 :root[data-tema="glassd"] .aviso,:root[data-tema="glassd"] .alQ,:root[data-tema="glassd"] .interr{background:#fff !important;color:#000 !important}
 :root[data-tema="glassd"] .hola .mas span[style]{background:#fff !important;color:#000 !important}
 :root[data-tema="glassd"] .verde{color:#fff}
@@ -604,6 +606,88 @@ button:active,.pago:active,.pc:active,a.btn:active{transform:scale(.97);transiti
 .lsNom{background:none;border:0;color:inherit;text-align:left;padding:0 10px 0 12px;font:inherit}
 .lsFila{animation:ricaEnt .32s cubic-bezier(.3,0,.15,1) both}
 .lsCard{border:0;color:inherit;font:inherit;cursor:pointer}
+/* 13.11: pantalla de inicio y entrada */
+#entrada{position:fixed;inset:0;z-index:200;background:#F6F7FB;overflow:hidden;transition:opacity .38s ease .32s}
+#entrada .enCab{position:absolute;left:0;right:0;top:0;height:42vh;border-radius:0 0 36px 36px;background:linear-gradient(135deg,#2F4FA8,#1C326E);transform:translateY(-110%);transition:transform .62s cubic-bezier(.3,0,.15,1);overflow:hidden}
+#entrada.pide .enCab{height:36vh}
+#entrada .enCab i{position:absolute;border-radius:50%;background:rgba(255,255,255,.09)}
+#entrada .enCab .c1{width:70vw;height:70vw;right:-22vw;top:-24vw;animation:enFlota 9s ease-in-out infinite}
+#entrada .enCab .c2{width:48vw;height:48vw;left:-14vw;bottom:-22vw;animation:enFlota 11s ease-in-out infinite reverse}
+#entrada .enCab .c3{width:34vw;height:34vw;left:34vw;top:28%;background:rgba(255,255,255,.06);animation:enFlota 13s ease-in-out infinite}
+#entrada .enCab .arco{width:44vw;height:44vw;right:-4vw;bottom:-6vw;background:none;border:5px solid rgba(240,138,60,.45);border-color:rgba(240,138,60,.45) rgba(240,138,60,.45) transparent transparent;animation:enGira 9s linear infinite}
+@keyframes enFlota{50%{transform:translate(10px,-8px)}}
+@keyframes enGira{to{transform:rotate(360deg)}}
+#entrada .enIco{position:absolute;left:50%;top:50%;width:112px;height:112px;margin:-96px 0 0 -56px;border-radius:26px;animation:enIco .56s cubic-bezier(.3,1.3,.5,1) both;transition:transform .62s cubic-bezier(.3,0,.15,1)}
+@keyframes enIco{from{opacity:0;transform:scale(.6)}}
+#entrada .enMarca{position:absolute;left:0;right:0;top:50%;margin-top:30px;text-align:center;animation:enMarca .46s cubic-bezier(.3,0,.15,1) .22s both;transition:transform .62s cubic-bezier(.3,0,.15,1)}
+#entrada .enMarca b{display:block;font-size:30px;color:#121A35;transition:color .52s}
+#entrada .enMarca span{display:block;font-size:14px;color:#6B7280;margin-top:4px;transition:color .52s}
+@keyframes enMarca{from{opacity:0;transform:translateY(10px)}}
+#entrada.baja .enCab{transform:none}
+#entrada.baja .enIco{transform:translate(24vw,calc(42vh * .58 - 50vh + 40px)) scale(.82)}
+#entrada.pide.baja .enIco{transform:translate(24vw,calc(36vh * .58 - 50vh + 40px)) scale(.82)}
+#entrada.baja .enMarca{text-align:left;transform:translate(24px,calc(42vh * .40 - 50vh - 30px))}
+#entrada.pide.baja .enMarca{transform:translate(24px,calc(36vh * .40 - 50vh - 30px))}
+#entrada.baja .enMarca b{color:#fff}
+#entrada.baja .enMarca span{color:rgba(255,255,255,.8)}
+#entrada .enTarjeta{text-align:left;position:absolute;left:0;right:0;top:calc(36vh - 30px);bottom:0;overflow:auto;background:#fff;border-radius:30px 30px 0 0;padding:26px 24px 30px;box-shadow:0 -10px 30px -18px rgba(18,26,53,.35);animation:enSube .52s cubic-bezier(.3,0,.15,1) both;color:#121A35;max-width:560px;margin:0 auto}
+#entrada .enTarjeta>*{animation:enMarca .36s cubic-bezier(.3,0,.15,1) both}
+#entrada .enTarjeta>*:nth-child(n){animation-delay:.16s}
+#entrada .enTarjeta>*:nth-child(n+3){animation-delay:.24s}
+#entrada .enTarjeta>*:nth-child(n+6){animation-delay:.32s}
+@keyframes enSube{from{opacity:0;transform:translateY(80px)}}
+#entrada .enTarjeta h1{margin:0;font-size:26px;text-align:left}
+#entrada .enTarjeta p{margin:4px 0 18px;font-size:14px;color:#6B7280}
+#entrada .enTarjeta input{width:100%;box-sizing:border-box;background:#F1F3F8;border:0;border-radius:14px;padding:14px 16px;font-size:16px;color:#121A35;margin-bottom:12px}
+#entrada .enErr{display:none;color:#D93A3A;font-size:13px;margin:-4px 4px 6px}
+#entrada .enLink{display:block;margin:0 4px 14px auto;background:none;border:0;color:#1C326E;font-weight:700;font-size:13px}
+#entrada .btn.lleno{width:100%;background:#1C326E;color:#fff}
+#entrada .enSep{display:flex;align-items:center;gap:10px;color:#6B7280;font-size:13px;margin:20px 0 14px}
+#entrada .enSep span{flex:1;height:1px;background:#E3E7EF}
+#entrada .enGoogle{display:flex;justify-content:center;min-height:44px;align-items:center}
+#entrada .enCrear{display:block;width:100%;background:none;border:0;color:#121A35;font-size:14px;margin-top:18px}
+#entrada .enSin{display:block;width:100%;background:none;border:0;color:#6B7280;font-size:13px;margin-top:10px}
+#entrada.sale{opacity:0}
+#entrada.sale .enCab{transform:translateY(-55%);opacity:0;transition:transform .52s cubic-bezier(.3,0,.15,1) .12s,opacity .52s .12s}
+#entrada.sale .enTarjeta{transform:translateY(60vh);opacity:0;transition:transform .42s cubic-bezier(.3,0,.15,1),opacity .42s}
+#entrada.sale .enIco,#entrada.sale .enMarca{opacity:0;transition:opacity .46s .08s}
+:root[data-tema="oscuro"] #entrada,:root[data-tema="glass-oscuro"] #entrada{background:#0F1426}
+:root[data-tema="oscuro"] #entrada .enMarca b,:root[data-tema="glass-oscuro"] #entrada .enMarca b{color:#fff}
+:root[data-tema="oscuro"] #entrada .enTarjeta,:root[data-tema="glass-oscuro"] #entrada .enTarjeta{background:#171C30;color:#fff}
+:root[data-tema="oscuro"] #entrada .enTarjeta input,:root[data-tema="glass-oscuro"] #entrada .enTarjeta input{background:#232A42;color:#fff}
+:root[data-tema="oscuro"] #entrada .enCrear,:root[data-tema="glass-oscuro"] #entrada .enCrear,:root[data-tema="oscuro"] #entrada .enLink,:root[data-tema="glass-oscuro"] #entrada .enLink{color:#B9C6FF}
+:root[data-tema="oscuro"] #entrada .enSep span,:root[data-tema="glass-oscuro"] #entrada .enSep span{background:#2C3450}
+:root[data-tema^="glass"] #entrada .enTarjeta{-webkit-backdrop-filter:blur(24px);backdrop-filter:blur(24px)}
+
+/* 13.11.2: encabezado intenso según la apariencia; arco centrado en el ícono; campos con ícono, ojo y aviso */
+#entrada{--enA:#1B3FA0;--enB:#3D6BFF}
+:root[data-tema="oscuro"] #entrada{--enA:#3A2E9E;--enB:#7B6CF6}
+:root[data-tema="glass"] #entrada,:root[data-tema="glassn"] #entrada{--enA:#5B21C7;--enB:#9B5CFF}
+:root[data-tema="glassb"] #entrada{--enA:#14161C;--enB:#4A5068}
+:root[data-tema="glassd"] #entrada,:root[data-tema="glass-oscuro"] #entrada{--enA:#3B12A8;--enB:#7B2FF7}
+#entrada .enCab{background:linear-gradient(135deg,var(--enB),var(--enA))}
+#entrada .enCab .arco{width:120px;height:120px;left:calc(74vw - 60px);top:calc(58% - 60px);right:auto;bottom:auto;border-width:4px;border-color:rgba(240,138,60,.85) rgba(240,138,60,.85) transparent transparent;opacity:0;transition:opacity .4s .5s}
+#entrada.baja .enCab .arco{opacity:1}
+#entrada .btn.lleno.enEntrar{background:linear-gradient(90deg,var(--enA),var(--enB))}
+#entrada .enLink,#entrada .enAcc{color:var(--enA)}
+#entrada .enCampo{display:flex;align-items:center;gap:12px;background:#F1F3F8;border-radius:14px;padding:0 14px;margin-bottom:4px;border:1.5px solid transparent;transition:border-color .2s}
+#entrada .enCampo i{display:grid;color:#6B7280;font-style:normal}
+#entrada .enCampo input{flex:1;margin:0!important;padding:14px 0!important;background:none!important;border:0!important;outline:none;min-width:0}
+#entrada .enCampo.mal{border-color:#D93A3A}
+#entrada .enCampo:focus-within{border-color:var(--enB)}
+#entrada .enCampo.mal:focus-within{border-color:#D93A3A}
+#entrada .enOjo{background:none;border:0;color:#6B7280;display:grid;padding:6px}
+#entrada .enOjo.ver .tacha{display:none}
+#entrada .enAv{color:#D93A3A;font-size:12px;min-height:8px;margin:2px 6px 8px}
+:root[data-tema="oscuro"] #entrada .enCampo,:root[data-tema="glassd"] #entrada .enCampo{background:#232A42}
+:root[data-tema="oscuro"] #entrada .enLink,:root[data-tema="oscuro"] #entrada .enAcc,:root[data-tema="glassd"] #entrada .enLink,:root[data-tema="glassd"] #entrada .enAcc{color:#B9C6FF}
+@media (prefers-reduced-motion: reduce){#entrada *{animation:none!important;transition:none!important}}
+
+.avCont{position:relative}
+.avCont .avX{position:absolute;top:8px;right:8px;z-index:2;width:30px;height:30px;border-radius:50%;border:0;background:color-mix(in srgb, var(--fg) 10%, transparent);color:var(--fg);font-size:14px;font-weight:800;display:grid;place-items:center}
+
+.tjIcono .cvBlanco{fill:#fff}
+:root[data-tema="glassd"] .tjIcono .cvBlanco{fill:#030304}
 </style>
 </head>
 <body>
@@ -780,6 +864,11 @@ function msiForm(f){
   if(fr){ fr.style.display = m ? 'none' : ''; if(lf && lf.tagName === 'LABEL') lf.style.display = m ? 'none' : ''; if(m) fr.value = 'M1'; }
   const mo = f.monto; if(mo){ mo.readOnly = m; mo.style.opacity = m ? .55 : ''; mo.placeholder = m ? 'Se calcula sola' : '$0'; }
   const lv = f.vence && f.vence.previousElementSibling; if(lv && lv.tagName === 'LABEL' && m) lv.textContent = 'Fecha de pago';
+  /* 13.10.5: en compra a meses la fecha sale de la tarjeta: no se elige, solo se muestra */
+  if(f.vence){ f.vence.readOnly = m; f.vence.style.opacity = m ? .75 : ''; f.vence.style.pointerEvents = m ? 'none' : '';
+    if(m){ const pc = f.pagoCon, tj = pc && D.pagos.find(z => String(z.id) === String(pc.value));
+      if(tj) f.vence.value = tj.vence; if(lv && lv.tagName === 'LABEL') lv.textContent = tj ? 'Fecha de pago (la de tu tarjeta)' : 'Fecha de pago: elige la tarjeta en Método de pago';
+      if(pc && !pc.dataset.msiF){ pc.dataset.msiF = 1; pc.addEventListener('change', () => msiForm(f)); } } }
   if(!m) return;
   const ms = f.querySelector('[name="x_meses"]'), mx = f.querySelector('[name="x_mes"]'), tot = f.querySelector('[name="x_total"]');
   if(ms && ms.tagName === 'INPUT' && !ms.dataset.msi){
@@ -835,8 +924,8 @@ function extResumen(p){
   return null;
 }
 function extDetalle(p){
-  const c = p.cat || adivinarCat(p.nombre), e = p.ext || {}, r = extResumen(p);
-  const filas = (EXT[c] || []).filter(([k]) => e[k] && k !== 'plazo' && k !== 'pagadas' && k !== 'plan').map(([k, n, t]) => { let v = e[k]; if(t === 'f') v = fechaExt(v); if(t === 'd') v = dinero(num(v)); if(k === 'tasa') v += ' % anual';
+  const c = catDe(p), e = p.ext || {}, r = extResumen(p);
+  const filas = (EXT[c] || []).filter(([k]) => e[k] && k !== 'plazo' && k !== 'pagadas' && k !== 'plan' && !(k === 'deuda' && r && /^Debes en total/.test(r[0])))   /* 13.10.5: la deuda ya es el título */.map(([k, n, t]) => { let v = e[k]; if(t === 'f') v = fechaExt(v); if(t === 'd') v = dinero(num(v)); if(k === 'tasa') v += ' % anual';
     const et = n.replace(/ \(.*\)/, '').replace(/[¿?]/g, '');
     return `<div class="dato"><span class="gris">${et}</span><span class="fila"><b>${esc(v)}</b>${t === 'tel' ? `<a class="pildora" style="text-decoration:none" href="tel:${esc(String(v).replace(/[^0-9+]/g,''))}">Llamar</a>` : ''}</span></div>`; }).join('');
   if(!r && !filas) return '';
@@ -1327,6 +1416,18 @@ function animarBalance(){
 }
 
 /* 13.6.1: la tarjeta principal se anima al llegar a Inicio: el monto cuenta hacia arriba y los íconos aparecen con rebote */
+/* 13.10.4: las tarjetas de Próximos van un poco a la derecha y regresan, con el mismo tiempo que la principal (820 ms);
+   la forma de seno sale y regresa sin frenones ni brinquitos. Solo al llegar a Inicio. */
+/* 13.11.2: avisos de Inicio que se cierran con la ✕ hasta volver a abrir la app (en memoria: minimizar no los regresa) */
+window._avCerr = window._avCerr || new Set();
+const avCerrado = k => window._avCerr.has(k);
+document.addEventListener('click', e => { const x = e.target.closest('[data-avx]'); if(!x) return; e.stopPropagation(); e.preventDefault(); vibrar([10]);
+  window._avCerr.add(x.dataset.avx); const c = x.closest('.avCont'), h = c.offsetHeight;
+  c.animate([{opacity:1, transform:'none', height:h + 'px'},{opacity:0, transform:'translateX(40px)', height:h + 'px', offset:.5},{opacity:0, transform:'translateX(40px)', height:'0px', marginBottom:'0px'}], {duration:460, easing:CURVA}).onfinish = () => c.remove(); }, true);
+function animarProximos(){ if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.querySelectorAll('.prox .pc').forEach((pc, i) => { if(i > 5) return;
+    const k = []; for(let j = 0; j <= 24; j++){ const f = j / 24; k.push({transform:`translateX(${(18 * Math.sin(Math.PI * f)).toFixed(2)}px)`, offset:f}); }
+    pc.animate(k, {duration:820, delay:100 + i * 60, easing:'cubic-bezier(.3,0,.15,1)'}); }); }
 function animarHero(){
   const h = document.getElementById('hero'); if(!h || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const cuenta = el => { const txt = el.textContent, fin = num(txt), cent = /\.\d\d$/.test(txt.trim()); if(!(fin > 0)) return; const t0 = performance.now(), d = 820;
@@ -1661,7 +1762,9 @@ function inicio(){
   let h = `<div class="hola"><span class="ava">${esc((D.nombre||'?')[0].toUpperCase())}</span>
     <div class="peso"><div class="b" style="font-size:22px">Hola${D.nombre ? ', ' + esc(D.nombre) : ''}</div><div class="gris chico">Bienvenido de nuevo</div></div>
     <button class="mas" data-act="avisos" data-n="1" aria-label="Avisos" style="margin-right:10px;position:relative;display:grid;place-items:center">${CAMPANA}${(D.historial||[]).some(a => !a.leido) ? `<span style="position:absolute;top:-2px;right:-2px;min-width:18px;height:18px;border-radius:9px;background:#E5484D;color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center">${Math.min(9,(D.historial||[]).filter(a => !a.leido).length)}</span>` : ''}</button><button class="mas" data-act="nuevo" aria-label="Agregar pago">+</button></div>
-    ${D.pagos.filter(p => p.nubeFalla && p.compartido && !p.creadoPor).map(p => { const sc = /aún no us/.test(p.nubeFalla); return `<button class="pago est-roj" style="display:block" data-act="${sc ? 'invForzar' : 'detalle'}" data-id="${p.id}"><b>${sc ? '👥 ' + esc(sinPrefijo(p.nombre)) + ': falta que se registren' : '⚠️ ' + esc(sinPrefijo(p.nombre)) + ' no se pudo compartir'}</b><div class="gris chico" style="margin-top:4px">${esc(p.nubeFalla)}</div></button>`; }).join('')}
+    ${!(D.nube && D.nube.uid) && (D.invLink || D.pagos.some(p => p.compartido)) && !avCerrado('cuenta') ? `<div class="avCont"><button class="avX" data-avx="cuenta" aria-label="Cerrar aviso">✕</button><button class="pago est-azu" style="display:block;padding-right:44px" data-act="cuenta"><b>🔐 Crea tu cuenta para recibir pagos compartidos</b><div class="gris chico" style="margin-top:4px">${D.invLink ? esc(D.invLink.de || 'Alguien') + ' compartió un pago contigo: te llega en cuanto tengas tu cuenta.' : 'Sin cuenta, los pagos que compartes solo se dividen en tu app.'} Toca para crearla.</div></button></div>` : ''}
+    ${D.nube && D.nube.uid && !D.nube.verif && !avCerrado('verif') ? `<div class="avCont"><button class="avX" data-avx="verif" aria-label="Cerrar aviso">✕</button><button class="pago est-ama" style="display:block;padding-right:44px" data-act="cuenta"><b>📧 Verifica tu correo</b><div class="gris chico" style="margin-top:4px">Abre el enlace que te enviamos a ${esc(D.nube.correo || '')} (revisa también spam). Hasta entonces no te llegan los pagos compartidos.</div></button></div>` : ''}
+    ${D.pagos.filter(p => p.nubeFalla && p.compartido && !p.creadoPor && !avCerrado('falla' + p.id)).map(p => { const sc = /aún no us/.test(p.nubeFalla); return `<div class="avCont"><button class="avX" data-avx="falla${p.id}" aria-label="Cerrar aviso">✕</button><button class="pago est-roj" style="display:block;padding-right:44px" data-act="${sc ? 'invForzar' : 'detalle'}" data-id="${p.id}"><b>${sc ? '👥 ' + esc(sinPrefijo(p.nombre)) + ': falta que se registren' : '⚠️ ' + esc(sinPrefijo(p.nombre)) + ' no se pudo compartir'}</b><div class="gris chico" style="margin-top:4px">${esc(p.nubeFalla)}</div></button></div>`; }).join('')}
     ${(D.invitaciones || []).map(x => `<button class="pago est-ama" style="display:block" data-act="invitacion" data-i="${x.id}"><b>✉ ${esc(x.de)} compartió ${esc(sinPrefijo(x.nombre))} contigo</b><div class="gris chico">Toca para aceptarlo o rechazarlo</div></button>`).join('')}
     ${D.pagos.filter(p => p.nubeSolVista && !p.creadoPor).map(p => `<button class="pago est-ama" style="display:block" data-act="solicitud" data-id="${p.id}"><b>✎ Piden un cambio en ${esc(sinPrefijo(p.nombre))}</b><div class="gris chico">Toca para revisarlo</div></button>`).join('')}
     ${(D.avisosNube || []).length ? `<button class="pago est-azu" style="display:block" data-act="avisoNubeOk">${D.avisosNube.map(esc).join('<br>')}<div class="gris chico">Toca para ocultar</div></button>` : ''}
@@ -1745,7 +1848,7 @@ function tarjetasLista(parte){
     else if(conC.length){
       const CART = '<svg viewBox="0 0 24 24" width="30" height="30" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3.5" y="6" width="17" height="12.5" rx="3"/><rect x="13.5" y="10" width="7" height="4.5" rx="1.5"/></svg>';
       const CALI = c => `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="${c}" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>`;
-      h += `<div class="caja" style="margin-bottom:16px;padding:12px 10px 6px"><div class="fila" style="align-items:center;gap:12px;padding:0 4px 10px"><span class="tjIcono" style="width:42px;height:42px;border-radius:12px;display:grid;place-items:center;flex:none">${CART.replace('width="30" height="30"','width="22" height="22"')}</span><div class="peso"><div class="b" style="font-size:16px">¿Con cuál comprar hoy?</div><div class="gris" style="font-size:11px;margin-top:2px">Usa la que ya hizo corte para pagar sin intereses.</div></div></div>`
+      h += `<div class="caja" style="margin-bottom:16px;padding:12px 10px 6px"><div class="fila" style="align-items:center;gap:12px;padding:0 4px 10px"><span class="tjIcono" style="width:44px;height:44px;display:grid;place-items:center;flex:none"><svg viewBox="0 0 100 100" width="44" height="44" aria-hidden="true"><g transform="rotate(-13 47 40)"><rect x="16" y="24" width="62" height="32" rx="7" fill="currentColor" opacity=".72"/><rect x="22" y="31" width="50" height="5" rx="2.5" class="cvBlanco" opacity=".95"/></g><rect x="10" y="42" width="74" height="50" rx="10" fill="currentColor"/><rect x="10" y="42" width="74" height="50" rx="10" fill="#000" opacity=".12"/><rect x="10" y="42" width="74" height="22" rx="10" fill="currentColor"/><rect x="64" y="57" width="28" height="22" rx="8" fill="currentColor"/><rect x="64" y="57" width="28" height="22" rx="8" class="cvBlanco" opacity=".4"/><circle cx="73" cy="68" r="3.8" class="cvBlanco"/><path d="M87 6L83 17M97 16L89 22" stroke="currentColor" stroke-opacity=".7" stroke-width="5" stroke-linecap="round"/></svg></span><div class="peso"><div class="b" style="font-size:16px">¿Con cuál comprar hoy?</div><div class="gris" style="font-size:11px;margin-top:2px">Usa la que ya hizo corte para pagar sin intereses.</div></div></div>`
         + conC.map(z => { const p = z.p; let sig = z.sig, faltan = z.faltan; const hoyC = corteDe(p.diaCorte, h0); if(hoyC && Math.round((hoyC - h0)/DIA) === 0){ sig = h0; faltan = 0; }
           let ult = new Date(h0.getFullYear(), h0.getMonth(), Math.min(p.diaCorte, new Date(h0.getFullYear(), h0.getMonth()+1, 0).getDate())); if(ult > h0) ult = new Date(h0.getFullYear(), h0.getMonth()-1, Math.min(p.diaCorte, new Date(h0.getFullYear(), h0.getMonth(), 0).getDate()));
           const hace = Math.round((h0 - ult)/DIA), buena = faltan > 0 && hace <= faltan;
@@ -2299,8 +2402,7 @@ function editor(id){
     ${p.creadoPor ? '' : `<p class="gris chico" style="margin:8px 4px 0">La otra persona verá tu cuenta o CLABE y el titular para depositarte su parte. Los datos de tus tarjetas nunca se comparten.</p>`}
     </div>
     <button class="btn lleno" style="margin-top:20px" type="submit">Guardar</button>
-    ${id ? `<button class="btn texto" type="button" style="margin-top:6px;color:var(--r-roj)" data-act="borrar" data-id="${id}">Eliminar este pago</button>` : ''}
-    <button class="btn borde" type="button" style="margin-top:10px" data-act="cerrar">Cancelar</button>
+    ${id ? `<div class="dos" style="margin-top:10px"><button class="btn borde" type="button" style="color:var(--r-roj)" data-act="borrar" data-id="${id}">Eliminar</button><button class="btn borde" type="button" data-act="cerrar">Cancelar</button></div>` : `<button class="btn borde" type="button" style="margin-top:10px" data-act="cerrar">Cancelar</button>`}
   </form>`);
   genteIniciar(p);   /* 13.7 */
   { const fm = document.querySelector('#capa form'); if(fm) msiForm(fm); }   /* 13.8.1 */
@@ -2439,7 +2541,7 @@ async function eliminarCuenta(clave){
   const yo = D.nube.correo; sesion(await pedir('POST', AUTHU + 'signInWithPassword?key=' + FB.key, {email:yo, password:clave, returnSecureToken:true})); D.nube.correo = yo;
   const uid = D.nube.uid, tk = await token(); let b = 0, s0 = 0;
   D.pagos.forEach(p => { if(p.creadoPor || !p.compartido) return; const sc = (window._sinCuenta || {})[p.id];
-    if(sc && sc.length) p.nubeFalla = `${sc.join(', ')} ${sc.length === 1 ? 'aún no usa' : 'aún no usan'} Mis Pagos: ${sc.length === 1 ? 'su parte se divide' : 'sus partes se dividen'} solo en tu app. Toca para invitar.`;
+    if(sc && sc.length) p.nubeFalla = `${sc.join(', ')} ${sc.length === 1 ? 'aún no usa' : 'aún no usan'} Mis Pagos con una cuenta verificada: ${sc.length === 1 ? 'su parte se divide' : 'sus partes se dividen'} solo en tu app. Si ya instaló la app, falta que cree su cuenta y verifique su correo. Toca para invitar.`;
     else if(p.nubeFalla && /aún no us/.test(p.nubeFalla)) delete p.nubeFalla; });
   const res = await pedir('POST', DOCS + ':runQuery', {structuredQuery:{from:[{collectionId:'compartidos'}], where:{fieldFilter:{field:{fieldPath:'participantes'}, op:'ARRAY_CONTAINS', value:sv(yo)}}}}, tk);
   for(const x of (Array.isArray(res) ? res : [])){ const d = x.document; if(!d) continue; const id = d.name.split('/').pop();
@@ -3097,6 +3199,79 @@ function tutorialLista(id){
   guiaWeb(pasos.filter(p => p[2]()));
 }
 
+/* ===== 13.11: pantalla de inicio y de entrada (inspirada en el video "Foodie") =====
+   1) El logo aparece; 2) baja un encabezado azul con formas que se mueven y el logo sube a él;
+   3) si hace falta, sube la tarjeta de entrada (correo, contraseña, Google, crear cuenta, sin cuenta);
+   4) al entrar, el encabezado sube y se desvanece mostrando la app. Solo al abrir la app. */
+let _authCfg = null;
+async function authCfg(){ if(_authCfg) return _authCfg; try{ const r = await fetch('auth.json', {cache:'no-store'}); _authCfg = r.ok ? await r.json() : {}; }catch(e){ _authCfg = {}; } return _authCfg; }
+function pideCuentaWeb(){ return !(D.nube && D.nube.uid) && !window._sinCuenta; }   /* 13.11.2: "sin cuenta" solo vale mientras la app sigue abierta */
+function entradaWeb(alTerminar){
+  if(document.getElementById('entrada')){ if(alTerminar) alTerminar(); return; }
+  const pedir = pideCuentaWeb(), mov = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const e = document.createElement('div'); e.id = 'entrada'; if(pedir) e.classList.add('pide');
+  e.innerHTML = `<div class="enCab"><i class="c1"></i><i class="c2"></i><i class="c3"></i><i class="arco"></i></div>
+    <img class="enIco" src="icon-512.png" alt=""><div class="enMarca"><b>Mis Pagos</b><span>Tus pagos, siempre a tiempo</span></div>`;
+  document.body.appendChild(e); vibrar([12]);
+  const salir = () => { if(e.dataset.sale) return; e.dataset.sale = 1; e.classList.add('sale'); setTimeout(() => { e.remove(); if(alTerminar) alTerminar(); }, mov ? 820 : 0); };
+  e._salir = salir;
+  const bajar = () => { if(e.classList.contains('baja')) return; e.classList.add('baja'); setTimeout(() => pedir ? tarjetaEntradaWeb(e, salir) : salir(), pedir ? 420 : 900); };
+  setTimeout(bajar, mov ? 1050 : 0);
+  e.addEventListener('click', ev => { if(!e.classList.contains('baja') && !ev.target.closest('.enTarjeta')) bajar(); });
+}
+async function tarjetaEntradaWeb(e, salir){
+  const t = document.createElement('div'); t.className = 'enTarjeta';
+  t.innerHTML = `<h1>${D.miCorreo || D.nombre ? 'Bienvenido de nuevo' : 'Bienvenido'}</h1><p class="gris">Entra para recibir los pagos que comparten contigo y tener tu respaldo.</p>
+    <label class="enCampo" id="enCoC"><i><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg></i><input id="enCo" type="email" placeholder="Correo" autocomplete="email" value="${esc(D.miCorreo || '')}"></label><div class="enAv" id="enCoA"></div>
+    <label class="enCampo" id="enClC"><i><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="3"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></i><input id="enCl" type="password" placeholder="Contraseña (mínimo 6)" autocomplete="current-password"><button type="button" class="enOjo" aria-label="Mostrar contraseña"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M2 12s3.6-6 10-6 10 6 10 6-3.6 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.6"/><path class="tacha" d="M4 4l16 16"/></svg></button></label><div class="enAv" id="enClA"></div>
+    <div id="enErr" class="enErr"></div>
+    <button class="enLink" data-en="olvide">¿Olvidaste tu contraseña?</button>
+    <button class="btn lleno enEntrar" data-en="entrar">Entrar</button>
+    <div class="enSep"><span></span>o continúa con<span></span></div>
+    <div id="enGoogle" class="enGoogle"><span class="gris chico">Entrar con Google se activa pronto.</span></div>
+    <button class="enCrear" data-en="crear">¿No tienes cuenta?&nbsp; <b class="enAcc">Crear cuenta</b></button>
+    <button class="enSin" data-en="sin">Continuar sin cuenta</button>`;
+  e.appendChild(t);
+  const err = m => { const x = t.querySelector('#enErr'); x.textContent = m; x.style.display = m ? 'block' : 'none'; if(m){ vibrar([20, 40, 20]); x.animate([{transform:'translateX(10px)'},{transform:'none'}], {duration:300, easing:'cubic-bezier(.3,1.6,.5,1)'}); } };
+  /* 13.11.2: aviso debajo del campo y borde rojo, como el diseño del video */
+  const marca = (id, txt) => { const c = t.querySelector('#' + id + 'C'), a = t.querySelector('#' + id + 'A'); c.classList.toggle('mal', !!txt); a.textContent = txt || '';
+    if(txt){ c.animate([{transform:'translateX(8px)'},{transform:'none'}], {duration:320, easing:'cubic-bezier(.3,1.6,.5,1)'}); vibrar([20, 40, 20]); } };
+  const corOk = v => /^[^@\s]+@[^@\s]+\.[^@\s]{2,}$/.test(v);
+  t.querySelector('#enCo').addEventListener('blur', e => { const v = e.target.value.trim(); if(v) marca('enCo', corOk(v) ? '' : 'Ese correo no parece correcto'); });
+  t.querySelector('#enCo').addEventListener('input', e => { if(t.querySelector('#enCoC').classList.contains('mal') && corOk(e.target.value.trim())) marca('enCo', ''); });
+  t.querySelector('#enCl').addEventListener('input', e => { if(t.querySelector('#enClC').classList.contains('mal') && e.target.value.length >= 6) marca('enCl', ''); });
+  t.querySelector('.enOjo').addEventListener('click', ev => { ev.preventDefault(); const i = t.querySelector('#enCl'), ver = i.type === 'password'; i.type = ver ? 'text' : 'password'; ev.currentTarget.classList.toggle('ver', ver); vibrar([10]); });
+  const trad = m => /EMAIL_EXISTS|Ya existe/.test(m) ? 'Ese correo ya tiene cuenta: toca Entrar.' : /INVALID_LOGIN|INVALID_PASSWORD|EMAIL_NOT_FOUND|incorrect/i.test(m) ? 'Correo o contraseña incorrectos.' : /WEAK_PASSWORD/.test(m) ? 'La contraseña debe tener al menos 6 caracteres.' : /TOO_MANY/.test(m) ? 'Demasiados intentos. Espera unos minutos.' : /fetch|network|conex/i.test(m) ? 'Sin conexión. Revisa tu internet.' : (m.length > 120 ? 'No se pudo. Intenta de nuevo.' : m);
+  t.addEventListener('click', async ev => { const b = ev.target.closest('[data-en]'); if(!b) return; vibrar([12]);
+    b.animate([{transform:'scale(.96)'},{transform:'none'}], {duration:200, easing:CURVA});
+    const co = t.querySelector('#enCo').value.trim().toLowerCase(), cl = t.querySelector('#enCl').value, a = b.dataset.en; err('');
+    if(a === 'sin'){ window._sinCuenta = true; return salir(); }
+    if(a === 'olvide'){ if(!co.includes('@')) return err('Escribe tu correo y te enviamos cómo cambiar tu contraseña.');
+      try{ await pedir('POST', AUTHU + 'sendOobCode?key=' + FB.key, {requestType:'PASSWORD_RESET', email:co}); aviso('Te enviamos un correo a ' + co + ' para cambiar tu contraseña'); }catch(x){ err(trad(String(x && x.message || x))); } return; }
+    if(!corOk(co)) return marca('enCo', co ? 'Ese correo no parece correcto' : 'Escribe tu correo');
+    if(cl.length < 6) return marca('enCl', 'Mínimo 6 caracteres');
+    D.miCorreo = co; guardar(); b.disabled = true;
+    try{ if(a === 'crear'){ await crearCuenta(co, cl); aviso('Cuenta creada. Te enviamos un correo para verificarla'); } else { await entrar(co, cl); aviso(D.nube.verif ? 'Bienvenido de nuevo' : 'Falta verificar tu correo'); } salir(); }
+    catch(x){ err(trad(String(x && x.message || x))); } finally { b.disabled = false; } });
+  /* Google: se activa cuando el proveedor está encendido (auth.json trae el id de cliente) */
+  const cfg = await authCfg();
+  if(cfg.googleClientId){
+    const g = t.querySelector('#enGoogle'); g.innerHTML = '<div id="enGbtn"></div>';
+    const cargar = () => new Promise((ok, mal) => { if(window.google && google.accounts) return ok(); const s = document.createElement('script'); s.src = 'https://accounts.google.com/gsi/client'; s.onload = ok; s.onerror = mal; document.head.appendChild(s); });
+    try{ await cargar();
+      google.accounts.id.initialize({client_id:cfg.googleClientId, callback: async r => { try{ await entrarGoogleWeb(r.credential); aviso('Entraste con Google como ' + D.nube.correo); salir(); }catch(x){ err(trad(String(x && x.message || x))); } }});
+      google.accounts.id.renderButton(document.getElementById('enGbtn'), {theme:'outline', size:'large', shape:'pill', text:'continue_with', locale:'es', width:Math.min(360, t.clientWidth - 48)});
+    }catch(x){ g.innerHTML = '<span class="gris chico">No pude cargar Google. Revisa tu conexión.</span>'; }
+  }
+}
+/* Google → sesión de Firebase (el correo de Google ya está verificado) */
+async function entrarGoogleWeb(credencial){
+  const r = await pedir('POST', AUTHU + 'signInWithIdp?key=' + FB.key, {postBody:'id_token=' + encodeURIComponent(credencial) + '&providerId=google.com', requestUri:location.origin, returnSecureToken:true, returnIdpCredential:true});
+  if(r.needConfirmation) throw new Error('Ese correo ya tiene cuenta con contraseña: entra con tu correo y contraseña.');
+  sesion(r); D.nube.correo = (r.email || '').toLowerCase(); D.nube.verif = r.emailVerified !== false; if(!D.miCorreo) D.miCorreo = D.nube.correo; guardar();
+  try{ registrarSesion(); }catch(e){}
+}
+
 function hojaRica(o){
   const ic = o.icono || '';
   abrirHoja(`<div class="rica">
@@ -3658,7 +3833,7 @@ function pintar(anim){
   const app = document.getElementById('app');
   app.innerHTML = [inicio, () => `<div class="seg"><button class="${calSeg===0?'sel':''}" data-act="calSeg" data-n="0">Calendario</button><button class="${calSeg===1?'sel':''}" data-act="calSeg" data-n="1">Quincenas</button></div>` + (calSeg ? quincenasV() : calendario()), carteraV, estadisticas, () => (verCar ? pantallaCarrusel() : ajustes())][tab]();
   carTimer(); carSwipe(); carAltura(); ponerPesos(document.getElementById('app'));
-  if(tab === 0 && window._tabAnt !== 0) animarHero(); window._tabAnt = tab;   /* 13.6.1 */
+  if(tab === 0 && window._tabAnt !== 0){ animarHero(); animarProximos(); } window._tabAnt = tab;   /* 13.6.1 · 13.10.4 */
   clearTimeout(window._gNovT); window._gNovT = setTimeout(() => { if(invitacionRecibida()) return; avisosEliminadosWeb(); guiaNovWeb(); }, 900);   /* 13.5.1: tutorial de lo nuevo */
   if(anim && !matchMedia('(prefers-reduced-motion: reduce)').matches) app.animate([{opacity:0, transform:'translateY(8px)'}, {opacity:1, transform:'none'}], {duration:260, easing:'cubic-bezier(.2,.8,.2,1)'});
   // las gráficas se animan cuando aparecen en pantalla
@@ -3685,7 +3860,7 @@ addEventListener('scroll', revisarArriba, {passive:true});
 aplicarTema();
 if(!D.nombre && !D.pagos.length){ setTimeout(() => { const v = prompt('¡Bienvenido a Mis Pagos! ¿Cómo te llamas?'); if(v){ D.nombre = v.trim(); guardar(); pintar(); } }, 400); }
 pintar();
-setTimeout(() => { if(D.bienvenida) return; if(D.pagos.length){ D.bienvenida = true; guardar(); return; } bvAbrir(); }, 400);   // primera vez: bienvenida y primer pago
+(pideCuentaWeb() ? entradaWeb : f => f())(() => setTimeout(() => {   /* 13.11.4: la pantalla de inicio solo si falta la cuenta */ if(D.bienvenida) return; if(D.pagos.length){ D.bienvenida = true; guardar(); return; } bvAbrir(); }, 100));   /* 13.11: primero la entrada */   // primera vez: bienvenida y primer pago
 if(D.nube && D.nube.refresh && D.nube.verif) sincronizar().then(pintar).catch(() => {});
 /* ---- jalar hacia abajo para sincronizar ---- */
 (() => {
@@ -3756,6 +3931,8 @@ function bvPintar(dir){
       <div class="b" style="margin:0 2px 8px">Tu nombre</div>${campo('nombre','¿Cómo te llamas?', BV.nom ?? D.nombre)}
       <div class="b" style="margin:0 2px 8px">Teléfono</div>${campo('tel','10 dígitos', BV.tel ?? D.miTel, 'inputmode="tel"')}
       <div class="b" style="margin:0 2px 8px">Correo</div>${campo('cor','tu@correo.com', BV.cor ?? D.miCorreo, 'type="email"')}
+      ${(D.nube && D.nube.uid) || window._sinCuenta ? '' : `<div class="b" style="margin:0 2px 8px">Contraseña de tu cuenta</div>${campo('clave','Mínimo 6 caracteres', BV.clave, 'type="password" autocomplete="new-password"')}
+      <p style="color:#6B7280;font-size:13px;line-height:1.4;margin:-4px 2px 14px">Con tu cuenta te llegan los pagos que comparten contigo${D.invLink ? ` (como el de ${esc(D.invLink.de || '')})` : ''} y se guarda tu respaldo. Te enviaremos un correo para verificarla.</p>`}
       <div style="display:flex;margin-top:8px">${btn('Continuar','perfilOk')}</div>`);
   } else {
     const k = BV.paso; let cuerpo = '', pie = '';
@@ -3791,6 +3968,15 @@ document.addEventListener('click', e => {
   if(navigator.vibrate) navigator.vibrate(20); bvGuardaForm();
   if(a === 'av'){ BV.av = avatarURL(b.dataset.e, b.dataset.c); bvPintar(0); return; }
   if(a === 'perfilOk'){ if(!(BV.nom||'').trim()){ aviso('Escribe tu nombre'); return; }
+    /* 13.10.4: la cuenta se crea aquí mismo (antes había que ir a Mi perfil → Cuenta y casi nadie lo hacía, así que los pagos compartidos nunca llegaban) */
+    const cor0 = (BV.cor || '').trim().toLowerCase(), cl0 = BV.clave || '';
+    if(!(D.nube && D.nube.uid) && !window._sinCuenta && cor0){
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(cor0)){ aviso('Revisa tu correo'); return; }
+      if(cl0.length < 6){ aviso('Crea una contraseña de al menos 6 caracteres para tu cuenta'); return; }
+      crearCuenta(cor0, cl0).then(() => aviso('Cuenta creada. Te enviamos un correo para verificarla'))
+        .catch(e => { if(/EMAIL_EXISTS|Ya existe/.test(e && e.message || '')) entrar(cor0, cl0).then(() => aviso('Entraste a tu cuenta')).catch(() => aviso('Ese correo ya tiene cuenta: entra desde Mi perfil → Cuenta'));
+          else aviso('No se pudo crear tu cuenta ahora; puedes hacerlo en Mi perfil → Cuenta'); });
+    }
     D.nombre = BV.nom.trim(); D.miTel = (BV.tel||'').replace(/[^0-9+]/g,''); D.miCorreo = (BV.cor||'').trim().toLowerCase(); if(BV.av) D.foto = BV.av; guardar(); BV.paso = 0; bvPintar(1); return; }
   if(a === 'tipo'){ v.cat = b.dataset.c; v.nombre = EJ[v.cat][0]; v.monto = EJ[v.cat][1]; BV.paso = 1; bvPintar(1); return; }
   if(a === 'dia'){ v.dia = b.dataset.d; bvPintar(0); return; }
@@ -4012,7 +4198,19 @@ function recorridoWeb(id){
 /* ===================== bloqueo: contraseña y Face ID (como una app de banco) ===================== */
 const Bloq = (() => {
   const b64 = a => btoa(String.fromCharCode(...new Uint8Array(a))), deB64 = t => Uint8Array.from(atob(t), c => c.charCodeAt(0));
-  const hash = async (sal, pw) => { let h = new TextEncoder().encode(sal + '|' + pw); for(let i = 0; i < 2000; i++) h = new Uint8Array(await crypto.subtle.digest('SHA-256', h)); return b64(h); };
+  const hash1 = async (sal, pw) => { let h = new TextEncoder().encode(sal + '|' + pw); for(let i = 0; i < 2000; i++) h = new Uint8Array(await crypto.subtle.digest('SHA-256', h)); return b64(h); };
+  /* 13.11.1: PBKDF2 con 150 000 vueltas (antes 2 000 SHA-256): adivinar la contraseña a partir de lo guardado tarda mucho más */
+  const hash = async (sal, pw) => { const k = await crypto.subtle.importKey('raw', new TextEncoder().encode(pw), 'PBKDF2', false, ['deriveBits']);
+    return 'p2:' + b64(await crypto.subtle.deriveBits({name:'PBKDF2', salt:new TextEncoder().encode(sal), iterations:150000, hash:'SHA-256'}, k, 256)); };
+  const comprobar = async pw => { const b = D.bloqueo; if(!b) return false;
+    const h = (b.hash || '').startsWith('p2:') ? await hash(b.sal, pw) : await hash1(b.sal, pw);
+    const ok = h.length === b.hash.length && [...h].reduce((d, ch, k) => d | (ch.charCodeAt(0) ^ b.hash.charCodeAt(k)), 0) === 0;   /* tiempo constante */
+    if(ok && !b.hash.startsWith('p2:')){ b.hash = await hash(b.sal, pw); guardar(); }   /* se pasa al nuevo formato */
+    return ok; };
+  /* límite de intentos: desde el 5.º error seguido hay que esperar 30 s, y el doble en cada error más (hasta 15 min) */
+  const espera = () => Math.max(0, (D.bloqueoHasta || 0) - Date.now());
+  const intento = async pw => { if(espera() > 0) return 'espera'; const ok = await comprobar(pw);
+    D.bloqueoFallos = ok ? 0 : (D.bloqueoFallos || 0) + 1; if(D.bloqueoFallos >= 5) D.bloqueoHasta = Date.now() + Math.min(15 * 60000, 30000 * 2 ** Math.min(5, D.bloqueoFallos - 5)); guardar(); return ok; };
   let abierta = false, ocultaDesde = 0;
   const activo = () => !!(D.bloqueo && D.bloqueo.hash);
   const tapar = x => x ? x.slice(0, Math.min(4, x.includes('@') ? Math.max(1, x.indexOf('@')) : 4)) + '••••••••' : '';
@@ -4041,7 +4239,8 @@ const Bloq = (() => {
       ${D.bloqueo.cred ? `<button class="blHuella" id="blFace" aria-label="Entrar con Face ID"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M9 9v1.5M15 9v1.5M12 9v4h-1M9.5 16c1.5 1 3.5 1 5 0"/></svg></button><div class="gris chico" style="text-align:center;margin-top:6px">Acceder con biometría</div>` : ''}
       <button class="blLink" id="blOlv">¿Olvidaste tu contraseña?</button>`);
     const pw = c.querySelector('#blPw');
-    const entrar = async () => { if(await hash(D.bloqueo.sal, pw.value) === D.bloqueo.hash) cerrar(); else { pw.value = ''; pw.placeholder = 'Contraseña incorrecta'; temblar(pw); } };
+    const entrar = async () => { const r = await intento(pw.value); if(r === true) cerrar(); else { pw.value = ''; const e = espera();
+      pw.placeholder = r === 'espera' || e > 0 ? 'Demasiados intentos. Espera ' + (e >= 60000 ? Math.ceil(e / 60000) + ' min' : Math.ceil(e / 1000) + ' s') : 'Contraseña incorrecta'; temblar(pw); vibrar([60]); } };
     c.querySelector('#blEnt').onclick = entrar; pw.onkeydown = e => { if(e.key === 'Enter') entrar(); };
     if(D.bloqueo.cred){ c.querySelector('#blFace').onclick = entrarConFace; setTimeout(entrarConFace, 500); }
     c.querySelector('#blOlv').onclick = () => { if(navigator.vibrate) navigator.vibrate(15); mostrarRecuperar(); };
@@ -4110,7 +4309,7 @@ const Bloq = (() => {
         <button class="btn borde" style="margin-top:14px" data-act="cerrar">Cerrar</button>`); },
     cambiar(){ cerrarHoja(); mostrarCrear(true); },
     async quitar(){ const pw = prompt('Escribe tu contraseña para quitar el bloqueo'); if(pw === null) return;
-      if(await hash(D.bloqueo.sal, pw) !== D.bloqueo.hash){ aviso('Contraseña incorrecta'); return; } D.bloqueo = null; guardar(); cerrarHoja(); pintar(); aviso('Bloqueo quitado'); }
+      if((await intento(pw)) !== true){ aviso(espera() > 0 ? 'Demasiados intentos. Espera un momento' : 'Contraseña incorrecta'); return; } D.bloqueo = null; guardar(); cerrarHoja(); pintar(); aviso('Bloqueo quitado'); }
   };
 })();
 
