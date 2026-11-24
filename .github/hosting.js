@@ -16,7 +16,13 @@ const sa = JSON.parse(process.env.FIREBASE_SA), SITE = 'mispagos-bb986', API = '
   for (const [loc, ruta] of lista) { const z = zlib.gzipSync(fs.readFileSync(loc), { level: 9 }); const h = crypto.createHash('sha256').update(z).digest('hex'); gz[h] = z; mapa[ruta] = h; }
   const ver = await pedir('POST', `${API}/sites/${SITE}/versions`, { config: {
     redirects: [{ glob: '/', location: '/MisPagos/web/', statusCode: 302 }, { glob: '/MisPagos', location: '/MisPagos/web/', statusCode: 302 }, { glob: '/MisPagos/', location: '/MisPagos/web/', statusCode: 302 }],
-    headers: [{ glob: '/MisPagos/android/descargar', headers: { 'Content-Type': 'application/vnd.android.package-archive', 'Content-Disposition': 'attachment; filename="MisPagos.apk"', 'Cache-Control': 'no-cache' } }, { glob: '**/sw.js', headers: { 'Cache-Control': 'no-cache' } }, { glob: '**/*.html', headers: { 'Cache-Control': 'no-cache' } }, { glob: '**/*.json', headers: { 'Cache-Control': 'no-cache' } }, { glob: '**/super.json', headers: { 'Access-Control-Allow-Origin': '*' } }] } });
+    headers: [
+      // 13.10.5: encabezados de seguridad para todas las páginas (HTTPS obligatorio, sin incrustar la app en otros sitios,
+      // sin adivinar tipos de archivo, sin plugins y referencias mínimas). No limitan los scripts para no romper la app.
+      { glob: '**', headers: { 'Strict-Transport-Security': 'max-age=31536000; includeSubDomains', 'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY',
+        'Referrer-Policy': 'strict-origin-when-cross-origin', 'Permissions-Policy': 'geolocation=(), microphone=(), payment=(), usb=()',
+        'Content-Security-Policy': "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'" } },
+      { glob: '/MisPagos/android/descargar', headers: { 'Content-Type': 'application/vnd.android.package-archive', 'Content-Disposition': 'attachment; filename="MisPagos.apk"', 'Cache-Control': 'no-cache' } }, { glob: '**/sw.js', headers: { 'Cache-Control': 'no-cache' } }, { glob: '**/*.html', headers: { 'Cache-Control': 'no-cache' } }, { glob: '**/*.json', headers: { 'Cache-Control': 'no-cache' } }, { glob: '**/super.json', headers: { 'Access-Control-Allow-Origin': '*' } }] } });
   const pop = await pedir('POST', `${API}/${ver.name}:populateFiles`, { files: mapa });
   for (const h of pop.uploadRequiredHashes || []) await pedir('POST', `${pop.uploadUrl}/${h}`, gz[h], 'application/octet-stream');
   await pedir('PATCH', `${API}/${ver.name}?update_mask=status`, { status: 'FINALIZED' });
